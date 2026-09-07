@@ -172,132 +172,30 @@ function logAttempt(id, chosen, right, ms, pass) {
 }
 const attempts = () => ns('attempt');
 
-/* ============================================================
-   דריל א' — פרק אמיתי של השלמת משפטים
-   4 פריטים, 4:00, ניווט חופשי. זה בדיוק הפרק במבחן.
-   ============================================================ */
-let RUN = null;
-
-async function startSection(kind, count, seconds, title) {
-  const rows = await A.bank(kind);
-  if (!rows || !rows.length) { toast('בנק השאלות לא נטען — התחבר קודם'); return; }
-  const done = attempts();
-  const fresh = rows.filter((r) => !done[itemId(r)]);
-  const pool = fresh.length >= count ? fresh : rows;
-  RUN = {
-    items: shuffle(pool.slice()).slice(0, count),
-    i: 0, answers: {}, firstPass: {}, seconds, left: seconds,
-    title, t0: Date.now(), ended: false,
-  };
-  tick();
-  paintSection();
-}
 const itemId = (r) => r.kind + ':' + r.exam + ':' + r.sec + ':' + r.n;
 
-function tick() {
-  clearInterval(RUN._t);
-  RUN._t = setInterval(() => {
-    if (!RUN || RUN.ended) return clearInterval(RUN._t);
-    RUN.left--;
-    const c = document.querySelector('#clock');
-    if (c) {
-      c.textContent = fmt(RUN.left);
-      c.className = 'clock' + (RUN.left <= 30 ? ' low' : '');
-    }
-    if (RUN.left <= 0) { clearInterval(RUN._t); endSection(); }
-  }, 1000);
-}
-const fmt = (s) => Math.floor(Math.max(0, s) / 60) + ':' + String(Math.max(0, s) % 60).padStart(2, '0');
-
-function paintSection() {
-  const it = RUN.items[RUN.i], id = itemId(it);
-  const c = el('div', 'card');
-  const mid = el('div', 'mid');
-  mid.innerHTML = '<span class="eyebrow">' + esc(RUN.title) + ' · שאלה ' + (RUN.i + 1) + ' מתוך ' + RUN.items.length + '</span>' +
-    '<div class="ex" style="font-size:var(--fs-lg)">' + A.examSentence(it.stem) + '</div>';
-  const box = el('div', 'opts');
-  it.options.forEach((o, k) => {
-    const b = el('button', 'opt' + (RUN.answers[id] === k ? ' pick' : ''),
-      '<span class="num">(' + (k + 1) + ')</span>' + esc(o));
-    b.onclick = () => {
-      if (!(id in RUN.firstPass)) RUN.firstPass[id] = k;   // מה ענית במעבר הראשון
-      RUN.answers[id] = k;
-      paintSection();
-    };
-    box.appendChild(b);
-  });
-  mid.appendChild(box);
-
-  /* ניווט חופשי בין ארבע השאלות — בדיוק מה שהמבחן מתיר, ומה שצריך לאמן. */
-  const acts = el('div', 'acts');
-  const pager = el('div', 'grades');
-  pager.style.gridTemplateColumns = 'repeat(' + RUN.items.length + ',1fr)';
-  RUN.items.forEach((x, k) => {
-    const answered = itemId(x) in RUN.answers;
-    const b = el('button', 'grade' + (k === RUN.i ? ' g3' : ''),
-      (k + 1) + (answered ? '<small>✓</small>' : '<small>—</small>'));
-    b.onclick = () => { RUN.i = k; paintSection(); };
-    pager.appendChild(b);
-  });
-  const fin = el('button', 'btn', 'סיום הפרק');
-  fin.onclick = endSection;
-  const hint = el('div', 'note',
-    'אין צבירת זמן בין פרקים — אם נשאר זמן, כדאי לחזור ולבדוק. ואף פעם אל תשאיר ריק: אין קנס על טעות.');
-  acts.append(pager, fin, hint);
-  c.append(mid, acts);
-
-  const box2 = openMode(c, { i: RUN.i, n: RUN.items.length, right: '', close: () => { RUN.ended = true; clearInterval(RUN._t); RUN = null; A.render(); } }, 'exam');
-  const bar = box2.querySelector('.sbar .cnt');
-  bar.id = 'clock'; bar.className = 'clock'; bar.textContent = fmt(RUN.left);
+/* לוח הקטע בקטע המלא. הפונקציה הזאת נקראה מ-paintRC אבל מעולם לא
+   הוגדרה — כלומר "קטע מלא" זרק ReferenceError בשאלה הראשונה, תמיד.
+   מכאן ואילך: הקטע פתוח בשאלה הראשונה ומקופל אחריה, כי אחרי שקראת
+   אותו פעם אחת הוא רק דוחף את השאלה מתחת לקפל. */
+function passagePanel(text, folded) {
+  const box = el('div', 'passage' + (folded ? ' folded' : ''));
+  box.innerHTML = text.split(/\n{2,}/)
+    .map((t) => '<p>' + esc(t.trim()) + '</p>').join('');
+  const tog = el('button', 'hint', folded ? 'פתח את הקטע' : 'קפל');
+  tog.onclick = () => {
+    const on = box.classList.toggle('folded');
+    tog.textContent = on ? 'פתח את הקטע' : 'קפל';
+  };
+  const wrap = el('div');
+  wrap.style.cssText = 'width:100%;max-width:48ch';
+  wrap.append(box, tog);
+  return wrap;
 }
 
-async function endSection() {
-  RUN.ended = true; clearInterval(RUN._t);
-  await scale();
-  const used = RUN.seconds - RUN.left;
-  let ok = 0, blank = 0, changedGood = 0, changedBad = 0;
-  RUN.items.forEach((it) => {
-    const id = itemId(it), a = RUN.answers[id], fp = RUN.firstPass[id];
-    if (a == null) { blank++; return; }
-    const right = a === it.answer;
-    if (right) ok++;
-    if (fp != null && fp !== a) (right ? changedGood++ : changedBad++);
-    logAttempt(id, a, right, 0, fp === a ? 1 : 2);
-  });
-
-  const c = el('div', 'card');
-  const mid = el('div', 'mid');
-  const est = toScale(ok, RUN.items.length);
-  mid.innerHTML = '<span class="eyebrow">תוצאה</span>' +
-    '<div class="hero"><div class="big">' + ok + '/' + RUN.items.length + '</div>' +
-    (est ? '<div class="cap">קצב של <b>' + est + '</b> בסולם 50–150</div>' : '') +
-    '<div class="cap">' + fmt(used) + ' מתוך ' + fmt(RUN.seconds) + ' נוצלו</div></div>';
-  if (blank) mid.appendChild(el('div', 'note',
-    '<b style="color:var(--bad)">' + blank + ' נשארו ריקות.</b> זה הפסד מיותר — במבחן אין קנס על טעות, ' +
-    'וההוראה הרשמית היא לנחש.'));
-  if (changedGood || changedBad) mid.appendChild(el('div', 'note',
-    'במעבר השני שינית ' + (changedGood + changedBad) + ' תשובות: ' + changedGood + ' לטובה, ' + changedBad + ' לרעה.'));
-
-  const list = el('div', 'sec');
-  RUN.items.forEach((it, k) => {
-    const a = RUN.answers[itemId(it)];
-    const head = el('div', 'sec');
-    head.appendChild(el('span', 'eyebrow',
-      'שאלה ' + (k + 1) + ' · ' + (a == null ? 'לא נענתה' : a === it.answer ? 'נכון' : 'שגוי')));
-    head.appendChild(el('div', 'ex', A.examSentence(it.stem)));
-    head.appendChild(whySC(it, a));
-    list.appendChild(head);
-  });
-  const acts = el('div', 'acts');
-  const again = el('button', 'btn', 'פרק נוסף');
-  again.onclick = () => startSection(RUN.kindUsed || 'sc', RUN.items.length, RUN.seconds, RUN.title);
-  const out = el('button', 'btn ghost sm', 'חזרה');
-  out.onclick = () => { RUN = null; closeStudy(); A.render(); };
-  acts.append(again, out);
-  c.append(mid, list, acts);
-  const b = openMode(c, { i: 1, n: 1, right: '', close: () => { RUN = null; A.render(); } }, 'exam');
-  b.querySelector('.sbar .cnt').textContent = '';
-}
+/* מנוע הפרקים עבר ל-exam.js. הוא היה כאן בגרסה שהכירה סוג פרק אחד;
+   עכשיו הוא מגיש את שלושת הסוגים, סימולציה מלאה ורצף פרקים, ואין טעם
+   בשתי מימושים לאותו דבר. */
 
 /* ============================================================
    דריל ב' — מסגרות מגלות
@@ -817,12 +715,13 @@ function tile(v, title, sub, fn, badge) {
 
 function menu(v) {
   const signed = !!(window.Cloud && window.Cloud.user);
-  v.appendChild(el('span', 'eyebrow', 'תרגול בפורמט המבחן'));
+  v.appendChild(el('span', 'eyebrow', 'תרגולים ממוקדים'));
+  v.appendChild(el('p', 'note',
+    'ארבעה תרגולים שמכוונים לדפוס אחד כל אחד. פרקים שלמים בפורמט המבחן ' +
+    'נמצאים תחת "פרקים".'));
   if (!signed) {
     v.appendChild(el('div', 'note', 'בנק השאלות דורש התחברות — הכפתור למעלה מימין.'));
   }
-  tile(v, 'פרק אמיתי — השלמת משפטים', '4 שאלות · 4:00 · ניווט חופשי. 52% מהניקוד.',
-    () => startSection('sc', 4, 240, 'השלמת משפטים'));
   tile(v, 'מסגרות מגלות', 'שני הדפוסים שמכריעים את השאלה כשהם נוכחים.', startFrames);
   tile(v, 'צייד המלכודות', 'ניסוח מחדש — לבחור נכון, ואז להבין למה השאר שגויים. 26% מהניקוד.',
     startTraps);
@@ -830,14 +729,6 @@ function menu(v) {
     () => startRC('sprint'));
   tile(v, 'קטע מלא', 'קטע אמיתי וחמש שאלות בסדר המבחן.', () => startRC('full'));
 
-  const s = el('div', 'sec');
-  s.appendChild(el('span', 'eyebrow', 'סימולציות רשמיות'));
-  s.appendChild(el('div', 'note',
-    'למאל"ו יש שלוש סימולציות חינם בפורמט אמירנט המלא. הן משלימות את התרגול כאן — ' +
-    'הפורמט האמיתי, כולל האדפטיביות.<br>' +
-    '<a href="https://amirnet-practice.nite.org.il/amirnet.html" target="_blank" rel="noopener" ' +
-    'style="color:var(--accent)">amirnet-practice.nite.org.il</a>'));
-  v.appendChild(s);
 
   const pg = el('button', 'btn ghost');
   pg.style.cssText = 'text-align:right;padding:14px';
@@ -899,7 +790,6 @@ window.AMDrills = {
   menu, play,
   /* משגרים למסך "היום" ולבנק הטעויות — הם מרכיבים משימה מהחלקים האלה
      ולכן צריכים לפתוח אותם ישירות, בלי לעבור דרך התפריט. */
-  section: (kind) => startSection(kind, 4, 240, kind === 'sc' ? 'השלמת משפטים' : 'ניסוח מחדש'),
   traps: startTraps,
   rc: (mode) => startRC(mode),
   blitz: startBlitz,

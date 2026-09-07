@@ -535,3 +535,10 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .trend .tlab { display: flex; justify-content: space-between; gap: 8px;
   font-size: var(--fs-xs); color: var(--dim); margin-top: 2px; }
 .trend .tlab span:nth-child(2) { color: var(--good); }
+
+/* ---- שורת הפרק: שם הפרק והשעון ---- */
+.secbar { display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; width: 100%; max-width: 46ch; }
+.secbar .clock { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-md);
+  font-weight: 600; color: var(--mode, var(--accent)); font-variant-numeric: tabular-nums; }
+.secbar .clock.low { color: var(--bad); }

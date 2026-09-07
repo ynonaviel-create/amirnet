@@ -138,7 +138,12 @@ function saveSoon() {
 }
 function put(n, k, v) {
   ns(n)[k] = v; dirty.add(n); saveSoon();
-  if (window.Cloud && window.Cloud.enabled) window.Cloud.queue(n, k, v);
+  /* הכתיבה המקומית כבר קרתה. תקלה בתור הענן לא אמורה להפיל את הקורא —
+     סגירת פרק כותבת כרטיס אחר כרטיס, ושגיאה באמצע הייתה משאירה חצי
+     מהפרק לא רשום ומסך תקוע. */
+  try {
+    if (window.Cloud && window.Cloud.enabled && window.Cloud.queue) window.Cloud.queue(n, k, v);
+  } catch (e) { /* יסונכרן בהזדמנות הבאה */ }
 }
 const pref = (k, d) => (k in ns('prefs') ? ns('prefs')[k] : d);
 const setPref = (k, v) => put('prefs', k, v);
@@ -272,7 +277,7 @@ function spine() {
 const NAV = [
   ['home',  'בית',    '◧'],
   ['strat', 'אסטרטגיה', '⊘'],
-  ['drill', 'תרגול',  '◆'],
+  ['drill', 'פרקים',  '◆'],
   ['play',  'משחקים', '✦'],
   ['more',  'עוד',    '≡'],
 ];
@@ -282,7 +287,7 @@ function nav() {
   n.hidden = false; n.innerHTML = '';
   /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
      לא מסומנת שם ולא ברור איפה נמצאים. */
-  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' ? 'more' : S.view;
+  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' ? 'more' : S.view === 'focus' ? 'drill' : S.view;
   NAV.forEach(([k, t, ic]) => {
     const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
     b.onclick = () => go(k);
@@ -296,7 +301,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -557,6 +562,10 @@ function viewStrat(v) {
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
 function viewDrill(v) {
+  if (window.AMExam) return window.AMExam.view(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
+function viewFocus(v) {
   if (window.AMDrills) return window.AMDrills.menu(v);
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
