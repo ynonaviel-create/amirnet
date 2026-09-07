@@ -829,7 +829,6 @@ function play(v) {
   tile(v, 'זוגות מבלבלים', 'המילים שהמבחן מציב זו לצד זו בכוונה.', startPairs);
   tile(v, 'בליץ 90', 'תשעים שניות. לתור בסופר.', startBlitz,
     pref('blitzBest', 0) ? 'שיא ' + pref('blitzBest', 0) : '');
-  printBlock(v);
 }
 
 /* ---------- התקדמות ---------- */
@@ -887,62 +886,6 @@ async function progressBlock(v) {
 }
 
 /* ---------- הדפסה לשבת ופיוס ---------- */
-function printBlock(v) {
-  const s = el('div', 'sec');
-  s.appendChild(el('span', 'eyebrow', 'חבילת הדפסה לשבת'));
-
-  /* איזה ימים סגורים בטווח הקרוב — משם נגזר מה להדפיס. */
-  const days = [];
-  for (let i = 0; i < 10; i++) { const d = addDays(today(), i); if (A.isOff(d)) days.push(d); }
-  const upto = days.length ? days[days.length - 1] : addDays(today(), 2);
-  const cs = ns('cards'), due = [];
-  for (const w in cs) if (cs[w].d && cs[w].d <= upto) due.push(w);
-
-  s.appendChild(el('div', 'note', days.length
-    ? 'הימים הסגורים הקרובים: ' + days.map(heDate).join(' · ') + '. ' +
-      '<b>' + due.length + '</b> מילים יגיעו לפירעון עד אז.'
-    : 'אין ימים סגורים בעשרה הימים הקרובים.'));
-
-  const p1 = el('button', 'btn ghost', 'גיליון לימוד · ' + due.length + ' מילים');
-  p1.onclick = () => printSheet(due);
-  s.appendChild(p1);
-
-  const batch = ns('print');
-  const open = Object.keys(batch).filter((k) => !batch[k].reconciled);
-  if (open.length) {
-    const b = el('button', 'btn', 'סמן מה זכרת · ' + (batch[open[0]].words || []).length + ' מילים');
-    b.onclick = () => reconcile(open[0]);
-    s.appendChild(b);
-    s.appendChild(el('div', 'note',
-      'בלי הסימון הזה התזמון נשבר — המערכת לא יודעת מה קרה בשבת. שלושים שניות לכל הדף.'));
-  }
-  v.appendChild(s);
-}
-
-function printSheet(words) {
-  if (!words.length) { toast('אין מילים לפירעון'); return; }
-  const id = 'p' + Date.now();
-  put('print', id, { words, layout: 'study', at: Date.now(), reconciled: 0 });
-  const sheet = el('div', 'sheet');
-  sheet.innerHTML = '<h1>אמירנט — ' + heDate(today()) + ' · ' + words.length + ' מילים</h1>';
-  words.forEach((w) => {
-    const o = S.words.get(w) || { w };
-    const row = el('div', 'row');
-    row.innerHTML = '<div class="box"></div>' +
-      '<div class="w">' + esc(w) + '</div>' +
-      '<div><div class="m">' + esc(o.def || '') + ' — ' + esc(o.he || '') + '</div>' +
-      '<div class="a">' + esc(A.assoc(w) || '') + '</div></div>';
-    sheet.appendChild(row);
-  });
-  const view = document.querySelector('#view');
-  view.innerHTML = '';
-  view.appendChild(sheet);
-  const back = el('button', 'btn ghost', 'חזרה');
-  back.onclick = () => A.render();
-  view.appendChild(back);
-  setTimeout(() => window.print(), 250);
-}
-
 function reconcile(id) {
   const b = ns('print')[id];
   const words = b.words || [];
@@ -990,6 +933,7 @@ window.AMDrills = {
   rc: (mode) => startRC(mode),
   blitz: startBlitz,
   itemId,
+  reconcile,
 };
 if (A.S.ready) A.render();
 

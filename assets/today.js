@@ -173,6 +173,26 @@ function home(v) {
     go: () => window.AMStrat.elim('sc', 8),
   });
 
+  /* הדפסה נכנסת למשימה רק כשיש יום סגור קרוב ואין אצווה שממתינה לפיוס —
+     אחרת היא רעש. */
+  const soonOff = (() => {
+    for (let i = 1; i <= 3; i++) { const d = addDays(today(), i); if (isOff(d)) return d; }
+    return null;
+  })();
+  const openBatch = Object.keys(ns('print')).filter((k) => !ns('print')[k].reconciled);
+  if (openBatch.length) M.unshift({
+    title: 'סמן מה זכרת', mode: 'read', time: '1 דק\'',
+    why: 'הדפסת דף ולא סימנת. בלי זה התזמון לא יודע מה קרה בשבת, ו‑<b>' +
+         (ns('print')[openBatch[0]].words || []).length + '</b> מילים יחזרו כאילו לא נגעת בהן.',
+    go: () => window.AMDrills.reconcile(openBatch[0]),
+  });
+  else if (soonOff) M.push({
+    title: 'הכן דף לשבת', mode: 'read', time: '2 דק\'',
+    why: '<b>' + A.heDate(soonOff) + '</b> הוא יום סגור. שלוש פריסות: גיליון לימוד, ' +
+         'כרטיסיות מתקפלות או דף תרגול עם מפתח.',
+    go: () => A.go('print'),
+  });
+
   if (stuck.length >= 5 && M.length < 4) M.push({
     title: 'מילים תקועות', mode: 'read',
     time: mmss(Math.min(stuck.length, 12) * 25 / 60),

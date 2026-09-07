@@ -254,22 +254,112 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* ---------- הדפסה ----------
    דף לשבת. שחור על לבן, בלי רקעים ובלי צללים — דיו עולה כסף והרקעים
    של המסך הופכים לאפור מלוכלך. */
+/* ================= הדפסה =================
+   הפריסות נבנות כרצף עמודים ולא כזרם אחד. על המסך העמוד הוא דף לבן עם
+   צל, וגם במצב כהה — נייר הוא נייר. בהדפסה אותו מבנה בדיוק, ולכן
+   התצוגה המקדימה היא ספירה ולא הערכה. */
+
+/* --- בוררים --- */
+.pick {
+  display: block; width: 100%; text-align: right; cursor: pointer;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 11px 13px; margin-bottom: 6px; font: inherit;
+}
+.pick.on { border-color: var(--accent); background: var(--accent-sl); }
+.pick.off { opacity: .5; }
+.pick .pt { display: flex; align-items: baseline; gap: 8px; font-weight: 600; font-size: var(--fs-md); }
+.pick .pt .cnt { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm);
+  font-weight: 600; color: var(--accent); margin-inline-start: auto; }
+.pick .pd { display: block; font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
+.pick.multi .pt::before {
+  content: "\2610"; font-family: "IBM Plex Mono", monospace; color: var(--dim);
+}
+.pick.multi.on .pt::before { content: "\2611"; color: var(--accent); }
+
+.tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.tally > div { background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px; text-align: center; }
+.tally b { display: block; font-family: "IBM Plex Mono", monospace;
+  font-size: var(--fs-lg); font-weight: 600; }
+.tally span { font-size: var(--fs-xs); color: var(--muted); }
+
+.picklist { display: flex; flex-direction: column; gap: 5px; width: 100%;
+  max-width: 46ch; max-height: 48vh; overflow-y: auto; margin-top: 8px; }
+
+/* --- העמוד --- */
+/* העמוד תמיד 210×297 מ"מ, גם על המסך. הקנה מידה נעשה ב-transform ולא
+   בהקטנת התיבה — אחרת הגופנים, שנקובים במילימטרים, היו נשארים בגודלם
+   בתוך תיבה קטנה יותר, ומדידת מספר השורות לעמוד הייתה משקרת. כך
+   התצוגה המקדימה היא מודל נאמן של הדף שייצא. */
+.sheet { display: flex; flex-direction: column; gap: 18px; align-items: center; --k: 1; }
+.pageframe {
+  width: 100%; max-width: 210mm; aspect-ratio: 210 / 297; overflow: hidden;
+  border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 12px 32px -20px rgba(0,0,0,.5);
+  background: #fff;
+}
+.page {
+  background: #fff; color: #14161a;
+  width: 210mm; height: 297mm; padding: 14mm 13mm;
+  overflow: hidden; font-size: 3.1mm; line-height: 1.45;
+  transform: scale(var(--k)); transform-origin: top right;
+}
+.page .phead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: .6pt solid #14161a; padding-bottom: 2mm; margin-bottom: 3.5mm;
+  font-weight: 700; font-size: 3.6mm;
+}
+.page .phead .ps { font-weight: 400; font-size: 2.7mm; color: #5b616a; }
+
+.page .prow {
+  display: grid; grid-template-columns: 6mm 32mm 1fr; gap: 3mm;
+  padding: 1.9mm 0; border-bottom: .3pt solid #c9ccd1; break-inside: avoid;
+}
+.page .prow .box { width: 4mm; height: 4mm; border: .6pt solid #14161a; margin-top: .8mm; }
+.page .prow .w { font-family: "Newsreader", Georgia, serif; direction: ltr;
+  font-size: 3.6mm; font-weight: 500; }
+.page .prow .m { font-size: 3mm; }
+.page .prow .a { font-size: 2.8mm; color: #4a5058; margin-top: .4mm; }
+
+/* כרטיסיות: החצי התחתון מסובב, כדי שאחרי קיפול לאחור הוא ייקרא נכון */
+.page .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0; height: 100%; }
+/* מסגרת מלאה = קו גזירה, מקווקו = קו קיפול. ההוראה בראש העמוד מסתמכת
+   על ההבחנה הזאת. */
+.page .fcard { border: .5pt solid #14161a; display: grid;
+  grid-template-rows: 1fr 0 1fr; break-inside: avoid; }
+.page .fcard .face { display: grid; place-items: center; padding: 2mm; text-align: center; }
+.page .fcard .fold { border-top: .5pt dashed #14161a; }
+.page .fcard .back { transform: rotate(180deg); }
+.page .fcard .fw { font-family: "Newsreader", Georgia, serif; direction: ltr;
+  font-size: 5.2mm; font-weight: 500; }
+.page .fcard .fm { font-size: 3mm; line-height: 1.35; }
+
+/* דף תרגול */
+.page .q { break-inside: avoid; padding: 2mm 0 2.4mm; border-bottom: .3pt solid #d6d9de; }
+.page .q .qs { font-family: "Newsreader", Georgia, serif; direction: ltr;
+  font-size: 3.4mm; line-height: 1.5; }
+.page .q .qs b { font-family: "IBM Plex Mono", monospace; font-size: 2.9mm; }
+.page .q .blank { display: inline-block; width: 22mm; border-bottom: .6pt solid #14161a; }
+.page .q .qo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm;
+  direction: ltr; font-family: "Newsreader", Georgia, serif; font-size: 3.1mm; margin-top: 1.4mm; }
+.page .q .qo i { font-style: normal; font-family: "IBM Plex Mono", monospace;
+  font-size: 2.6mm; color: #5b616a; }
+.page .keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6mm 5mm;
+  direction: ltr; font-family: "Newsreader", Georgia, serif; font-size: 3.2mm; }
+.page .keys b { font-family: "IBM Plex Mono", monospace; font-size: 2.9mm; }
+
 @media print {
-  .topbar, .nav, .toast, .btn, .hints, #layer { display: none !important; }
-  body { background: #fff; color: #000; font-size: 11pt; }
+  .topbar, .nav, .toast, .btn, .hints, .sec, #layer, #spine { display: none !important; }
+  body { background: #fff; color: #000; }
   .wrap { max-width: none; padding: 0; }
-  @page { margin: 15mm; }
-  .sheet { display: block; }
-  .sheet h1 { font-size: 15pt; margin: 0 0 3mm; }
-  .sheet .row {
-    display: grid; grid-template-columns: 8mm 34mm 1fr; gap: 3mm;
-    padding: 2.2mm 0; border-bottom: .3pt solid #bbb; break-inside: avoid;
-  }
-  .sheet .box { width: 4.5mm; height: 4.5mm; border: .6pt solid #000; margin-top: 1mm; }
-  .sheet .w { font-family: "Newsreader", Georgia, serif; font-size: 12.5pt; direction: ltr; }
-  .sheet .m { font-size: 10pt; }
-  .sheet .a { font-size: 9.5pt; color: #333; }
-  .sheet .pagebreak { break-before: page; }
+  /* השוליים שייכים לעמוד עצמו ולא ל-@page, ולכן המסך וההדפסה מודדים
+     בדיוק את אותה תיבה. */
+  @page { margin: 0; size: A4; }
+  .sheet { display: block; gap: 0; --k: 1; }
+  .pageframe { max-width: none; width: auto; aspect-ratio: auto;
+    overflow: visible; box-shadow: none; border-radius: 0; break-after: page; }
+  .pageframe:last-child { break-after: auto; }
+  .page { transform: none; }
 }
 
 /* ===== זהות צבע לפי מצב =====
