@@ -1,0 +1,5 @@
+.DS_Store
+.claude/settings.local.json
+
+# תוכן של מאל"ו — נשאר מקומי, נטען למסד מאחורי התחברות
+data-private/
