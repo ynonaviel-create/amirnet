@@ -271,3 +271,74 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
   .sheet .a { font-size: 9.5pt; color: #333; }
   .sheet .pagebreak { break-before: page; }
 }
+
+/* ===== זהות צבע לפי מצב =====
+   משטח הלימוד רגוע בכוונה — שם צריך ריכוז. המשחקים מקבלים צבע, כי משחק
+   שנראה כמו מבחן לא ירגיש כמו משחק. כל מצב מקבל --mode משלו והמשטח
+   מושך ממנו. */
+.study { --mode: var(--accent); --mode-bg: var(--accent-sl); }
+.study.m-exam  { --mode:#3d6bb3; --mode-bg:#e6edf9; }
+.study.m-frame { --mode:#b07d1a; --mode-bg:#fbf1dc; }
+.study.m-trap  { --mode:#b8452f; --mode-bg:#fbe8e3; }
+.study.m-read  { --mode:#6a4b9c; --mode-bg:#efeafa; }
+.study.m-quad  { --mode:#0d8b84; --mode-bg:#dff2f0; }
+.study.m-tower { --mode:#c2185b; --mode-bg:#fce4ec; }
+.study.m-pair  { --mode:#1a7f6b; --mode-bg:#ddf2ec; }
+:root[data-theme="dark"] .study.m-exam  { --mode-bg:#131f33; }
+:root[data-theme="dark"] .study.m-frame { --mode-bg:#2b2312; }
+:root[data-theme="dark"] .study.m-trap  { --mode-bg:#2e1712; }
+:root[data-theme="dark"] .study.m-read  { --mode-bg:#221a33; }
+:root[data-theme="dark"] .study.m-quad  { --mode-bg:#0f2b28; }
+:root[data-theme="dark"] .study.m-tower { --mode-bg:#2e1220; }
+:root[data-theme="dark"] .study.m-pair  { --mode-bg:#0d2a24; }
+
+.study .sbar { background: var(--mode-bg); border-bottom-color: transparent; }
+.study .sbar .prog i { background: var(--mode); }
+.study .eyebrow { color: var(--mode); }
+.study .opt.pick { border-color: var(--mode); background: var(--mode-bg); }
+.study .grade.on { border-color: var(--mode); background: var(--mode-bg); color: var(--mode); }
+.study .btn { background: var(--mode); }
+.study .btn.ghost { background: none; color: var(--mode); border-color: var(--mode); }
+
+/* כותרת מצב — נותנת לכל מסך זהות במקום עוד רשימה */
+.hero { background: var(--mode-bg); border-radius: var(--radius); padding: 16px; width: 100%;
+        max-width: 46ch; text-align: center; }
+.hero .big { font-family:"IBM Plex Mono",monospace; font-size: var(--fs-2xl); font-weight:500;
+             color: var(--mode); line-height:1.05; font-variant-numeric: tabular-nums; }
+.hero .cap { font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
+
+/* ===== ההסבר — הדבר שבאמת מלמד ===== */
+.why { width:100%; max-width:46ch; text-align:right; margin-top:4px; }
+.why h4 { margin:0 0 6px; font-size:var(--fs-sm); font-weight:700; color:var(--mode);
+          letter-spacing:.04em; }
+.opt-row { display:grid; grid-template-columns:22px 1fr; gap:8px; padding:8px 0;
+           border-top:1px solid var(--line); align-items:start; }
+.opt-row:first-of-type { border-top:0; }
+.opt-row .mk { font-family:"IBM Plex Mono",monospace; font-size:var(--fs-sm); color:var(--dim); }
+.opt-row.ok  .mk { color:var(--good); }
+.opt-row.no  .mk { color:var(--bad); }
+.opt-row .en { font-family:"Newsreader",Georgia,serif; direction:ltr; font-size:var(--fs-md); }
+.opt-row.ok .en { font-weight:500; }
+.opt-row .gl { font-size:var(--fs-sm); color:var(--muted); }
+.opt-row .gl b { color:var(--text); font-weight:600; }
+.opt-row.dim { opacity:.62; }
+
+/* הבדל מילולי בין המקור למסיח — "למה זה שגוי" בלי לכתוב 232 הסברים ביד */
+.diff ins { text-decoration:none; background:var(--good-bg); color:var(--good);
+            border-radius:3px; padding:0 2px; font-weight:600; }
+.diff del { text-decoration:line-through; background:var(--bad-bg); color:var(--bad);
+            border-radius:3px; padding:0 2px; }
+
+/* הקטע נשאר על המסך לאורך כל השאלות */
+.passage { width:100%; max-width:48ch; max-height:34vh; overflow:auto;
+           background:var(--surface-solid); border:1px solid var(--line);
+           border-radius:var(--radius-sm); padding:12px 14px; direction:ltr; text-align:left;
+           font-family:"Newsreader",Georgia,serif; font-size:var(--fs-base); line-height:1.55; }
+.passage .pn { color:var(--dim); font-size:var(--fs-xs); }
+.passage.folded { max-height:78px; }
+.fold { font-size:var(--fs-sm); color:var(--mode); padding:6px 2px; }
+
+/* קומבו במשחקי קצב */
+.combo { font-family:"IBM Plex Mono",monospace; font-weight:500; color:var(--mode); }
+.pop { animation: pop .28s ease-out; }
+@keyframes pop { 0%{transform:scale(.82);opacity:.4} 100%{transform:scale(1);opacity:1} }

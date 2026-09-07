@@ -15,6 +15,96 @@ const A = window.AM;
 const { el, esc, shuffle, toast, openStudy, closeStudy, today, addDays, between,
         heDate, ns, put, pref, setPref, bump, day, streak, card, S } = A;
 
+
+/* ---------- משטח עם זהות צבע ---------- */
+function openMode(cardEl, opts, mode) {
+  const box = openStudy(cardEl, opts);
+  box.className = 'study m-' + mode;
+  return box;
+}
+
+/* ============================================================
+   ההסבר
+   ============================================================
+   בלי זה התרגול הוא בדיקה ולא לימוד. אין כאן הסבר שנכתב ביד לכל אחד
+   מ-1,273 הפריטים; יש הסבר שנבנה מהנתונים שכבר קיימים, ולכן הוא מכסה
+   את כולם: המשפט השלם עם התשובה במקומה, ארבע האפשרויות עם המשמעות של
+   כל אחת, והמסגרת הלוגית כשהיא נוכחת. */
+
+function glossRow(word, mark, cls) {
+  const o = S.words.get(String(word).toLowerCase().trim());
+  const gl = o && (o.def || o.he)
+    ? '<div class="gl">' + (o.def ? esc(o.def) : '') +
+      (o.he ? ' — <b>' + esc(o.he) + '</b>' : '') + '</div>'
+    : '<div class="gl dim">—</div>';
+  return '<div class="opt-row ' + cls + '">' +
+    '<div class="mk">' + mark + '</div>' +
+    '<div><div class="en">' + esc(word) + '</div>' + gl + '</div></div>';
+}
+
+function whySC(it, chosen) {
+  const box = el('div', 'why');
+  let h = '';
+  if (it.full) {
+    h += '<h4>המשפט השלם</h4><div class="ex">' +
+      A.highlightWord(it.full, it.options[it.answer]) + '</div>';
+  }
+  const f = frameOf(it.stem);
+  if (f) {
+    h += '<div class="note">' + (f === 'definition'
+      ? '<b>המשפט מגדיר את עצמו.</b> הפסוקית או האפוזיציה אומרות מה המילה החסרה — ' +
+        'זו אחת משתי המסגרות היחידות שמכריעות את השאלה כשהן נוכחות.'
+      : '<b>יש כאן היפוך.</b> המילה החסרה חייבת להיות בקוטביות ההפוכה מהחצי השני של המשפט.') +
+      '</div>';
+  }
+  h += '<h4>ארבע האפשרויות</h4>';
+  it.options.forEach((o, k) => {
+    h += glossRow(o, k === it.answer ? '✓' : (k === chosen ? '✗' : (k + 1)),
+      k === it.answer ? 'ok' : k === chosen ? 'no' : 'dim');
+  });
+  box.innerHTML = h;
+  return box;
+}
+
+/* ההבדל בין המקור למסיח, מסומן מילה-מילה. במקום לכתוב 232 הסברים ביד,
+   מראים בדיוק מה המסיח הוסיף שלא היה במקור — וזו בפועל המלכודת השכיחה
+   ביותר בפרק הזה (עובדה שלא נאמרה, 29%). */
+const STOPW = new Set(('a an the of in on at to for and or but is are was were be been by with '
+  + 'that this these those it its as from has have had not no than then so such which who whose '
+  + 'their his her they he she we you i there').split(' '));
+const stemOf = (w) => w.toLowerCase().replace(/[^a-z]/g, '').replace(/(ing|ed|es|s|ly)$/, '');
+
+function diffAgainst(src, txt) {
+  const base = new Set(src.split(/\s+/).map(stemOf).filter(Boolean));
+  return txt.split(/(\s+)/).map((tok) => {
+    if (!tok.trim()) return tok;
+    const k = stemOf(tok);
+    if (!k || k.length < 3 || STOPW.has(tok.toLowerCase().replace(/[^a-z]/g, ''))) return esc(tok);
+    return base.has(k) ? esc(tok) : '<ins>' + esc(tok) + '</ins>';
+  }).join('');
+}
+
+function whyRS(it, chosen) {
+  const box = el('div', 'why');
+  let h = '<h4>מה השתנה מול המקור</h4>' +
+    '<div class="note">מסומן מה שהמסיח <b>הוסיף</b> ולא היה במשפט המקורי. ' +
+    'המלכודת השכיחה בפרק הזה היא בדיוק זו — עובדה שלא נאמרה, 29% מהמסיחים.</div>';
+  it.options.forEach((o, k) => {
+    const mark = k === it.answer ? '✓' : (k === chosen ? '✗' : (k + 1));
+    const cls = k === it.answer ? 'ok' : k === chosen ? 'no' : 'dim';
+    h += '<div class="opt-row ' + cls + '"><div class="mk">' + mark + '</div>' +
+      '<div class="en diff" style="font-size:var(--fs-base)">' + diffAgainst(it.stem, o) + '</div></div>';
+  });
+  const lens = it.options.map((x) => x.split(/\s+/).length);
+  const shortest = lens.indexOf(Math.min(...lens));
+  h += '<div class="note">' + (shortest === it.answer
+    ? 'כאן דווקא הקצרה הייתה נכונה — זה קורה ב‑14% מהפריטים.'
+    : '<b>הקצרה ביותר</b> הייתה אפשרות ' + (shortest + 1) + ', והיא לא הנכונה. ' +
+      'זה נכון ב‑86% מהמקרים — היוריסטיקת החיסול היחידה שעמדה במבחן סטטיסטי.') + '</div>';
+  box.innerHTML = h;
+  return box;
+}
+
 /* ---------- תיוג פריטים ----------
    נגזר מהטקסט ולא נשמר, כדי שלא יהיה מקור אמת שני שיכול להתיישן. */
 
@@ -144,7 +234,7 @@ function paintSection() {
   acts.append(pager, fin, hint);
   c.append(mid, acts);
 
-  const box2 = openStudy(c, { i: RUN.i, n: RUN.items.length, right: '', close: () => { RUN.ended = true; clearInterval(RUN._t); RUN = null; A.render(); } });
+  const box2 = openMode(c, { i: RUN.i, n: RUN.items.length, right: '', close: () => { RUN.ended = true; clearInterval(RUN._t); RUN = null; A.render(); } }, 'exam');
   const bar = box2.querySelector('.sbar .cnt');
   bar.id = 'clock'; bar.className = 'clock'; bar.textContent = fmt(RUN.left);
 }
@@ -167,9 +257,9 @@ async function endSection() {
   const mid = el('div', 'mid');
   const est = toScale(ok, RUN.items.length);
   mid.innerHTML = '<span class="eyebrow">תוצאה</span>' +
-    '<div class="head-en">' + ok + '/' + RUN.items.length + '</div>' +
-    (est ? '<div class="he">קצב של ' + est + ' בסולם</div>' : '') +
-    '<div class="tiny dim">' + fmt(used) + ' מתוך ' + fmt(RUN.seconds) + ' נוצלו</div>';
+    '<div class="hero"><div class="big">' + ok + '/' + RUN.items.length + '</div>' +
+    (est ? '<div class="cap">קצב של <b>' + est + '</b> בסולם 50–150</div>' : '') +
+    '<div class="cap">' + fmt(used) + ' מתוך ' + fmt(RUN.seconds) + ' נוצלו</div></div>';
   if (blank) mid.appendChild(el('div', 'note',
     '<b style="color:var(--bad)">' + blank + ' נשארו ריקות.</b> זה הפסד מיותר — במבחן אין קנס על טעות, ' +
     'וההוראה הרשמית היא לנחש.'));
@@ -179,16 +269,12 @@ async function endSection() {
   const list = el('div', 'sec');
   RUN.items.forEach((it, k) => {
     const a = RUN.answers[itemId(it)];
-    const right = a === it.answer;
-    const item = el('div', 'item');
-    item.innerHTML =
-      '<div class="b" style="direction:ltr;text-align:left">' +
-      '<b>' + (k + 1) + '.</b> ' + A.examSentence(it.stem) +
-      '<br><span style="color:var(--good)">✓ ' + esc(it.options[it.answer]) + '</span>' +
-      (a != null && !right ? '<br><span style="color:var(--bad)">✗ ' + esc(it.options[a]) + '</span>' : '') +
-      (a == null ? '<br><span style="color:var(--warn)">— לא נענתה</span>' : '') +
-      '</div>';
-    list.appendChild(item);
+    const head = el('div', 'sec');
+    head.appendChild(el('span', 'eyebrow',
+      'שאלה ' + (k + 1) + ' · ' + (a == null ? 'לא נענתה' : a === it.answer ? 'נכון' : 'שגוי')));
+    head.appendChild(el('div', 'ex', A.examSentence(it.stem)));
+    head.appendChild(whySC(it, a));
+    list.appendChild(head);
   });
   const acts = el('div', 'acts');
   const again = el('button', 'btn', 'פרק נוסף');
@@ -197,7 +283,7 @@ async function endSection() {
   out.onclick = () => { RUN = null; closeStudy(); A.render(); };
   acts.append(again, out);
   c.append(mid, list, acts);
-  const b = openStudy(c, { i: 1, n: 1, right: '', close: () => { RUN = null; A.render(); } });
+  const b = openMode(c, { i: 1, n: 1, right: '', close: () => { RUN = null; A.render(); } }, 'exam');
   b.querySelector('.sbar .cnt').textContent = '';
 }
 
@@ -224,7 +310,7 @@ function paintFrame() {
     const a = el('div', 'acts'); const b = el('button', 'btn', 'חזרה');
     b.onclick = () => { FR = null; closeStudy(); A.render(); };
     a.appendChild(b); c.appendChild(a);
-    openStudy(c, { i: 1, n: 1, right: '', close: () => { FR = null; A.render(); } });
+    openMode(c, { i: 1, n: 1, right: '', close: () => { FR = null; A.render(); } }, 'frame');
     return;
   }
   const it = FR.q[FR.i], f = frameOf(it.stem);
@@ -243,12 +329,7 @@ function paintFrame() {
       : 'יש כאן היפוך. המילה החסרה חייבת להיות בקוטביות ההפוכה מהחצי השני של המשפט.';
     mid.appendChild(el('div', 'note',
       (right ? '<b style="color:var(--good)">נכון.</b> ' : '<b style="color:var(--bad)">לא.</b> ') + why));
-    const box = el('div', 'opts');
-    it.options.forEach((o, k) => {
-      box.appendChild(el('div', 'opt' + (k === it.answer ? ' right' : ''),
-        '<span class="num">(' + (k + 1) + ')</span>' + esc(o)));
-    });
-    mid.appendChild(box);
+    mid.appendChild(whySC(it, -1));
     const nx = el('button', 'btn', 'הבא');
     nx.onclick = () => { FR.i++; paintFrame(); };
     acts.appendChild(nx);
@@ -258,7 +339,7 @@ function paintFrame() {
   });
   acts.appendChild(g);
   c.append(mid, acts);
-  openStudy(c, { i: FR.i, n: FR.q.length, right: '', close: () => { FR = null; A.render(); } });
+  openMode(c, { i: FR.i, n: FR.q.length, right: '', close: () => { FR = null; A.render(); } }, 'frame');
 }
 
 /* ============================================================
@@ -290,7 +371,7 @@ function paintTrap() {
     const a = el('div', 'acts'); const b = el('button', 'btn', 'חזרה');
     b.onclick = () => { TR = null; closeStudy(); A.render(); };
     a.appendChild(b); c.appendChild(a);
-    openStudy(c, { i: 1, n: 1, right: '', close: () => { TR = null; A.render(); } });
+    openMode(c, { i: 1, n: 1, right: '', close: () => { TR = null; A.render(); } }, 'trap');
     return;
   }
   const it = TR.q[TR.i];
@@ -311,31 +392,24 @@ function paintTrap() {
       Array.from(box.children).forEach((n, j) => {
         n.className = 'opt' + (j === it.answer ? ' right' : j === k ? ' wrong' : '');
       });
-      /* ההיוריסטיקה היחידה שעברה מובהקות: התשובה כמעט אף פעם אינה הקצרה. */
-      const lens = it.options.map((x) => x.split(/\s+/).length);
-      const shortest = lens.indexOf(Math.min(...lens));
       acts.innerHTML = '';
-      acts.appendChild(el('div', 'note', shortest === it.answer
-        ? 'שים לב: כאן דווקא הקצרה הייתה נכונה. זה קורה ב‑14% מהפריטים.'
-        : '<b>הקצרה ביותר</b> הייתה אפשרות ' + (shortest + 1) + ' — ולא היא הנכונה. ' +
-          'זה נכון ב‑86% מהפריטים, וזו היוריסטיקת החיסול היחידה שעמדה במבחן סטטיסטי.'));
-      /* תיוג המלכודות: העיבוד העמוק הוא כאן, לא בבחירה. */
-      const lab = el('div', 'sec');
-      lab.appendChild(el('span', 'eyebrow', 'למה כל מסיח שגוי?'));
+      acts.appendChild(whyRS(it, k));
+      /* התיוג הוא העיבוד העמוק: לבחור נכון זו בדיקה, לנמק זה לימוד. */
+      const lab = el('div', 'why');
+      lab.appendChild(el('h4', '', 'תייג את המלכודת בכל מסיח'));
       it.options.forEach((o, j) => {
         if (j === it.answer) return;
-        const row = el('div', 'item');
-        row.innerHTML = '<div class="b" style="direction:ltr;text-align:left">' + esc(o) + '</div>';
+        const row = el('div', 'opt-row');
+        row.innerHTML = '<div class="mk">' + (j + 1) + '</div>';
         const sel = el('select', 't');
-        sel.style.maxWidth = '150px';
         sel.innerHTML = '<option value="">— בחר —</option>' +
           TRAPS.map(([k2, he]) => '<option value="' + k2 + '">' + he + '</option>').join('');
         sel.onchange = () => {
           const t = TRAPS.find((x) => x[0] === sel.value);
-          if (t) { put('attempt', itemId(it) + ':trap' + j, { t: t[0], at: Date.now() });
-                   sel.insertAdjacentHTML('afterend', ''); toast(t[2]); }
+          if (t) { put('attempt', itemId(it) + ':trap' + j, { t: t[0], at: Date.now() }); toast(t[2]); }
         };
-        row.appendChild(sel);
+        const cell = el('div'); cell.appendChild(sel);
+        row.appendChild(cell);
         lab.appendChild(row);
       });
       acts.appendChild(lab);
@@ -347,7 +421,7 @@ function paintTrap() {
   });
   mid.appendChild(box);
   c.append(mid, acts);
-  openStudy(c, { i: TR.i, n: TR.q.length, right: '', close: () => { TR = null; A.render(); } });
+  openMode(c, { i: TR.i, n: TR.q.length, right: '', close: () => { TR = null; A.render(); } }, 'trap');
 }
 
 /* ============================================================
@@ -382,31 +456,50 @@ function paraOf(text, stem) {
   return i == null ? null : parts[Math.min(i, parts.length - 1)];
 }
 
+/* הקטע נשאר על המסך לאורך כל חמש השאלות. בגרסה הקודמת הוא הוצג רק
+   בשאלה הראשונה ואז נעלם — ואי אפשר לענות על שאלת הבנת נקרא בלי הטקסט. */
+function passagePanel(text, folded) {
+  const box = el('div', 'passage' + (folded ? ' folded' : ''));
+  box.innerHTML = esc(text).replace(/\((\d{1,2})\)/g, '<span class="pn">$1</span>');
+  const btn = el('button', 'fold', folded ? 'הצג את הקטע המלא' : 'כווץ את הקטע');
+  btn.onclick = () => {
+    const now = box.classList.toggle('folded');
+    btn.textContent = now ? 'הצג את הקטע המלא' : 'כווץ את הקטע';
+    if (!now) box.scrollTop = 0;
+  };
+  const wrap = el('div');
+  wrap.style.cssText = 'width:100%;display:flex;flex-direction:column;align-items:center';
+  wrap.append(box, btn);
+  return wrap;
+}
+
 function paintRC() {
   if (RC.i >= RC.q.length) {
     const c = el('div', 'card');
     c.innerHTML = '<div class="mid"><span class="eyebrow">סיימת</span>' +
-      '<div class="head-en">' + RC.ok + '/' + RC.q.length + '</div>' +
-      '<div class="he">הבנת הנקרא</div></div>';
-    const a = el('div', 'acts'); const b = el('button', 'btn', 'חזרה');
+      '<div class="hero"><div class="big">' + RC.ok + '/' + RC.q.length + '</div>' +
+      '<div class="cap">הבנת הנקרא</div></div></div>';
+    const a = el('div', 'acts');
+    const again = el('button', 'btn', RC.mode === 'sprint' ? 'עוד ספרינט' : 'קטע נוסף');
+    again.onclick = () => startRC(RC.mode);
+    const b = el('button', 'btn ghost sm', 'חזרה');
     b.onclick = () => { RC = null; closeStudy(); A.render(); };
-    a.appendChild(b); c.appendChild(a);
-    openStudy(c, { i: 1, n: 1, right: '', close: () => { RC = null; A.render(); } });
+    a.append(again, b); c.appendChild(a);
+    openMode(c, { i: 1, n: 1, right: '', close: () => { RC = null; A.render(); } }, 'read');
     return;
   }
   const q = RC.q[RC.i], t = rcType(q.stem);
   const p = RC.mode === 'sprint' ? RC.ps[q.passage] : RC.passage;
   const c = el('div', 'card');
   const mid = el('div', 'mid');
-  let head = '<span class="eyebrow">' + esc(t.he) + ' · ' + (RC.i + 1) + '/' + RC.q.length + '</span>';
+
+  mid.appendChild(el('span', 'eyebrow', t.he + ' · שאלה ' + (RC.i + 1) + ' מתוך ' + RC.q.length));
   if (RC.mode === 'sprint') {
-    const para = paraOf(p.text, q.stem);
-    head += '<div class="ex">' + esc(para || p.text) + '</div>';
-  } else if (RC.i === 0) {
-    head += '<div class="ex" style="max-height:38vh;overflow:auto">' + esc(p.text) + '</div>';
+    mid.appendChild(el('div', 'passage', esc(paraOf(p.text, q.stem) || p.text)));
+  } else {
+    mid.appendChild(passagePanel(p.text, RC.i > 0));
   }
-  head += '<div class="def" style="font-size:var(--fs-md)">' + esc(q.stem) + '</div>';
-  mid.innerHTML = head;
+  mid.appendChild(el('div', 'def', esc(q.stem)));
 
   const box = el('div', 'opts');
   const acts = el('div', 'acts');
@@ -422,13 +515,15 @@ function paintRC() {
         n.className = 'opt' + (j === q.answer ? ' right' : j === k ? ' wrong' : '');
       });
       acts.innerHTML = '';
-      acts.appendChild(el('div', 'note', '<b>מתכון התבנית:</b> ' + esc(RECIPE[t.k])));
-      if (RC.mode !== 'sprint' && !RC.textShown) {
-        const s = el('button', 'btn ghost sm', 'הצג שוב את הקטע');
-        s.onclick = () => { s.remove(); mid.insertAdjacentHTML('afterbegin', '<div class="ex" style="max-height:34vh;overflow:auto">' + esc(p.text) + '</div>'); };
-        acts.appendChild(s);
-      }
-      const nx = el('button', 'btn', 'הבא');
+      const why = el('div', 'why');
+      why.innerHTML = '<h4>' + esc(t.he) + ' — איך תוקפים</h4>' +
+        '<div class="note">' + esc(RECIPE[t.k]) + '</div>';
+      const ord = q.stem.match(/(first|second|third|fourth|fifth|last) paragraph/i);
+      if (ord) why.innerHTML += '<div class="note">התשובה נמצאת ב<b>פסקה ה' +
+        ({ first: 'ראשונה', second: 'שנייה', third: 'שלישית', fourth: 'רביעית',
+           fifth: 'חמישית', last: 'אחרונה' }[ord[1].toLowerCase()]) + '</b>. חזור אליה ואמת.</div>';
+      acts.appendChild(why);
+      const nx = el('button', 'btn', RC.i + 1 >= RC.q.length ? 'סיום' : 'הבא');
       nx.onclick = () => { RC.i++; paintRC(); };
       acts.appendChild(nx);
     };
@@ -440,7 +535,7 @@ function paintRC() {
       'השאלות עוקבות אחרי סדר הקטע ב‑92% מהמקרים. סרוק מלמעלה למטה פעם אחת ואל תקפוץ אחורה.'));
   }
   c.append(mid, acts);
-  openStudy(c, { i: RC.i, n: RC.q.length, right: '', close: () => { RC = null; A.render(); } });
+  openMode(c, { i: RC.i, n: RC.q.length, right: '', close: () => { RC = null; A.render(); } }, 'read');
 }
 
 /* ============================================================
@@ -468,7 +563,7 @@ function towerRound() {
     const out = el('button', 'btn ghost sm', 'חזרה');
     out.onclick = () => { TW = null; closeStudy(); A.render(); };
     a.append(again, out); c.appendChild(a);
-    openStudy(c, { i: 1, n: 1, right: '', close: () => { TW = null; A.render(); } });
+    openMode(c, { i: 1, n: 1, right: '', close: () => { TW = null; A.render(); } }, 'tower');
     return;
   }
   const target = TW.pool[(Math.random() * TW.pool.length) | 0];
@@ -504,7 +599,7 @@ function towerRound() {
   });
   mid.appendChild(box);
   c.appendChild(mid);
-  openStudy(c, { i: 1, n: 1, right: 'שיא ' + TW.best, close: () => { clearInterval(TW._t); TW = null; A.render(); } });
+  openMode(c, { i: 1, n: 1, right: 'שיא ' + TW.best, close: () => { clearInterval(TW._t); TW = null; A.render(); } }, 'tower');
   const t0 = Date.now();
   TW._t = setInterval(() => {
     const left = 1 - (Date.now() - t0) / TW.speed;
@@ -558,7 +653,7 @@ function paintPairs() {
     out.onclick = () => { PR = null; closeStudy(); A.render(); };
     a.append(again, out); c.appendChild(a);
   }
-  openStudy(c, { i: done, n: PR.pairsN, right: '', close: () => { PR = null; A.render(); } });
+  openMode(c, { i: done, n: PR.pairsN, right: '', close: () => { PR = null; A.render(); } }, 'pair');
 }
 function flip(i) {
   PR.open.push(i);
@@ -635,7 +730,7 @@ function paintQuads() {
     acts.appendChild(go);
   }
   c.append(mid, acts);
-  openStudy(c, { i: QD.solved.length, n: QD.groups.length, right: '', close: () => { QD = null; A.render(); } });
+  openMode(c, { i: QD.solved.length, n: QD.groups.length, right: '', close: () => { QD = null; A.render(); } }, 'quad');
 }
 
 /* --- בליץ 90: מיקרו-סשן לתור בסופר --- */

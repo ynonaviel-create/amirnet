@@ -770,7 +770,7 @@ window.AM = {
   el, esc, clamp, shuffle, toast, render, go, openStudy, closeStudy,
   today, addDays, between, heDate, iso, isOff, isShabbat, isHalf, studyDaysLeft,
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
-  S, dueList, newList, meaning, examSentence,
+  S, dueList, newList, meaning, examSentence, highlightWord: highlight, blankWord,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;
