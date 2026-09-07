@@ -342,3 +342,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .combo { font-family:"IBM Plex Mono",monospace; font-weight:500; color:var(--mode); }
 .pop { animation: pop .28s ease-out; }
 @keyframes pop { 0%{transform:scale(.82);opacity:.4} 100%{transform:scale(1);opacity:1} }
+
+/* פסקאות אמיתיות בקטע הקריאה */
+.passage p { margin: 0 0 .7em; }
+.passage p:last-child { margin-bottom: 0; }

@@ -129,7 +129,10 @@ function ns(n) {
 function saveSoon() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    dirty.forEach((n) => { try { localStorage.setItem(KEY[n], JSON.stringify(cache[n])); } catch (e) {} });
+    dirty.forEach((n) => {
+      if (!cache[n]) return;            // המטמון הופל בין הכתיבה לטיימר
+      try { localStorage.setItem(KEY[n], JSON.stringify(cache[n])); } catch (e) {}
+    });
     dirty.clear();
   }, 400);
 }
@@ -140,7 +143,21 @@ function put(n, k, v) {
 const pref = (k, d) => (k in ns('prefs') ? ns('prefs')[k] : d);
 const setPref = (k, v) => put('prefs', k, v);
 
+/* מיזוג מהענן מפיל את המטמון כדי לקרוא מחדש מ-localStorage. חובה לשטוף
+   קודם: בלי זה כתיבה שנעשתה ב-400 המילישניות האחרונות נשארת בתור ה-dirty,
+   הטיימר יורה על מטמון שכבר נמחק, JSON.stringify(undefined) מחזיר undefined,
+   ו-localStorage שומר את המחרוזת "undefined" — כלומר כל מרחב הכרטיסים נמחק. */
+function flushNow() {
+  clearTimeout(saveTimer);
+  dirty.forEach((n) => {
+    if (!cache[n]) return;
+    try { localStorage.setItem(KEY[n], JSON.stringify(cache[n])); } catch (e) {}
+  });
+  dirty.clear();
+}
+
 document.addEventListener('cloud:merged', () => {
+  flushNow();
   Object.keys(cache).forEach((k) => delete cache[k]);
   S.exam = pref('exam', EXAM_DEFAULT);
   render();
@@ -781,9 +798,8 @@ window.AM = {
   },
 };
 
-window.addEventListener('pagehide', () => {
-  dirty.forEach((n) => { try { localStorage.setItem(KEY[n], JSON.stringify(cache[n])); } catch (e) {} });
-});
+window.addEventListener('pagehide', flushNow);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushNow(); });
 
 boot();
 

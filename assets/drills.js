@@ -1,8 +1,8 @@
 /* ================= אמירנט — תרגול בפורמט המבחן =================
 
-   ארבעה דרילים, אחד לכל מקור נקודות לפי משקלו: השלמת משפטים 12/19,
-   ניסוח מחדש 6/19, הבנת הנקרא 5/19. וכן שלושה משחקים, הדפסה לשבת
-   ומסך התקדמות.
+   ארבעה דרילים, אחד לכל מקור נקודות לפי משקלו. הבחינה סופרת 23 שאלות
+   (4+4 השלמת משפטים · 5 הבנת הנקרא · 3+3 ניסוח מחדש · 4 השלמת משפטים):
+   השלמת משפטים 12/23, ניסוח מחדש 6/23, הבנת הנקרא 5/23.
 
    כל פריט כאן הוא שאלה אמיתית ממבחן עבר עם התשובה הרשמית. הפריטים
    מגיעים מהמסד ולא מהקוד — ראה README.
@@ -100,7 +100,7 @@ function whyRS(it, chosen) {
   h += '<div class="note">' + (shortest === it.answer
     ? 'כאן דווקא הקצרה הייתה נכונה — זה קורה ב‑14% מהפריטים.'
     : '<b>הקצרה ביותר</b> הייתה אפשרות ' + (shortest + 1) + ', והיא לא הנכונה. ' +
-      'זה נכון ב‑86% מהמקרים — היוריסטיקת החיסול היחידה שעמדה במבחן סטטיסטי.') + '</div>';
+      'זה נכון ב‑86% מהפריטים בבנק — היוריסטיקת החיסול היחידה שעמדה במבחן סטטיסטי.') + '</div>';
   box.innerHTML = h;
   return box;
 }
@@ -445,32 +445,21 @@ async function startRC(mode) {
   }
   paintRC();
 }
-/* הפסקה שהשאלה מדברת עליה — כדי שספרינט "מטרת הפסקה" יראה רק אותה. */
+/* הפסקה שהשאלה מדברת עליה. הקטעים נושאים עכשיו גבולות פסקה אמיתיים
+   (\n\n) שחולצו מה-PDF; בגרסה הקודמת החלוקה נעשתה לפי הסוגריים שבטקסט,
+   שהם **מספרי שורה** ולא סימני פסקה, ולכן כל פריט בספרינט הציג חלון
+   טקסט שמתחיל באמצע משפט. */
 const ORD = { first: 0, second: 1, third: 2, fourth: 3, fifth: 4 };
+function paras(text) {
+  return text.split(/\n{2,}/).map((x) => x.trim()).filter((x) => x.length > 40);
+}
 function paraOf(text, stem) {
-  const m = stem.match(/main purpose of the (\w+) paragraph/i);
-  const parts = text.split(/\s*\(\d+\)\s*/).filter((x) => x.trim().length > 40);
-  if (!m || !parts.length) return null;
+  const m = stem.match(/(first|second|third|fourth|fifth|last) paragraph/i);
+  const parts = paras(text);
+  if (!m || parts.length < 2) return null;
   const key = m[1].toLowerCase();
   const i = key === 'last' ? parts.length - 1 : ORD[key];
-  return i == null ? null : parts[Math.min(i, parts.length - 1)];
-}
-
-/* הקטע נשאר על המסך לאורך כל חמש השאלות. בגרסה הקודמת הוא הוצג רק
-   בשאלה הראשונה ואז נעלם — ואי אפשר לענות על שאלת הבנת נקרא בלי הטקסט. */
-function passagePanel(text, folded) {
-  const box = el('div', 'passage' + (folded ? ' folded' : ''));
-  box.innerHTML = esc(text).replace(/\((\d{1,2})\)/g, '<span class="pn">$1</span>');
-  const btn = el('button', 'fold', folded ? 'הצג את הקטע המלא' : 'כווץ את הקטע');
-  btn.onclick = () => {
-    const now = box.classList.toggle('folded');
-    btn.textContent = now ? 'הצג את הקטע המלא' : 'כווץ את הקטע';
-    if (!now) box.scrollTop = 0;
-  };
-  const wrap = el('div');
-  wrap.style.cssText = 'width:100%;display:flex;flex-direction:column;align-items:center';
-  wrap.append(box, btn);
-  return wrap;
+  return i == null || i >= parts.length ? null : parts[i];
 }
 
 function paintRC() {
@@ -813,10 +802,10 @@ function menu(v) {
   if (!signed) {
     v.appendChild(el('div', 'note', 'בנק השאלות דורש התחברות — הכפתור למעלה מימין.'));
   }
-  tile(v, 'פרק אמיתי — השלמת משפטים', '4 שאלות · 4:00 · ניווט חופשי. 63% מהניקוד.',
+  tile(v, 'פרק אמיתי — השלמת משפטים', '4 שאלות · 4:00 · ניווט חופשי. 52% מהניקוד.',
     () => startSection('sc', 4, 240, 'השלמת משפטים'));
   tile(v, 'מסגרות מגלות', 'שני הדפוסים שמכריעים את השאלה כשהם נוכחים.', startFrames);
-  tile(v, 'צייד המלכודות', 'ניסוח מחדש — לבחור נכון, ואז להבין למה השאר שגויים. 32% מהניקוד.',
+  tile(v, 'צייד המלכודות', 'ניסוח מחדש — לבחור נכון, ואז להבין למה השאר שגויים. 26% מהניקוד.',
     startTraps);
   tile(v, 'ספרינט מטרת הפסקה', 'התבנית הבודדת הגדולה ביותר בהבנת הנקרא — 20% מהשאלות.',
     () => startRC('sprint'));
@@ -860,7 +849,8 @@ async function progressBlock(v) {
     if (!by[kind]) return;
     by[kind][1]++; if (at[k].ok) by[kind][0]++;
   });
-  /* משקלים לפי מבנה הבחינה: 12 השלמת משפטים, 6 ניסוח מחדש, 5 הבנת הנקרא. */
+  /* משקלים לפי מבנה הבחינה: 23 שאלות נספרות — 12 השלמת משפטים,
+     6 ניסוח מחדש, 5 הבנת הנקרא. */
   const Wt = { sc: 12, rs: 6, rc: 5 };
   let num = 0, den = 0;
   Object.keys(Wt).forEach((k) => { if (by[k][1]) { num += by[k][0] / by[k][1] * Wt[k]; den += Wt[k]; } });

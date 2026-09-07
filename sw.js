@@ -1,11 +1,11 @@
 /* אופליין: cache-first לקליפה ולנתונים, ורשת-תחילה לכלום — האתר סטטי,
    ועדכון מגיע בהחלפת גרסת המטמון. */
-const V = 'amirnet-2af06eab';
+const V = 'amirnet-e7eabd83';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './assets/style.css', './assets/tokens.css', './assets/components.css',
   './assets/app.js', './assets/drills.js', './assets/cloud.js', './assets/vendor/supabase.js',
-  './data/words.json',
+  './data/words.json', './data/quads.json', './data/pairs.json', './data/scale.json',
 ];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(V).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
