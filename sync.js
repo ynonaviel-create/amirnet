@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* sync.js — מאחד את קובצי המשמעות לתוך data/words.json ובודק תקינות.
    מריצים לפני כל דחיפה:  node sync.js  */
-const fs = require('fs'), path = require('path');
+const fs = require('fs'), path = require('path'), crypto = require('crypto');
 
 const words = JSON.parse(fs.readFileSync('data/words.json', 'utf8'));
 const byWord = new Map(words.map((w) => [w.w, w]));
@@ -38,6 +38,15 @@ for (const [file, lo, hi] of (fs.existsSync(BANK) ? [['sc', 1, 8], ['rs', 9, 12]
 }
 
 fs.writeFileSync('data/words.json', JSON.stringify(words));
+
+/* חתימת גרסה. בלי זה ה-Service Worker ממשיך להגיש את הקליפה הישנה מהמטמון
+   ועדכון פשוט לא מגיע למשתמש — תקלה שקטה שקשה לאבחן אחר כך. */
+const stamp = crypto.createHash('sha1').update(
+  ['assets/app.js', 'assets/cloud.js', 'assets/style.css', 'index.html', 'data/words.json']
+    .map((f) => fs.readFileSync(f)).join('')
+).digest('hex').slice(0, 8);
+fs.writeFileSync('sw.js', fs.readFileSync('sw.js', 'utf8').replace(/const V = '[^']*'/, `const V = 'amirnet-${stamp}'`));
+console.log('גרסת מטמון:', stamp);
 const withDef = words.filter((w) => w.def).length;
 console.log(`מילים במאגר: ${words.length} · עם משמעות: ${withDef} (${Math.round(withDef / words.length * 100)}%)`);
 if (unknown.length) console.log(`מילים שלא במאגר (${unknown.length}): ${unknown.slice(0, 12).join(', ')}`);

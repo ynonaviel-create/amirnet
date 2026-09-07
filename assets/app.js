@@ -674,38 +674,56 @@ document.addEventListener('cloud:user', () => { if (S.ready) loadSentences(); })
    הקבצים נבחרים מהדיסק ונכתבים למסד. ה-RLS מתיר את זה לבעלים בלבד. */
 function seedUI(v) {
   const C = window.Cloud;
-  if (!C || !C.enabled || !C.user) return;
   const sec = el('div', 'sec');
   sec.appendChild(el('span', 'eyebrow', 'בנק השאלות'));
+
+  /* אבחון במקום כישלון שקט: אם משהו חוסם, שיהיה כתוב מה. */
+  if (!C || !C.enabled) {
+    sec.appendChild(el('div', 'note', 'הענן כבוי בעותק הזה. פתח את האתר בכתובת האמיתית.'));
+    v.appendChild(sec); return;
+  }
+  if (!C.user) {
+    sec.appendChild(el('div', 'note', 'צריך להתחבר קודם — הכפתור למעלה מימין.'));
+    v.appendChild(sec); return;
+  }
+
   const have = S.sent.size;
-  sec.appendChild(el('p', 'note', have
-    ? 'הבנק טעון — ' + have + ' משפטי מבחן זמינים.'
-    : 'הבנק עדיין ריק. בחר את הקבצים מתוך <b>data-private</b> כדי לטעון אותם פעם אחת.'));
-  const inp = el('input'); inp.type = 'file'; inp.multiple = true; inp.accept = '.json';
+  sec.appendChild(el('div', 'note',
+    'מחובר כ‑<b>' + esc(C.user.email || '—') + '</b>.<br>' +
+    (have ? 'הבנק טעון: ' + have + ' משפטי מבחן זמינים.'
+          : 'הבנק ריק. בחר את חמשת הקבצים מתוך <b>data-private</b>.')));
+
+  const inp = el('input');
+  inp.type = 'file'; inp.multiple = true; inp.accept = 'application/json,.json';
   inp.className = 't';
   const out = el('div', 'note');
+  const line = (html) => { const d = el('div', '', html); out.appendChild(d); return d; };
+
   const go = el('button', 'btn ghost', 'העלה למסד');
   go.onclick = async () => {
-    if (!inp.files.length) { toast('בחר קבצים'); return; }
-    go.disabled = true;
+    if (!inp.files.length) { toast('לא נבחרו קבצים'); return; }
+    go.disabled = true; out.innerHTML = '';
     const KIND = { 'sc.json': 'sc', 'rs.json': 'rs', 'rc.json': 'rc',
                    'passages.json': 'passage', 'sentences.json': 'sentence' };
     for (const f of inp.files) {
       const kind = KIND[f.name];
-      if (!kind) { out.innerHTML += '<br>' + esc(f.name) + ' — שם לא מוכר, דילגתי'; continue; }
+      if (!kind) { line('· ' + esc(f.name) + ' — שם לא מוכר, דילגתי'); continue; }
+      const row = line('· ' + esc(f.name) + ' — קורא…');
       try {
         const rows = JSON.parse(await f.text());
-        out.innerHTML += '<br>' + esc(f.name) + ' — מעלה ' + rows.length + '…';
+        if (!Array.isArray(rows)) throw new Error('הקובץ אינו רשימה');
         const r = await C.seedBank(kind, rows, (n, tot) => {
-          out.lastChild.textContent = '';
+          row.innerHTML = '· ' + esc(f.name) + ' — ' + n + '/' + tot;
         });
-        out.innerHTML += r.ok ? ' הועלו ' + r.n : ' נכשל: ' + esc(r.reason);
+        row.innerHTML = r.ok
+          ? '· ' + esc(f.name) + ' — ✅ ' + r.n
+          : '· ' + esc(f.name) + ' — ❌ ' + esc(r.reason);
       } catch (e) {
-        out.innerHTML += '<br>' + esc(f.name) + ' — שגיאה: ' + esc(String(e.message || e));
+        row.innerHTML = '· ' + esc(f.name) + ' — ❌ ' + esc(String((e && e.message) || e));
       }
     }
     go.disabled = false;
-    loadSentences();
+    await loadSentences();
   };
   sec.append(inp, go, out);
   v.appendChild(sec);
