@@ -253,10 +253,10 @@ function spine() {
 }
 
 const NAV = [
-  ['home',  'בית',      '◧'],
-  ['drill', 'תרגול',    '◆'],
-  ['lab',   'אסוציאציות', '✦'],
-  ['more',  'עוד',      '≡'],
+  ['home',  'בית',    '◧'],
+  ['drill', 'תרגול',  '◆'],
+  ['play',  'משחקים', '✦'],
+  ['more',  'עוד',    '≡'],
 ];
 function nav() {
   const n = $('#nav');
@@ -275,7 +275,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, drill: viewDrill, lab: viewLab, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, drill: viewDrill, play: viewPlay, lab: viewLab, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -371,7 +371,7 @@ function paintTriage() {
   acts.appendChild(g);
   if (sentOf(w)) {
     const peek = el('button', 'btn ghost sm', 'הצג את המשפט שבו הופיעה');
-    peek.onclick = () => { peek.remove(); mid.appendChild(el('div', 'ex', examSentence(sentOf(w)))); };
+    peek.onclick = () => { peek.remove(); mid.appendChild(el('div', 'ex', highlight(sentOf(w), w))); };
     acts.appendChild(peek);
   }
   c.append(mid, acts);
@@ -398,6 +398,10 @@ function openStudy(cardEl, o) {
 function closeStudy() { const b = $('#study'); if (b) b.remove(); }
 
 const examSentence = (s) => esc(s).replace(/_{2,}/g, '<b>______</b>');
+function blankWord(sent, w) {
+  const re = new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\w*', 'i');
+  return esc(sent).replace(re, '<b>______</b>');
+}
 function highlight(sent, w) {
   const re = new RegExp('\\b(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\w*)', 'i');
   return esc(sent).replace(re, '<b>$1</b>');
@@ -407,7 +411,7 @@ function meaning(o, withEx) {
     (o.def ? '<div class="def">' + esc(o.def) + '</div>' : '') +
     (o.syn && o.syn.length ? '<div class="syn">' + o.syn.map(esc).join('  ·  ') + '</div>' : '') +
     (o.he ? '<div class="he">' + esc(o.he) + '</div>' : '') +
-    (withEx && sentOf(o.w) ? '<div class="ex"><span class="ex-lab">seen in a real exam</span>' + examSentence(sentOf(o.w)) + '</div>' : '');
+    (withEx && sentOf(o.w) ? '<div class="ex"><span class="ex-lab">from a real exam</span>' + highlight(sentOf(o.w), o.w) + '</div>' : '');
 }
 
 /* ---------- תרגול אוצר מילים ---------- */
@@ -488,7 +492,8 @@ function cardRecall(w) {
   bA.disabled = !a; bE.disabled = !sentOf(w);
   bA.onclick = () => { SESS.usedAssoc = true; bA.disabled = true;
     zone.appendChild(el('div', 'assoc', '<span class="eyebrow">האסוציאציה שלך</span>' + esc(a))); };
-  bE.onclick = () => { bE.disabled = true; zone.appendChild(el('div', 'ex', examSentence(sentOf(w)))); };
+  /* ברמז מסתירים את המילה עצמה, אחרת הרמז הוא התשובה */
+  bE.onclick = () => { bE.disabled = true; zone.appendChild(el('div', 'ex', blankWord(sentOf(w), w))); };
   ladder.append(bA, bE);
 
   const show = el('button', 'btn', 'הצג תשובה');
@@ -592,9 +597,14 @@ function viewLab(v) {
 
 /* ---------- placeholders עד שהדרילים ייבנו ---------- */
 function viewDrill(v) {
-  v.appendChild(el('span', 'eyebrow', 'תרגול בפורמט המבחן'));
-  v.appendChild(el('div', 'empty', 'בבנייה — פרק אמיתי, מסגרות מגלות, צייד המלכודות ותבניות הבנת הנקרא.'));
+  if (window.AMDrills) return window.AMDrills.menu(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
 }
+function viewPlay(v) {
+  if (window.AMDrills) return window.AMDrills.play(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
+
 function viewMore(v) {
   const s = el('div', 'sec');
   s.appendChild(el('span', 'eyebrow', 'כיול'));
@@ -752,6 +762,24 @@ async function boot() {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }
+
+/* ---------- מה שהחלק השני של האפליקציה צריך ----------
+   drills.js נשען על אותם כלים ואותו אחסון; שכפול שלהם היה מייצר שני
+   מקורות אמת למצב הלומד. */
+window.AM = {
+  el, esc, clamp, shuffle, toast, render, go, openStudy, closeStudy,
+  today, addDays, between, heDate, iso, isOff, isShabbat, isHalf, studyDaysLeft,
+  ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
+  S, dueList, newList, meaning, examSentence,
+  async bank(kind) {
+    if (S.bank[kind]) return S.bank[kind];
+    const C = window.Cloud;
+    if (!C || !C.enabled || !C.user) return null;
+    const rows = await C.bank(kind);
+    S.bank[kind] = rows || [];
+    return S.bank[kind];
+  },
+};
 
 window.addEventListener('pagehide', () => {
   dirty.forEach((n) => { try { localStorage.setItem(KEY[n], JSON.stringify(cache[n])); } catch (e) {} });
