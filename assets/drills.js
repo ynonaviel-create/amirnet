@@ -66,9 +66,10 @@ function whySC(it, chosen) {
   return box;
 }
 
-/* ההבדל בין המקור למסיח, מסומן מילה-מילה. במקום לכתוב 232 הסברים ביד,
-   מראים בדיוק מה המסיח הוסיף שלא היה במקור — וזו בפועל המלכודת השכיחה
-   ביותר בפרק הזה (עובדה שלא נאמרה, 29%). */
+/* ההבדל בין המקור לכל אפשרות, מסומן מילה-מילה. במקור זה נכתב כאילו
+   הסימון חושף את המסיח; המדידה הפריכה את זה — התשובה הנכונה מכניסה
+   יותר מילים חדשות מהמסיח (4.96 מול 4.34 בממוצע). הסימון נשאר כי הוא
+   מראה איפה כל אפשרות נפרדת מהמקור, אבל הוא כלי השוואה ולא מחוון. */
 const STOPW = new Set(('a an the of in on at to for and or but is are was were be been by with '
   + 'that this these those it its as from has have had not no than then so such which who whose '
   + 'their his her they he she we you i there').split(' '));
@@ -86,21 +87,32 @@ function diffAgainst(src, txt) {
 
 function whyRS(it, chosen) {
   const box = el('div', 'why');
-  let h = '<h4>מה השתנה מול המקור</h4>' +
-    '<div class="note">מסומן מה שהמסיח <b>הוסיף</b> ולא היה במשפט המקורי. ' +
-    'המלכודת השכיחה בפרק הזה היא בדיוק זו — עובדה שלא נאמרה, 29% מהמסיחים.</div>';
+
+  /* ההסבר הקודם כאן טען שהמסיח הוא זה ש"מוסיף מה שלא נאמר". מדדתי, וזה
+     הפוך: התשובה הנכונה מכניסה בממוצע 4.96 מילות תוכן חדשות מול 4.34
+     במסיח, והיא בעלת המספר הגבוה ביותר ב-45.5% מהפריטים — כמעט כפול
+     מהמקרה. ניסוח מחדש הוא בהגדרה ניסוח באחרות, ולכן "נשמע אחרת" הוא
+     סימן לפרפרזה אמיתית ולא למלכודת. */
+  let h = '<h4>מה כל אפשרות מנסחת אחרת</h4>' +
+    '<div class="note">מסומן מה שאין במשפט המקורי. <b>שים לב שהתשובה הנכונה ' +
+    'בדרך כלל מסומנת הכי הרבה</b> — היא בעלת מספר המילים החדשות הגבוה ביותר ' +
+    'ב-45.5% מהפריטים במאגר, לעומת 25% במקרה. "היא אומרת את זה במילים אחרות" ' +
+    'הוא לא נימוק לפסילה; זו בדיוק העבודה של ניסוח מחדש.</div>';
+
   it.options.forEach((o, k) => {
     const mark = k === it.answer ? '✓' : (k === chosen ? '✗' : (k + 1));
     const cls = k === it.answer ? 'ok' : k === chosen ? 'no' : 'dim';
     h += '<div class="opt-row ' + cls + '"><div class="mk">' + mark + '</div>' +
       '<div class="en diff" style="font-size:var(--fs-base)">' + diffAgainst(it.stem, o) + '</div></div>';
   });
-  const lens = it.options.map((x) => x.split(/\s+/).length);
-  const shortest = lens.indexOf(Math.min(...lens));
-  h += '<div class="note">' + (shortest === it.answer
-    ? 'כאן דווקא הקצרה הייתה נכונה — זה קורה ב‑14% מהפריטים.'
-    : '<b>הקצרה ביותר</b> הייתה אפשרות ' + (shortest + 1) + ', והיא לא הנכונה. ' +
-      'זה נכון ב‑86% מהפריטים בבנק — היוריסטיקת החיסול היחידה שעמדה במבחן סטטיסטי.') + '</div>';
+
+  h += '<h4>מה כן מכריע</h4>' +
+    '<div class="note">שאלה אחת: האם האפשרות נושאת את <b>אותה עובדה</b> — מי, ' +
+    'עשה מה, למי, מתי. מסיח משנה פרט אחד בשלד הזה, לא את אוצר המילים.</div>';
+
+  const tip = window.AMStrat && window.AMStrat.ruleFor(Object.assign({ kind: 'rs' }, it));
+  if (tip) h += '<h4>הכלל הנמדד שחל כאן</h4><div class="note">' + tip + '</div>';
+
   box.innerHTML = h;
   return box;
 }
@@ -344,8 +356,15 @@ function paintFrame() {
 
 /* ============================================================
    דריל ג' — צייד המלכודות (ניסוח מחדש)
-   בוחרים נכון, ואז מתייגים למה כל מסיח שגוי. הטקסונומיה מהניתוח של
-   232 הפריטים; ההיוריסטיקה "לעולם לא הקצרה ביותר" נבדקת על הפריט עצמו.
+   בוחרים נכון, ואז מתייגים למה כל מסיח שגוי.
+
+   התיוג הוא שלך ולא שלי, וזה מכוון. בניתי חמישה מזהים אוטומטיים
+   לטקסונומיה הזאת ומדדתי אותם על 693 המסיחים: כולם נורים על התשובה
+   הנכונה באותו שיעור כמו על המסיח (יחס 0.63 עד 1.00). כלומר אי אפשר
+   לזהות את סוג המלכודת מהמאפיינים הגלויים, ותווית שהייתי מדביק כאן
+   הייתה מלמדת רעש בביטחון מלא. מה שכן עובד הוא שתנסח בעצמך למה
+   המסיח שגוי — העיבוד הזה הוא הלימוד, והתוויות שלך מרכיבות את מפת
+   המלכודות במסך ההתקדמות.
    ============================================================ */
 const TRAPS = [
   ['added',    'עובדה שלא נאמרה', 'מוסיף סיבה, מניע או תוצאה שאין במקור'],
@@ -819,7 +838,13 @@ function menu(v) {
     '<a href="https://amirnet-practice.nite.org.il/amirnet.html" target="_blank" rel="noopener" ' +
     'style="color:var(--accent)">amirnet-practice.nite.org.il</a>'));
   v.appendChild(s);
-  progressBlock(v);
+
+  const pg = el('button', 'btn ghost');
+  pg.style.cssText = 'text-align:right;padding:14px';
+  pg.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">התקדמות</div>' +
+    '<div class="tiny muted" style="font-weight:400;margin-top:2px">אומדן ציון מול 134, מגמה, ודיוק לפי פרק.</div>';
+  pg.onclick = () => A.go('prog');
+  v.appendChild(pg);
 }
 
 function play(v) {
@@ -829,60 +854,6 @@ function play(v) {
   tile(v, 'זוגות מבלבלים', 'המילים שהמבחן מציב זו לצד זו בכוונה.', startPairs);
   tile(v, 'בליץ 90', 'תשעים שניות. לתור בסופר.', startBlitz,
     pref('blitzBest', 0) ? 'שיא ' + pref('blitzBest', 0) : '');
-}
-
-/* ---------- התקדמות ---------- */
-async function progressBlock(v) {
-  await scale();
-  const at = attempts();
-  const ids = Object.keys(at).filter((k) => !k.includes(':trap'));
-  const s = el('div', 'sec');
-  s.appendChild(el('span', 'eyebrow', 'האם אני בקצב ל-134?'));
-  if (!ids.length) {
-    s.appendChild(el('div', 'note', 'עוד לא ענית על שאלות מבחן. אחרי פרק אחד יופיע כאן אומדן.'));
-    v.appendChild(s); return;
-  }
-  const by = { sc: [0, 0], rs: [0, 0], rc: [0, 0] };
-  ids.forEach((k) => {
-    const kind = k.split(':')[0];
-    if (!by[kind]) return;
-    by[kind][1]++; if (at[k].ok) by[kind][0]++;
-  });
-  /* משקלים לפי מבנה הבחינה: 23 שאלות נספרות — 12 השלמת משפטים,
-     6 ניסוח מחדש, 5 הבנת הנקרא. */
-  const Wt = { sc: 12, rs: 6, rc: 5 };
-  let num = 0, den = 0;
-  Object.keys(Wt).forEach((k) => { if (by[k][1]) { num += by[k][0] / by[k][1] * Wt[k]; den += Wt[k]; } });
-  const acc = den ? num / den : 0;
-  const est = SCALE ? SCALE[Math.max(0, Math.min(44, Math.round(acc * 44)))] : null;
-  const lo = SCALE ? SCALE[Math.max(0, Math.round(acc * 44) - 3)] : null;
-  const hi = SCALE ? SCALE[Math.min(44, Math.round(acc * 44) + 3)] : null;
-
-  if (est) {
-    s.appendChild(el('div', 'figs',
-      '<div class="fig"><span class="n">' + lo + '–' + hi + '</span><span class="k">טווח משוער</span></div>' +
-      '<div class="fig ' + (est >= 134 ? 'new' : 'due') + '"><span class="n">' + est + '</span><span class="k">אמצע</span></div>' +
-      '<div class="fig"><span class="n">' + ids.length + '</span><span class="k">שאלות</span></div>'));
-    s.appendChild(el('div', 'note',
-      est >= 134
-        ? '<b style="color:var(--good)">אתה מעל סף הפטור בתרגול.</b> שמור על זה והרחב את מספר השאלות.'
-        : 'צריך עוד <b>' + Math.max(1, Math.round((0.855 - acc) * 44)) + '</b> תשובות נכונות מתוך 44 ' +
-          'כדי לחצות את 134. הזולות ביותר נמצאות בהשלמת משפטים.'));
-  }
-  const rows = el('div', 'sec');
-  [['sc', 'השלמת משפטים', 12], ['rs', 'ניסוח מחדש', 6], ['rc', 'הבנת הנקרא', 5]].forEach(([k, he, w]) => {
-    if (!by[k][1]) return;
-    const pct = Math.round(by[k][0] / by[k][1] * 100);
-    const row = el('div', 'item');
-    row.innerHTML = '<div class="b"><b>' + esc(he) + '</b> · ' + w + ' שאלות במבחן</div>' +
-      '<div class="pill ' + (pct >= 85 ? 'good' : 'bad') + '">' + pct + '%</div>';
-    rows.appendChild(row);
-  });
-  s.appendChild(rows);
-  s.appendChild(el('div', 'note',
-    'האומדן מבוסס על טבלת המעבר הרשמית מציון גלם לסולם 50–150. הוא מתאר את הרמה שלך על ' +
-    'פריטים אמיתיים; אמירנט עצמו אדפטיבי, ולכן זה כיוון ולא הבטחה.'));
-  v.appendChild(s);
 }
 
 /* ---------- הדפסה לשבת ופיוס ---------- */

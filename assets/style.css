@@ -524,3 +524,14 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .mission .mdone { font-size: var(--fs-xs); color: var(--good); margin-top: 5px; }
 
 .opt.oldpick { border-style: dashed; }
+
+/* ---- גרף המגמה ---- */
+.trend svg { width: 100%; height: auto; display: block; margin-top: 6px; }
+.trend .gr  { stroke: var(--line); stroke-width: 1; }
+.trend .tgt { stroke: var(--good); stroke-width: 1; stroke-dasharray: 3 3; }
+.trend .ln  { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.trend .pt  { fill: var(--accent); }
+.trend .axl { fill: var(--dim); font-family: "IBM Plex Mono", monospace; font-size: 8px; }
+.trend .tlab { display: flex; justify-content: space-between; gap: 8px;
+  font-size: var(--fs-xs); color: var(--dim); margin-top: 2px; }
+.trend .tlab span:nth-child(2) { color: var(--good); }

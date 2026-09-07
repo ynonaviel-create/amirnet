@@ -511,6 +511,6 @@ function view(v) {
   v.appendChild(gap);
 }
 
-window.AMStrat = { view, elim: startElim, focus: startFocus };
+window.AMStrat = { view, elim: startElim, focus: startFocus, ruleFor };
 
 })();

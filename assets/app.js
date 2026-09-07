@@ -282,7 +282,7 @@ function nav() {
   n.hidden = false; n.innerHTML = '';
   /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
      לא מסומנת שם ולא ברור איפה נמצאים. */
-  const at = S.view === 'fix' ? 'home' : S.view === 'print' ? 'more' : S.view;
+  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' ? 'more' : S.view;
   NAV.forEach(([k, t, ic]) => {
     const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
     b.onclick = () => go(k);
@@ -296,7 +296,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -310,6 +310,10 @@ function viewFix(v) {
 }
 function viewPrint(v) {
   if (window.AMPrint) return window.AMPrint.view(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
+function viewProg(v) {
+  if (window.AMProgress) return window.AMProgress.view(v);
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
 
@@ -598,13 +602,20 @@ function viewMore(v) {
   th.appendChild(g);
 
   const pr = el('div', 'sec');
-  pr.appendChild(el('span', 'eyebrow', 'שבתות וחגים'));
+  pr.appendChild(el('span', 'eyebrow', 'עוד מסכים'));
   const pb = el('button', 'btn ghost');
   pb.style.cssText = 'text-align:right;padding:14px';
   pb.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">הדפסה</div>' +
     '<div class="tiny muted" style="font-weight:400;margin-top:2px">טווח, מקור ושלוש פריסות — עם תצוגה מקדימה וספירת עמודים.</div>';
   pb.onclick = () => go('print');
   pr.appendChild(pb);
+
+  const pg = el('button', 'btn ghost');
+  pg.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
+  pg.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">התקדמות</div>' +
+    '<div class="tiny muted" style="font-weight:400;margin-top:2px">אומדן ציון, מגמה, דיוק לפי פרק, ומפת המלכודות שלך.</div>';
+  pg.onclick = () => go('prog');
+  pr.appendChild(pg);
 
   v.append(s, th, pr);
   seedUI(v);

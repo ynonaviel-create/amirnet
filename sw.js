@@ -1,10 +1,10 @@
 /* אופליין: cache-first לקליפה ולנתונים, ורשת-תחילה לכלום — האתר סטטי,
    ועדכון מגיע בהחלפת גרסת המטמון. */
-const V = 'amirnet-97bdb31b';
+const V = 'amirnet-4deb16ff';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './assets/style.css', './assets/tokens.css', './assets/components.css',
-  './assets/app.js', './assets/today.js', './assets/print.js', './assets/strategy.js', './assets/drills.js', './assets/cloud.js', './assets/vendor/supabase.js',
+  './assets/app.js', './assets/today.js', './assets/print.js', './assets/progress.js', './assets/strategy.js', './assets/drills.js', './assets/cloud.js', './assets/vendor/supabase.js',
   './data/words.json', './data/quads.json', './data/pairs.json', './data/scale.json',
 ];
 self.addEventListener('install', (e) => {
