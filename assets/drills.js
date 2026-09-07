@@ -981,7 +981,16 @@ function reconcile(id) {
   openStudy(c, { i: 0, n: words.length, right: '', close: () => A.render() });
 }
 
-window.AMDrills = { menu, play };
+window.AMDrills = {
+  menu, play,
+  /* משגרים למסך "היום" ולבנק הטעויות — הם מרכיבים משימה מהחלקים האלה
+     ולכן צריכים לפתוח אותם ישירות, בלי לעבור דרך התפריט. */
+  section: (kind) => startSection(kind, 4, 240, kind === 'sc' ? 'השלמת משפטים' : 'ניסוח מחדש'),
+  traps: startTraps,
+  rc: (mode) => startRC(mode),
+  blitz: startBlitz,
+  itemId,
+};
 if (A.S.ready) A.render();
 
 })();

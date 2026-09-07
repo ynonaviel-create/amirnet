@@ -411,3 +411,26 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .passage .plab.dim { color: var(--dim); font-weight: 400; }
 .mid .big { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-2xl);
   font-weight: 500; line-height: 1; margin: 6px 0; }
+
+/* ================= משימת היום ================= */
+.mission {
+  display: block; width: 100%; text-align: right; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--mode, var(--accent));
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+  font: inherit; color: var(--text);
+}
+.mission:active { transform: scale(.995); }
+.mission.m-exam { --mode: var(--accent); }
+.mission.m-trap { --mode: var(--bad); }
+.mission.m-read { --mode: var(--warn); }
+.mission.m-elim { --mode: var(--good); }
+.mission .mh { display: flex; align-items: baseline; gap: 8px; }
+.mission .mt { font-weight: 700; font-size: var(--fs-md); flex: 1; }
+.mission .mm { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xs);
+  color: var(--mode, var(--accent)); white-space: nowrap; }
+.mission .mw { font-size: var(--fs-sm); color: var(--muted); line-height: 1.55; margin-top: 3px; }
+.mission .mw b { color: var(--text); font-weight: 600; }
+.mission .mdone { font-size: var(--fs-xs); color: var(--good); margin-top: 5px; }
+
+.opt.oldpick { border-style: dashed; }

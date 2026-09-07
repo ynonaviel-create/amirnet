@@ -280,8 +280,11 @@ function nav() {
   const n = $('#nav');
   if (!S.ready) { n.hidden = true; return; }
   n.hidden = false; n.innerHTML = '';
+  /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
+     לא מסומנת שם ולא ברור איפה נמצאים. */
+  const at = S.view === 'fix' ? 'home' : S.view;
   NAV.forEach(([k, t, ic]) => {
-    const b = el('button', S.view === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
+    const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
     b.onclick = () => go(k);
     n.appendChild(b);
   });
@@ -293,78 +296,27 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, lab: viewLab, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
 function viewHome(v) {
-  const p = plan(), d = day(), nTri = untriaged().length;
-  const left = between(today(), S.exam);
-
-  const figs = el('div', 'figs',
-    '<div class="fig due"><span class="n">' + p.dueN + '</span><span class="k">לחזרה</span></div>' +
-    '<div class="fig new"><span class="n">' + p.newN + '</span><span class="k">חדשות</span></div>' +
-    '<div class="fig"><span class="n">' + d.rev + '</span><span class="k">היום</span></div>' +
-    '<div class="fig"><span class="n">' + streak() + '</span><span class="k">רצף</span></div>');
-  v.appendChild(figs);
-
-  if (nTri) {
-    const t = el('button', 'btn', 'מיון מהיר · ' + nTri + ' מילים');
-    t.onclick = startTriage;
-    v.appendChild(t);
-    v.appendChild(el('div', 'note',
-      'עבור על המאגר וסמן מה אתה כבר יודע. מילה שסימנת כידועה יוצאת מהתור ' +
-      'וחוזרת פעם אחת בלבד לפני המבחן — ככה לא תבזבז ימים על מה שכבר בראש.'));
-  }
-
-  const go1 = el('button', nTri ? 'btn ghost' : 'btn',
-    p.dueN + p.newN ? 'תרגול אוצר מילים · ' + (p.dueN + p.newN) + ' כרטיסים' : 'אין כרטיסים להיום');
-  go1.disabled = !(p.dueN + p.newN);
-  go1.onclick = () => startStudy();
-  v.appendChild(go1);
-
-  if (left <= 12 && left >= 0) {
-    v.appendChild(el('div', 'note',
-      '<b style="color:var(--warn)">מצב סגירה.</b> נשארו ' + left +
-      ' ימים — יעד הזכירה הועלה ל‑94% ואף מילה לא מתוזמנת אחרי המבחן.'));
-  }
-
-  /* בשלות המאגר */
-  const cnt = { new: 0, young: 0, solid: 0, strong: 0 };
-  S.words.forEach((o, w) => { cnt[bucket(card(w))]++; });
-  const tot = S.words.size || 1;
-  const sec = el('div', 'sec');
-  sec.appendChild(el('span', 'eyebrow', 'המאגר · ' + S.words.size + ' מילים ממבחני אמת'));
-  sec.appendChild(el('div', 'bar',
-    '<i style="width:' + (cnt.strong / tot * 100) + '%;background:var(--good)"></i>' +
-    '<i style="width:' + (cnt.solid / tot * 100) + '%;background:var(--accent);opacity:.7"></i>' +
-    '<i style="width:' + (cnt.young / tot * 100) + '%;background:var(--warn);opacity:.6"></i>'));
-  sec.appendChild(el('div', 'legend',
-    '<span><i class="dot" style="background:var(--good)"></i>מבוססות ' + cnt.strong + '</span>' +
-    '<span><i class="dot" style="background:var(--accent);opacity:.7"></i>יציבות ' + cnt.solid + '</span>' +
-    '<span><i class="dot" style="background:var(--warn);opacity:.6"></i>טריות ' + cnt.young + '</span>' +
-    '<span><i class="dot" style="background:var(--surface-2)"></i>טרם נלמדו ' + cnt.new + '</span>'));
-
-  /* בדיקת קצב — לפי ימי לימוד בפועל, לא ימים קלנדריים */
-  const rem = cnt.new;
-  if (rem) {
-    const days = Math.max(1, studyDaysLeft(today(), S.exam) - 10);   // 10 ימי סגירה
-    const need = Math.ceil(rem / days);
-    sec.appendChild(el('div', 'note',
-      'נותרו <b>' + rem + '</b> מילים שלא נגעת בהן, ו‑<b>' + Math.round(studyDaysLeft(today(), S.exam)) +
-      '</b> ימי לימוד בפועל עד המבחן (שבתות וחגים כבר מנוכים). כדי לכסות אותן לפני שלב הסגירה ' +
-      'צריך <b>' + need + ' מילים חדשות ביום</b> — היעד הנוכחי הוא ' + dailyNew() +
-      (need <= dailyNew() ? ' ומספיק.' : ' ולא יספיק.')));
-  }
-  v.appendChild(sec);
+  if (window.AMToday) return window.AMToday.home(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
+function viewFix(v) {
+  if (window.AMToday) return window.AMToday.fix(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
 }
 
 /* ---------- מיון מהיר ---------- */
 let TRI = null;
-function startTriage() {
+function startTriage(limit) {
   const q = untriaged();
   if (!q.length) { toast('כל המאגר כבר ממוין'); return; }
-  TRI = { q: shuffle(q), i: 0, known: 0 };
+  /* המיון מוגש באצוות. 1,600 מילים ברצף הן שעה וחצי ולכן לא ייעשו;
+     מאה ועשרים הן שש דקות ולכן כן. */
+  TRI = { q: shuffle(q).slice(0, limit || q.length), i: 0, known: 0 };
   paintTriage();
 }
 function paintTriage() {
@@ -591,28 +543,6 @@ function finish() {
 }
 
 /* ---------- מעבדת אסוציאציות ---------- */
-function viewLab(v) {
-  const s = el('div', 'sec');
-  s.appendChild(el('span', 'eyebrow', 'מעבדת אסוציאציות'));
-  s.appendChild(el('p', 'note',
-    'מילים שהאסוציאציה שלהן לא הצליחה להציל אותך. כתיבה מחדש היא התיקון היחיד שעובד.'));
-  const cs = ns('cards'), stuck = [];
-  for (const w in cs) if ((cs[w].af || 0) >= 2 || (cs[w].l || 0) >= 3) stuck.push(w);
-  stuck.sort((a, b) => ((cs[b].af || 0) + (cs[b].l || 0)) - ((cs[a].af || 0) + (cs[a].l || 0)));
-  if (!stuck.length) s.appendChild(el('div', 'empty', 'אין כרגע מילים תקועות. טוב מאוד.'));
-  stuck.slice(0, 40).forEach((w) => {
-    const o = S.words.get(w) || { w };
-    const it = el('div', 'item',
-      '<div class="w">' + esc(w) + '</div>' +
-      '<div class="b"><b>' + esc(o.he || o.def || '') + '</b><br>' + esc(assoc(w) || '— אין אסוציאציה —') + '</div>');
-    const b = el('button', 'hint', 'כתוב מחדש');
-    b.onclick = () => editAssoc(w, () => render());
-    it.appendChild(b);
-    s.appendChild(it);
-  });
-  v.appendChild(s);
-}
-
 /* ---------- מסכים שמוגשים על ידי הקבצים האחרים ---------- */
 function viewStrat(v) {
   if (window.AMStrat) return window.AMStrat.view(v);
@@ -793,6 +723,7 @@ window.AM = {
   today, addDays, between, heDate, iso, isOff, isShabbat, isHalf, studyDaysLeft,
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
   S, dueList, newList, meaning, examSentence, highlightWord: highlight, blankWord,
+  plan, untriaged, startTriage, startStudy, editAssoc,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;
