@@ -271,6 +271,7 @@ function spine() {
 
 const NAV = [
   ['home',  'בית',    '◧'],
+  ['strat', 'אסטרטגיה', '⊘'],
   ['drill', 'תרגול',  '◆'],
   ['play',  'משחקים', '✦'],
   ['more',  'עוד',    '≡'],
@@ -292,7 +293,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, drill: viewDrill, play: viewPlay, lab: viewLab, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, lab: viewLab, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -612,7 +613,11 @@ function viewLab(v) {
   v.appendChild(s);
 }
 
-/* ---------- placeholders עד שהדרילים ייבנו ---------- */
+/* ---------- מסכים שמוגשים על ידי הקבצים האחרים ---------- */
+function viewStrat(v) {
+  if (window.AMStrat) return window.AMStrat.view(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
 function viewDrill(v) {
   if (window.AMDrills) return window.AMDrills.menu(v);
   v.appendChild(el('div', 'empty', 'טוען…'));

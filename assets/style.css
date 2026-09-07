@@ -346,3 +346,68 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* פסקאות אמיתיות בקטע הקריאה */
 .passage p { margin: 0 0 .7em; }
 .passage p:last-child { margin-bottom: 0; }
+
+/* ================= אסטרטגיה =================
+   הפסילה היא הרעיון המרכזי של השכבה הזו, ולכן היא מקבלת שפה משלה:
+   אפשרות פסולה נשארת על המסך מחוקה ולא נעלמת — לראות מה פסלת הוא חצי
+   מהאימון. */
+
+.study.m-elim { --mode: var(--accent); --mode-bg: var(--accent-sl); }
+
+.opt.struck {
+  opacity: .5; text-decoration: line-through;
+  text-decoration-color: var(--bad); text-decoration-thickness: 2px;
+  border-style: dashed;
+}
+.opt.struck .num { text-decoration: none; }
+.opt:disabled { cursor: default; }
+
+/* מד הסיכוי */
+.oddsbar { width: 100%; max-width: 46ch; margin-top: 12px; text-align: center; }
+.oddsbar .lab { font-size: var(--fs-xs); color: var(--muted); letter-spacing: .04em; }
+.oddsbar .val { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xl);
+  font-weight: 600; color: var(--mode, var(--accent)); line-height: 1.1; }
+.oddsbar .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
+.oddsbar .steps i { font-style: normal; font-family: "IBM Plex Mono", monospace;
+  font-size: var(--fs-xs); padding: 3px 0; border-radius: 6px;
+  background: var(--surface-2); color: var(--dim); }
+.oddsbar .steps i.on { background: var(--mode-bg, var(--accent-sl)); color: var(--mode, var(--accent)); font-weight: 600; }
+
+/* סולם הפסילה במסך האסטרטגיה */
+.ladder { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+.rung { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 4px; text-align: center; }
+.rung b { display: block; font-family: "IBM Plex Mono", monospace; font-size: var(--fs-md);
+  color: var(--accent); }
+.rung span { font-size: var(--fs-xs); color: var(--muted); }
+
+/* לוח המדדים */
+.statgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+.stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.stat .v { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-lg); font-weight: 600; }
+.stat .l { font-size: var(--fs-sm); font-weight: 600; margin-top: 2px; }
+.stat .s { font-size: var(--fs-xs); color: var(--muted); }
+
+/* הממצאים */
+.finding { border-top: 1px solid var(--line); }
+.finding:first-of-type { border-top: 0; }
+.finding > summary { display: grid; grid-template-columns: 4.4em 1fr auto; gap: 8px;
+  align-items: baseline; padding: 10px 0; cursor: pointer; list-style: none; }
+.finding > summary::-webkit-details-marker { display: none; }
+.finding .fv { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: var(--fs-sm); }
+.finding.works .fv { color: var(--good); }
+.finding.dead  .fv { color: var(--bad); }
+.finding .fn { font-size: var(--fs-sm); font-weight: 600; }
+.finding .fp { font-size: var(--fs-xs); color: var(--dim); white-space: nowrap; }
+.finding p { font-size: var(--fs-sm); color: var(--muted); line-height: 1.6;
+  margin: 0 0 12px; padding-inline-start: calc(4.4em + 8px); }
+.finding p b { color: var(--text); }
+.finding[open] > summary { padding-bottom: 4px; }
+
+/* קריאה ממוקדת */
+.passage.focus { border-color: var(--mode, var(--accent)); }
+.passage .plab { font-size: var(--fs-xs); color: var(--mode, var(--accent));
+  font-weight: 600; margin-bottom: 6px; }
+.passage .plab.dim { color: var(--dim); font-weight: 400; }
+.mid .big { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-2xl);
+  font-weight: 500; line-height: 1; margin: 6px 0; }
