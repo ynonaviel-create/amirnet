@@ -824,8 +824,12 @@ async function boot() {
   if (!pref('start', null)) setPref('start', today());
   S.ready = true;
   render();
-  /* כניסה ראשונה — אחרי שהמאגר נטען, כי הצעד השלישי מחשב קצב מולו. */
-  if (window.AMOnboard && window.AMOnboard.needed()) window.AMOnboard.start();
+  /* האירוע הזה, ולא קריאה ישירה ל-AMOnboard.start. boot() רץ בסוף
+     app.js, בעוד onboard.js נטען אחריו — ועל השרת החי, שבו שירות
+     העובד מגיש את המילון מהמטמון, ה-await חוזר לפני ששאר קבצי
+     ה-script בכלל התחילו לרוץ. התוצאה הייתה שמסך הכניסה הראשונה
+     לא נפתח בדיוק במקום היחיד שבו הוא חשוב. */
+  document.dispatchEvent(new CustomEvent('am:ready'));
 
   if (window.Cloud && window.Cloud.enabled) { try { await window.Cloud.init(); } catch (e) {} }
   paintAccount();

@@ -1,6 +1,6 @@
 /* אופליין: cache-first לקליפה ולנתונים, ורשת-תחילה לכלום — האתר סטטי,
    ועדכון מגיע בהחלפת גרסת המטמון. */
-const V = 'amirnet-c4b182bf';
+const V = 'amirnet-a56152be';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './assets/style.css', './assets/tokens.css',

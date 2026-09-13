@@ -214,6 +214,13 @@ window.addEventListener('online', paintNet);
 window.addEventListener('offline', paintNet);
 paintNet();
 
-window.AMOnboard = { start, needed: () => !pref('onboarded', 0), replay: start };
+const needed = () => !pref('onboarded', 0);
+/* שני מסלולים בכוונה: אם app.js כבר סיים לפני שהקובץ הזה נטען,
+   S.ready כבר דלוק והאירוע כבר נורה; אם לא, האירוע יגיע. */
+function maybeStart() { if (needed() && !ST) start(); }
+document.addEventListener('am:ready', maybeStart);
+if (S.ready) setTimeout(maybeStart, 0);
+
+window.AMOnboard = { start, needed, replay: start };
 
 })();
