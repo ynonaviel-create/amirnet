@@ -84,7 +84,12 @@ function previewDays(c, g) {
   if (g === 1) return 1;
   const t = c.last ? Math.max(0, between(c.last, today())) : 0;
   const st = (c.r > 0 && c.st) ? nextS(c.dd, c.st, retr(t, c.st), g) : clamp(W[g - 1], 0.1, 36500);
-  return clamp(Math.round(ivl(st, retention())), 1, 400);
+  const d = clamp(Math.round(ivl(st, retention())), 1, 400);
+  /* אותו מהדק שב-schedule. בלעדיו כפתור השיפוט הבטיח "בעוד 60 יום"
+     בזמן שהתזמון בפועל קבע את יום המבחן — כלומר התצוגה שיקרה, ודווקא
+     בשלב הסגירה שבו כל יום נחשב. */
+  const left = between(today(), S.exam);
+  return (left > 0 && d > left) ? left : d;
 }
 
 function schedule(c, g) {
@@ -146,7 +151,10 @@ function put(n, k, v) {
   } catch (e) { /* יסונכרן בהזדמנות הבאה */ }
 }
 const pref = (k, d) => (k in ns('prefs') ? ns('prefs')[k] : d);
-const setPref = (k, v) => put('prefs', k, v);
+/* חותמת זמן לצד כל העדפה. בלעדיה מיזוג הענן לא ידע איזו משתי גרסאות
+   חדשה יותר, והכלל היה "המקומי תמיד מנצח" — כלומר העדפה שנקבעה בטלפון
+   לא הגיעה למחשב לעולם. המפתח מתחיל ב-@ ולכן לא מתנגש בשום העדפה. */
+const setPref = (k, v) => { put('prefs', '@' + k, Date.now()); put('prefs', k, v); };
 
 /* מיזוג מהענן מפיל את המטמון כדי לקרוא מחדש מ-localStorage. חובה לשטוף
    קודם: בלי זה כתיבה שנעשתה ב-400 המילישניות האחרונות נשארת בתור ה-dirty,

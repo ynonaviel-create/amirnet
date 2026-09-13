@@ -597,11 +597,27 @@ async function startQuads() {
   try { groups = await fetch('data/quads.json').then((r) => r.json()); } catch (e) {}
   const ok = groups.filter((g) => g.words.every((w) => S.words.get(w)));
   if (ok.length < 4) { toast('חבילת הרביעיות עוד לא מוכנה'); return; }
-  /* פאזל יומי: אותו זרע לשני הלומדים, כך שאפשר להשוות תוצאות. */
-  const seed = today().split('-').join('') | 0;
+  /* פאזל יומי. הגרסה הקודמת לקחה חלון רץ — rot.slice(start, start+4) —
+     כלומר שני ימים עוקבים חלקו שלוש מתוך ארבע הקבוצות. עכשיו הזרע
+     מערבב את כל הרשימה ולוקח את הארבע הראשונות, כך שכל יום הוא חלוקה
+     אחרת באמת. */
+  let seed = 0;
+  for (const ch of today()) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) >>> 0) / 4294967296);
   const rot = ok.slice();
-  const start = seed % Math.max(1, rot.length - 3);
-  const pick = rot.slice(start, start + 4);
+  for (let i = rot.length - 1; i > 0; i--) {
+    const j = (rnd() * (i + 1)) | 0;
+    [rot[i], rot[j]] = [rot[j], rot[i]];
+  }
+  /* מילה שחוזרת בשתי קבוצות הופכת את הפאזל לבלתי פתיר חד-משמעית. */
+  const pick = [], taken = new Set();
+  for (const g of rot) {
+    if (pick.length >= 4) break;
+    if (g.words.some((w) => taken.has(w))) continue;
+    g.words.forEach((w) => taken.add(w));
+    pick.push(g);
+  }
+  if (pick.length < 4) { toast('חבילת הרביעיות עוד לא מוכנה'); return; }
   QD = { groups: pick, tiles: shuffle(pick.flatMap((g) => g.words)), sel: [], solved: [], mistakes: 0 };
   paintQuads();
 }
@@ -659,8 +675,12 @@ function paintQuads() {
 
 /* --- בליץ 90: מיקרו-סשן לתור בסופר --- */
 async function startBlitz() {
-  const due = A.dueList();
-  const pool = (due.length ? due : A.newList().slice(0, 40)).slice(0, 60);
+  /* רק מילים שיש מה להציג להן. בלי הסינון הזה הבליץ היה מבקש שיפוט
+     על מילה בלי הגדרה, וכותב על סמך זה מצב FSRS — כלומר מזיז תזמון
+     לפי ניחוש עיוור. */
+  const has = (w) => { const o = S.words.get(w); return o && (o.def || o.he); };
+  const due = A.dueList().filter(has);
+  const pool = (due.length ? due : A.newList().filter(has).slice(0, 40)).slice(0, 60);
   if (!pool.length) { toast('אין מה לתרגל'); return; }
   let i = 0, ok = 0, left = 90;
   const t = setInterval(() => {
@@ -689,7 +709,7 @@ async function startBlitz() {
     const mid = el('div', 'mid');
     mid.innerHTML = '<span class="eyebrow">בליץ 90 · ' + ok + ' נכונות</span>' +
       '<div class="head-en">' + esc(w) + '</div>' +
-      (o && o.def ? '' : '<div class="tiny dim">אין עדיין הגדרה למילה הזאת</div>');
+      '';
     const acts = el('div', 'acts');
     const g = el('div', 'grades'); g.style.gridTemplateColumns = 'repeat(2,1fr)';
     const grade = (n) => {
@@ -758,7 +778,7 @@ function menu(v) {
 
 function play(v) {
   v.appendChild(el('span', 'eyebrow', 'משחקים'));
-  tile(v, 'רביעיות', 'שש-עשרה מילים, ארבע קבוצות משמעות. פאזל יומי זהה לשניכם.', startQuads);
+  tile(v, 'רביעיות', 'שש-עשרה מילים, ארבע קבוצות משמעות. פאזל חדש בכל יום.', startQuads);
   tile(v, 'מגדל המילים', 'זיהוי תחת שעון. המבחן נותן 60 שניות לשאלה.', startTower);
   tile(v, 'זוגות מבלבלים', 'המילים שהמבחן מציב זו לצד זו בכוונה.', startPairs);
   tile(v, 'בליץ 90', 'תשעים שניות. לתור בסופר.', startBlitz,

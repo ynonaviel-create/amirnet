@@ -1,1 +1,245 @@
-[{"label": "להידרדר ולהיחלש", "words": ["deteriorate", "diminished", "faded", "wither"]}, {"label": "לשגשג ולנסוק", "words": ["thrive", "soared", "skyrocketed", "boost"]}, {"label": "מחסור", "words": ["scarce", "shortage", "famine", "drought"]}, {"label": "בשפע", "words": ["abundant", "plentiful", "affluence", "abundance"]}, {"label": "לגלות ולאתר", "words": ["detect", "unearthed", "detected", "trace"]}, {"label": "להרוס כליל", "words": ["demolished", "devastated", "wiped out", "engulfed"]}, {"label": "לתמוך ולטפח", "words": ["foster", "cultivated", "subsidize", "fostering"]}, {"label": "להעריך ולשער", "words": ["estimated", "assessment", "hypothesized", "conceived"]}, {"label": "מסוכן", "words": ["hazardous", "flammable", "ferocious", "venom"]}, {"label": "רגוע וידידותי", "words": ["tranquil", "amicable", "mild", "graceful"]}, {"label": "נועז", "words": ["audacious", "daring", "ventured", "venturing"]}, {"label": "עמיד לאורך זמן", "words": ["durable", "enduring", "timeless", "longevity"]}, {"label": "מסמכים וכתובות", "words": ["manuscript", "inscriptions", "catalogue", "inscribed"]}, {"label": "מסעות", "words": ["expedition", "voyage", "pilgrimage", "quest"]}, {"label": "לחקות ולהעתיק", "words": ["emulate", "replica", "mock", "forged"]}, {"label": "להפריך ולדחות", "words": ["refute", "dismissed", "contest", "refuted"]}, {"label": "להתאסף", "words": ["congregate", "assemble", "convened", "flock"]}, {"label": "לחלק ולהקצות", "words": ["dispenses", "allocate", "granted", "supplier"]}, {"label": "בגדים וכיסוי", "words": ["attire", "garments", "thread", "strands"]}, {"label": "לעכב ולהתמהמה", "words": ["tedious", "hinder", "persist", "linger"]}, {"label": "פגום", "words": ["defective", "flaws", "disrepair", "damaged"]}, {"label": "להגביל ולאסור", "words": ["prohibits", "restricted", "banished", "barred"]}, {"label": "מדכא וענישה", "words": ["repressive", "punitive", "discriminatory", "captivity"]}, {"label": "להחלים ולשקם", "words": ["recuperate", "restore", "salvaged", "renovations"]}, {"label": "להבחין בין דברים", "words": ["differentiate", "distinguish", "classified", "distinct"]}, {"label": "להעביר מסר", "words": ["convey", "signifies", "stands for", "portrayal"]}, {"label": "לשקול ולהרהר", "words": ["contemplates", "ponders", "observation", "reflection"]}]
+[
+{
+"label": "להידרדר ולהיחלש",
+"words": [
+"deteriorate",
+"diminished",
+"faded",
+"wither"
+]
+},
+{
+"label": "לשגשג ולנסוק",
+"words": [
+"thrive",
+"soared",
+"skyrocketed",
+"boost"
+]
+},
+{
+"label": "מחסור",
+"words": [
+"scarce",
+"shortage",
+"famine",
+"drought"
+]
+},
+{
+"label": "בשפע",
+"words": [
+"abundant",
+"plentiful",
+"affluence",
+"abundance"
+]
+},
+{
+"label": "לגלות ולאתר",
+"words": [
+"detect",
+"unearthed",
+"trace",
+"revealed"
+]
+},
+{
+"label": "להרוס כליל",
+"words": [
+"demolished",
+"devastated",
+"wiped out",
+"engulfed"
+]
+},
+{
+"label": "לתמוך ולטפח",
+"words": [
+"foster",
+"cultivated",
+"subsidize",
+"fostering"
+]
+},
+{
+"label": "להעריך ולשער",
+"words": [
+"estimated",
+"assessment",
+"hypothesized",
+"conceived"
+]
+},
+{
+"label": "מסוכן",
+"words": [
+"hazardous",
+"flammable",
+"ferocious",
+"venom"
+]
+},
+{
+"label": "רגוע וידידותי",
+"words": [
+"tranquil",
+"amicable",
+"mild",
+"graceful"
+]
+},
+{
+"label": "נועז",
+"words": [
+"audacious",
+"daring",
+"ventured",
+"fearless"
+]
+},
+{
+"label": "עמיד לאורך זמן",
+"words": [
+"durable",
+"enduring",
+"timeless",
+"longevity"
+]
+},
+{
+"label": "מסמכים וכתובות",
+"words": [
+"manuscript",
+"inscriptions",
+"catalogue",
+"inscribed"
+]
+},
+{
+"label": "מסעות",
+"words": [
+"expedition",
+"voyage",
+"pilgrimage",
+"quest"
+]
+},
+{
+"label": "לחקות ולהעתיק",
+"words": [
+"emulate",
+"replica",
+"mock",
+"forged"
+]
+},
+{
+"label": "להפריך ולדחות",
+"words": [
+"refute",
+"dismissed",
+"contest",
+"refuted"
+]
+},
+{
+"label": "להתאסף",
+"words": [
+"congregate",
+"assemble",
+"convened",
+"flock"
+]
+},
+{
+"label": "לחלק ולהקצות",
+"words": [
+"dispenses",
+"allocate",
+"granted",
+"supplier"
+]
+},
+{
+"label": "בגדים וכיסוי",
+"words": [
+"attire",
+"garments",
+"thread",
+"strands"
+]
+},
+{
+"label": "לעכב ולהתמהמה",
+"words": [
+"tedious",
+"hinder",
+"persist",
+"linger"
+]
+},
+{
+"label": "פגום",
+"words": [
+"defective",
+"flaws",
+"disrepair",
+"damaged"
+]
+},
+{
+"label": "להגביל ולאסור",
+"words": [
+"prohibits",
+"restricted",
+"banished",
+"barred"
+]
+},
+{
+"label": "מדכא וענישה",
+"words": [
+"repressive",
+"punitive",
+"discriminatory",
+"captivity"
+]
+},
+{
+"label": "להחלים ולשקם",
+"words": [
+"recuperate",
+"restore",
+"salvaged",
+"renovations"
+]
+},
+{
+"label": "להבחין בין דברים",
+"words": [
+"differentiate",
+"distinguish",
+"classified",
+"distinct"
+]
+},
+{
+"label": "להעביר מסר",
+"words": [
+"convey",
+"signifies",
+"stands for",
+"portrayal"
+]
+},
+{
+"label": "לשקול ולהרהר",
+"words": [
+"contemplates",
+"ponders",
+"observation",
+"reflection"
+]
+}
+]

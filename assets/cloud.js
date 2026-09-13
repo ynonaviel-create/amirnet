@@ -216,8 +216,27 @@
      משתמש בודד קטן — מאות בודדות של שורות), ממזג מול המקומי מפתח-מפתח,
      ומה שקיים רק מקומית עולה לענן. כך גם ההגירה של התקדמות ותיקה קורית
      מעצמה בהתחברות הראשונה: הענן ריק, הכל מקומי בלבד — הכל עולה. */
-  function winner(ns, l, r) {
+  /* השוואה בלי תלות בסדר המפתחות. jsonb מחזיר מפתחות בסדר של המסד,
+     JSON.stringify של אובייקט מקומי מחזיר אותם בסדר ההכנסה, ולכן
+     השוואה נאיבית מצאה הבדל בכל שורה ודחפה את כל המרחב בכל סנכרון. */
+  function canon(v) {
+    if (v === null || typeof v !== 'object') return JSON.stringify(v);
+    if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
+    return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
+  }
+
+  function winner(ns, l, r, k, local, remote) {
     const at = (x) => (x && typeof x === 'object' ? Number(x.at) || 0 : 0);
+
+    /* העדפות: החותמת ש-app.js כותב תחת '@'+key מכריעה. בלי זה המקומי
+       תמיד ניצח, והעדפה לא עברה בין מכשירים. */
+    if (ns === 'prefs') {
+      if (String(k).charAt(0) === '@') return Math.max(Number(l) || 0, Number(r) || 0);
+      const lt = Number((local || {})['@' + k]) || 0;
+      const rt = Number((remote || {})['@' + k]) || 0;
+      if (lt !== rt) return lt > rt ? l : r;
+      return l === undefined ? r : l;
+    }
 
     /* כרטיס: החזרה המאוחרת יותר היא האמת. מכשיר שנשאר מאחור לא מחייה
        תזמון ישן. app.js כותב at=Date.now() בכל שינוי כרטיס. */
@@ -282,13 +301,13 @@
           if (l === undefined) win = r;
           else if (r === undefined) { win = l; ups.push({ op: 'set', ns, k, v: l }); }
           else {
-            win = winner(ns, l, r);
+            win = winner(ns, l, r, k, local, remote[ns]);
             /* המקומי ניצח והוא שונה ממה שבענן — מעדכנים את הענן. */
-            if (JSON.stringify(win) !== JSON.stringify(r)) ups.push({ op: 'set', ns, k, v: win });
+            if (canon(win) !== canon(r)) ups.push({ op: 'set', ns, k, v: win });
           }
           merged[k] = win;
         });
-        if (JSON.stringify(merged) !== JSON.stringify(local)) { writeLS(ns, merged); changed = true; }
+        if (canon(merged) !== canon(local)) { writeLS(ns, merged); changed = true; }
       });
 
       ups.forEach(push);
