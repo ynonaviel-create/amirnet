@@ -700,3 +700,37 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* סימוני השורות של מאל"ו בתוך הקטע — מספר שורה, לא חלק מהמשפט */
 .passage .pn { color: var(--dim); font-size: .78em; font-family: "IBM Plex Mono", monospace;
   vertical-align: .12em; padding: 0 .15em; }
+
+/* ================= שליטה בטיפוגרפיה האנגלית =================
+
+   נקבע בתגיות על <html> ולא ב-style inline, כדי שהכל יישאר בקובץ
+   אחד ויעבוד גם על מה שייכתב בעתיד. הבוררים ב-index.html מציבים את
+   התגיות לפני הציור הראשון, אחרת המסך היה קופץ בכל טעינה. */
+
+:root[data-en-size="s"]  { --fs-en-sm: 15px;   --fs-en: 17px;   --fs-en-md: 18.5px; --fs-en-lg: 21px; }
+:root[data-en-size="l"]  { --fs-en-sm: 17.5px; --fs-en: 20.5px; --fs-en-md: 22px;   --fs-en-lg: 25px; }
+:root[data-en-size="xl"] { --fs-en-sm: 19px;   --fs-en: 22.5px; --fs-en-md: 24px;   --fs-en-lg: 27px; }
+
+/* סאנס: גופן המערכת. על אייפון זה SF Pro, ואין מה להוריד. */
+:root[data-en-face="sans"] {
+  --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* "כמו במבחן": חוברות מאל"ו מודפסות בסריף בסגנון Times. */
+:root[data-en-face="exam"] {
+  --font-en: "Times New Roman", Times, Georgia, "Liberation Serif", serif;
+}
+
+:root[data-en-lead="loose"] { --lh-en: 1.82; --lh-en-loose: 1.95; }
+:root[data-en-lead="tight"] { --lh-en: 1.45; --lh-en-loose: 1.5; }
+
+/* דוגמית חיה בתוך הבורר */
+.sample {
+  font-family: var(--font-en); direction: ltr; text-align: left;
+  font-size: var(--fs-en); line-height: var(--lh-en);
+  background: var(--surface-solid); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 12px 13px; margin-top: 10px;
+}
+.sample b { font-weight: 600; }
+.ctl { margin-top: 14px; }
+.ctl > .f { display: block; font-size: var(--fs-sm); font-weight: 600;
+  color: var(--muted); margin-bottom: 6px; }

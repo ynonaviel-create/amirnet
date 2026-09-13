@@ -364,6 +364,20 @@ function viewAbout(v) {
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
 
+/* ---------- טיפוגרפיה אנגלית ----------
+   התגיות יושבות על <html>; ה-CSS דורס מהן את טוקני האנגלית. אותה
+   פונקציה בדיוק רצה גם ב-index.html לפני הציור הראשון, כדי שלא
+   יהיה הבזק של גודל ברירת המחדל. */
+function applyTypo() {
+  const r = document.documentElement;
+  [['enSize', 'data-en-size'], ['enFace', 'data-en-face'], ['enLead', 'data-en-lead']]
+    .forEach(([k, attr]) => {
+      const v = pref(k, '');
+      v ? r.setAttribute(attr, v) : r.removeAttribute(attr);
+      try { localStorage.setItem('amirnet.' + k, v); } catch (e) {}
+    });
+}
+
 /* ---------- מיון מהיר ---------- */
 let TRI = null;
 function startTriage(limit) {
@@ -681,6 +695,37 @@ function viewMore(v) {
   });
   th.appendChild(g);
 
+  /* ---- שליטה בטיפוגרפיה האנגלית ----
+     כל תוכן המבחן הוא אנגלית, וטיפוגרפיה טובה היא לא אותו דבר לכל
+     עין ולכל מסך. שלושה בוררים, ודוגמית שמשתנה מתחתיהם מיד. */
+  const TYPO = [
+    ['enSize', 'גודל', [['s', 'קטן'], ['', 'רגיל'], ['l', 'גדול'], ['xl', 'ענק']]],
+    ['enFace', 'גופן', [['', 'סריף'], ['sans', 'סאנס'], ['exam', 'כמו במבחן']]],
+    ['enLead', 'רווח שורה', [['tight', 'צפוף'], ['', 'רגיל'], ['loose', 'רחב']]],
+  ];
+  const sample = el('div', 'sample',
+    'Peanut butter was once <b>considered</b> a delicacy and served ' +
+    'only in the finest restaurants.');
+
+  TYPO.forEach(([key, label, opts]) => {
+    const wrap = el('div', 'ctl');
+    wrap.appendChild(el('span', 'f', esc(label)));
+    const row = el('div', 'grades');
+    row.style.gridTemplateColumns = 'repeat(' + opts.length + ',1fr)';
+    const cur = pref(key, '');
+    opts.forEach(([val, txt]) => {
+      const b = el('button', 'grade' + (cur === val ? ' g3' : ''), esc(txt));
+      b.onclick = () => { setPref(key, val); applyTypo(); render(); };
+      row.appendChild(b);
+    });
+    wrap.appendChild(row);
+    th.appendChild(wrap);
+  });
+  th.appendChild(sample);
+  const reset = el('button', 'btn ghost sm', 'אפס לברירת המחדל');
+  reset.onclick = () => { ['enSize', 'enFace', 'enLead'].forEach((k) => setPref(k, '')); applyTypo(); render(); };
+  th.appendChild(reset);
+
   const pr = el('div', 'sec');
   pr.appendChild(el('span', 'eyebrow', 'עוד מסכים'));
   const pb = el('button', 'btn ghost');
@@ -830,6 +875,7 @@ async function boot() {
     return;
   }
   S.exam = pref('exam', EXAM_DEFAULT);
+  applyTypo();
   if (!pref('start', null)) setPref('start', today());
   S.ready = true;
   render();
@@ -872,7 +918,7 @@ window.AM = {
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
   S, dueList, newList, meaning, examSentence, passageHTML, highlightWord: highlight, blankWord,
   plan, untriaged, startTriage, startStudy, editAssoc, markKnown, previewDays,
-  state, skeleton, buzz, plural,
+  state, skeleton, buzz, plural, applyTypo,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;
