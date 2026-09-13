@@ -849,6 +849,17 @@ async function boot() {
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
+    /* שירות עובד חדש משתלט תוך כדי הטעינה הראשונה שאחרי פריסה, אבל
+       הדף שכבר נצבע הוגש מהגרסה הישנה — כלומר עדכון נראה רק בטעינה
+       השנייה. רענון אחד ופעם אחת סוגר את זה. לא באמצע פרק: שם רענון
+       היה מוחק שעון רץ ותשובות שטרם נסגרו. */
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded || !navigator.serviceWorker.controller) return;
+      if ($('#study')) { toast('יש גרסה חדשה. תיכנס לתוקף בפתיחה הבאה.'); return; }
+      reloaded = true;
+      location.reload();
+    });
   }
 }
 
