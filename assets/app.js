@@ -286,7 +286,7 @@ const NAV = [
   ['home',  'בית',    '◧'],
   ['strat', 'אסטרטגיה', '⊘'],
   ['drill', 'פרקים',  '◆'],
-  ['play',  'משחקים', '✦'],
+  ['words', 'מילים',  '✦'],
   ['more',  'עוד',    '≡'],
 ];
 function nav() {
@@ -295,7 +295,7 @@ function nav() {
   n.hidden = false; n.innerHTML = '';
   /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
      לא מסומנת שם ולא ברור איפה נמצאים. */
-  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' ? 'more' : S.view === 'focus' ? 'drill' : S.view;
+  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' || S.view === 'play' ? 'more' : S.view === 'focus' ? 'drill' : S.view;
   NAV.forEach(([k, t, ic]) => {
     const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
     b.onclick = () => go(k);
@@ -309,7 +309,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, words: viewWords, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -327,6 +327,10 @@ function viewPrint(v) {
 }
 function viewProg(v) {
   if (window.AMProgress) return window.AMProgress.view(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
+function viewWords(v) {
+  if (window.AMWords) return window.AMWords.view(v);
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
 
@@ -634,6 +638,13 @@ function viewMore(v) {
   pg.onclick = () => go('prog');
   pr.appendChild(pg);
 
+  const gm = el('button', 'btn ghost');
+  gm.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
+  gm.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">משחקים</div>' +
+    '<div class="tiny muted" style="font-weight:400;margin-top:2px">רביעיות · מגדל המילים · זוגות מבלבלים · בליץ 90.</div>';
+  gm.onclick = () => go('play');
+  pr.appendChild(gm);
+
   const kb = el('div', 'sec');
   kb.appendChild(el('span', 'eyebrow', 'מקלדת'));
   kb.appendChild(el('p', 'note',
@@ -777,7 +788,7 @@ window.AM = {
   today, addDays, between, heDate, iso, isOff, isShabbat, isHalf, studyDaysLeft,
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
   S, dueList, newList, meaning, examSentence, highlightWord: highlight, blankWord,
-  plan, untriaged, startTriage, startStudy, editAssoc,
+  plan, untriaged, startTriage, startStudy, editAssoc, markKnown, previewDays,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;
