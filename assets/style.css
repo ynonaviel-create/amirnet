@@ -25,7 +25,8 @@ input, textarea, select { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-.en   { font-family: "Newsreader", Georgia, serif; direction: ltr; unicode-bidi: isolate; }
+.en   { font-family: var(--font-en); direction: ltr; unicode-bidi: isolate;
+        font-size: var(--fs-en); line-height: var(--lh-en); }
 .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 .dim   { color: var(--dim); }
@@ -143,19 +144,20 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
 .acts { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; }
 
 .head-en {
-  font-family: "Newsreader", Georgia, serif; direction: ltr;
-  font-size: clamp(34px, 11vw, 46px); line-height: 1.08; font-weight: 500;
+  font-family: var(--font-en); direction: ltr;
+  font-size: clamp(34px, 11vw, 46px); line-height: 1.08; font-weight: 600;
   letter-spacing: -.015em; text-wrap: balance;
 }
-.pos { font-family: "Newsreader", Georgia, serif; font-style: italic; direction: ltr; color: var(--dim); font-size: var(--fs-base); }
-.def { font-family: "Newsreader", Georgia, serif; direction: ltr; font-size: var(--fs-lg); line-height: 1.35; max-width: 40ch; text-wrap: balance; }
+.pos { font-family: var(--font-en); font-style: italic; direction: ltr; color: var(--dim); font-size: var(--fs-en-sm); }
+.def { font-family: var(--font-en); direction: ltr; font-size: var(--fs-en-lg); line-height: 1.4;
+       max-width: 34ch; text-wrap: balance; }
 .syn { font-family: "IBM Plex Mono", monospace; direction: ltr; font-size: var(--fs-sm); color: var(--dim); }
 .he  { font-size: var(--fs-md); font-weight: 600; color: var(--accent); }
 .ex {
-  font-family: "Newsreader", Georgia, serif; direction: ltr; text-align: left;
-  font-size: var(--fs-md); line-height: 1.5; color: var(--muted);
+  font-family: var(--font-en); direction: ltr; text-align: left;
+  font-size: var(--fs-en); line-height: var(--lh-en-loose); color: var(--text);
   background: var(--surface-solid); border: 1px solid var(--line);
-  border-radius: var(--radius-sm); padding: 11px 13px; max-width: 46ch; width: 100%;
+  border-radius: var(--radius-sm); padding: 13px 15px; max-width: 52ch; width: 100%;
 }
 .ex b { color: var(--text); font-weight: 500; background: var(--accent-sl); padding: 0 3px; border-radius: 3px; }
 .ex-lab {
@@ -189,16 +191,17 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
 .hint:disabled { opacity: .35; cursor: default; }
 
 /* ---------- אפשרויות אמריקאיות ---------- */
-.opts { display: flex; flex-direction: column; gap: 7px; width: 100%; max-width: 46ch; }
+.opts { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 52ch; }
 .opt {
   padding: 13px 15px; border: 1px solid var(--line); border-radius: var(--radius-sm);
   background: var(--surface-solid); text-align: left; direction: ltr;
-  font-size: var(--fs-md); font-family: "Newsreader", Georgia, serif; min-height: 48px;
+  font-size: var(--fs-en); font-family: var(--font-en); line-height: var(--lh-en);
+  min-height: 48px;
 }
 .opt.pick  { border-color: var(--accent); background: var(--accent-sl); }
 .opt.right { border-color: var(--good); background: var(--good-bg); font-weight: 500; }
 .opt.wrong { border-color: var(--bad);  background: var(--bad-bg); }
-.opt .num { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm); color: var(--dim); margin-inline-end: 8px; }
+.opt .num { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm); color: var(--dim); margin-inline-end: 10px; }
 
 /* ---------- טפסים ---------- */
 label.f { display: block; font-size: var(--fs-sm); color: var(--muted); font-weight: 600; margin-bottom: 5px; }
@@ -216,7 +219,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* ---------- רשימות ---------- */
 .item { display: flex; gap: 10px; align-items: flex-start; padding: 11px 0; border-top: 1px solid var(--line); }
 .item:first-child { border-top: 0; }
-.item .w { font-family: "Newsreader", Georgia, serif; direction: ltr; font-size: var(--fs-md);
+.item .w { font-family: var(--font-en); direction: ltr; font-size: var(--fs-en);
            min-width: 108px; flex: none; }
 .item .b { flex: 1; font-size: var(--fs-sm); color: var(--muted); min-width: 0; }
 .pill { display: inline-flex; align-items: center; gap: 5px; line-height: 1;
@@ -319,7 +322,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
   padding: 1.9mm 0; border-bottom: .3pt solid #c9ccd1; break-inside: avoid;
 }
 .page .prow .box { width: 4mm; height: 4mm; border: .6pt solid #14161a; margin-top: .8mm; }
-.page .prow .w { font-family: "Newsreader", Georgia, serif; direction: ltr;
+.page .prow .w { font-family: var(--font-en); direction: ltr;
   font-size: 3.6mm; font-weight: 500; }
 .page .prow .m { font-size: 3mm; }
 .page .prow .a { font-size: 2.8mm; color: #4a5058; margin-top: .4mm; }
@@ -333,22 +336,22 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .page .fcard .face { display: grid; place-items: center; padding: 2mm; text-align: center; }
 .page .fcard .fold { border-top: .5pt dashed #14161a; }
 .page .fcard .back { transform: rotate(180deg); }
-.page .fcard .fw { font-family: "Newsreader", Georgia, serif; direction: ltr;
+.page .fcard .fw { font-family: var(--font-en); direction: ltr;
   font-size: 5.2mm; font-weight: 500; }
 .page .fcard .fm { font-size: 3mm; line-height: 1.35; }
 
 /* דף תרגול */
 .page .q { break-inside: avoid; padding: 2mm 0 2.4mm; border-bottom: .3pt solid #d6d9de; }
-.page .q .qs { font-family: "Newsreader", Georgia, serif; direction: ltr;
+.page .q .qs { font-family: var(--font-en); direction: ltr;
   font-size: 3.4mm; line-height: 1.5; }
 .page .q .qs b { font-family: "IBM Plex Mono", monospace; font-size: 2.9mm; }
 .page .q .blank { display: inline-block; width: 22mm; border-bottom: .6pt solid #14161a; }
 .page .q .qo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm;
-  direction: ltr; font-family: "Newsreader", Georgia, serif; font-size: 3.1mm; margin-top: 1.4mm; }
+  direction: ltr; font-family: var(--font-en); font-size: 3.1mm; margin-top: 1.4mm; }
 .page .q .qo i { font-style: normal; font-family: "IBM Plex Mono", monospace;
   font-size: 2.6mm; color: #5b616a; }
 .page .keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6mm 5mm;
-  direction: ltr; font-family: "Newsreader", Georgia, serif; font-size: 3.2mm; }
+  direction: ltr; font-family: var(--font-en); font-size: 3.2mm; }
 .page .keys b { font-family: "IBM Plex Mono", monospace; font-size: 2.9mm; }
 
 @media print {
@@ -401,7 +404,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .hero .cap { font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
 
 /* ===== ההסבר — הדבר שבאמת מלמד ===== */
-.why { width:100%; max-width:46ch; text-align:right; margin-top:4px; }
+.why { width:100%; max-width:52ch; text-align:right; margin-top:4px; }
 .why h4 { margin:0 0 6px; font-size:var(--fs-sm); font-weight:700; color:var(--mode);
           letter-spacing:.04em; }
 .opt-row { display:grid; grid-template-columns:22px 1fr; gap:8px; padding:8px 0;
@@ -410,7 +413,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .opt-row .mk { font-family:"IBM Plex Mono",monospace; font-size:var(--fs-sm); color:var(--dim); }
 .opt-row.ok  .mk { color:var(--good); }
 .opt-row.no  .mk { color:var(--bad); }
-.opt-row .en { font-family:"Newsreader",Georgia,serif; direction:ltr; font-size:var(--fs-md); }
+.opt-row .en { font-family:var(--font-en); direction:ltr; font-size:var(--fs-en); line-height:var(--lh-en); }
 .opt-row.ok .en { font-weight:500; }
 .opt-row .gl { font-size:var(--fs-sm); color:var(--muted); }
 .opt-row .gl b { color:var(--text); font-weight:600; }
@@ -423,12 +426,12 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
             border-radius:3px; padding:0 2px; }
 
 /* הקטע נשאר על המסך לאורך כל השאלות */
-.passage { width:100%; max-width:48ch; max-height:34vh; overflow:auto;
+.passage { width:100%; max-width:56ch; max-height:40vh; overflow:auto;
            background:var(--surface-solid); border:1px solid var(--line);
            border-radius:var(--radius-sm); padding:12px 14px; direction:ltr; text-align:left;
-           font-family:"Newsreader",Georgia,serif; font-size:var(--fs-base); line-height:1.55; }
+           font-family:var(--font-en); font-size:var(--fs-en); line-height:var(--lh-en-loose); }
 .passage .pn { color:var(--dim); font-size:var(--fs-xs); }
-.passage.folded { max-height:78px; }
+.passage.folded { max-height:84px; }
 .fold { font-size:var(--fs-sm); color:var(--mode); padding:6px 2px; }
 
 /* קומבו במשחקי קצב */
@@ -437,7 +440,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 @keyframes pop { 0%{transform:scale(.82);opacity:.4} 100%{transform:scale(1);opacity:1} }
 
 /* פסקאות אמיתיות בקטע הקריאה */
-.passage p { margin: 0 0 .7em; }
+.passage p { margin: 0 0 .85em; }
 .passage p:last-child { margin-bottom: 0; }
 
 /* ================= אסטרטגיה =================
@@ -456,7 +459,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .opt:disabled { cursor: default; }
 
 /* מד הסיכוי */
-.oddsbar { width: 100%; max-width: 46ch; margin-top: 12px; text-align: center; }
+.oddsbar { width: 100%; max-width: 52ch; margin-top: 12px; text-align: center; }
 .oddsbar .lab { font-size: var(--fs-xs); color: var(--muted); letter-spacing: .04em; }
 .oddsbar .val { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xl);
   font-weight: 600; color: var(--mode, var(--accent)); line-height: 1.1; }
@@ -541,7 +544,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 
 /* ---- שורת הפרק: שם הפרק והשעון ---- */
 .secbar { display: flex; align-items: baseline; justify-content: space-between;
-  gap: 12px; width: 100%; max-width: 46ch; }
+  gap: 12px; width: 100%; max-width: 52ch; }
 .secbar .clock { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-md);
   font-weight: 600; color: var(--mode, var(--accent)); font-variant-numeric: tabular-nums; }
 .secbar .clock.low { color: var(--bad); }
@@ -577,7 +580,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
   padding: 11px 2px; min-height: 44px; color: var(--text);
 }
 .wrow:hover { background: var(--surface-2); }
-.wrow .ww { font-family: "Newsreader", Georgia, serif; direction: ltr;
+.wrow .ww { font-family: var(--font-en); direction: ltr;
   font-size: var(--fs-md); text-align: left; }
 .wrow .wm { font-size: var(--fs-sm); color: var(--muted); }
 .wrow .wb { width: 8px; height: 8px; border-radius: 50%; align-self: center; }
@@ -591,7 +594,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .occ:first-of-type { border-top: 0; }
 .occ .mk { font-family: "IBM Plex Mono", monospace; color: var(--dim); font-size: var(--fs-sm); }
 .occ.ok .mk { color: var(--good); }
-.occ .en { font-family: "Newsreader", Georgia, serif; direction: ltr;
+.occ .en { font-family: var(--font-en); direction: ltr;
   font-size: var(--fs-sm); line-height: 1.5; }
 .occ.ok .en b { color: var(--good); }
 
@@ -601,7 +604,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
    מילים בחציון, וארבע אפשרויות באורך של שורה וחצי כל אחת. ברירת
    המחדל של .opt נכתבה למילים בודדות ודחסה אותן. כאן הן מקבלות את
    הרווח שהמבחן נותן להן. */
-.study.m-trap .opts, .study.m-elim .opts { max-width: 52ch; }
+.study.m-trap .opts, .study.m-elim .opts { max-width: 58ch; }
 .study.m-trap .opt, .study.m-elim .opt {
   line-height: 1.55; padding: 12px 14px;
   display: grid; grid-template-columns: 2.1em 1fr; gap: 2px 6px; align-items: start;
@@ -648,3 +651,52 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 
 .lead { font-size: var(--fs-md); line-height: 1.6; color: var(--text); margin-top: 8px; }
 .lead b { font-weight: 700; }
+
+/* ================= קריאוּת האנגלית =================
+
+   כל תוכן המבחן הוא אנגלית, ורובו נקרא על רקע כהה. שלושה כיוונים
+   שנעשו יחד, כי כל אחד לבדו לא הספיק: משפחה עם x-height גבוה
+   וגזרה עבה יותר, סולם גדלים נפרד לאנגלית, וגובה שורה נדיב.
+
+   ובנוסף — ורק כאן — ביטול ההחלקה של macOS. antialiased מדלל את
+   הקווים, וסריף דק על רקע כהה מאבד מהם חלק. הטקסט העברי נשאר כפי
+   שהוא; רק האנגלית מקבלת את המשקל המלא שלה בחזרה. */
+.en, .ex, .opt, .def, .passage, .head-en, .opt-row .en, .item .w,
+.wrow .ww, .occ .en, .pos {
+  -webkit-font-smoothing: auto;
+  font-optical-sizing: auto;
+  font-variant-ligatures: common-ligatures;
+}
+
+/* המילה הנכונה בתוך המשפט השלם צריכה להיקרא בבירור, לא רק להיות מסומנת */
+.ex b { font-weight: 600; }
+
+/* אפשרויות של משפט שלם: המספר בעמודה משלו, כך שהשורה השנייה לא
+   נכנסת מתחתיו ומאבדת את היישור. העמודה צרה בכוונה — בטלפון כל
+   פיקסל שלה נגרע מרוחב השורה, וזה בדיוק מה שהופך קריאה למעיקה. */
+.study.m-trap .opt, .study.m-elim .opt,
+.study.m-read .opt, .study.m-exam .opt {
+  display: grid; grid-template-columns: 1.65em 1fr; gap: 0 3px; align-items: start;
+  padding: 12px 13px;
+}
+.study .opt .num { margin: 0; padding-top: .2em; font-size: var(--fs-xs); }
+
+/* בטלפון רוחב השורה הוא המשאב הנדיר. שלושים ושתיים תווים לשורה הם
+   קריאה מעיקה; כל מילימטר שנחסך מהריפוד חוזר כטקסט. */
+@media (max-width: 480px) {
+  .study > .card { padding: 14px 12px 10px; }
+  .wrap { padding-inline: 12px; }
+  .ex { padding: 12px 13px; }
+  .passage { padding: 12px 12px; }
+}
+
+/* קטע קריאה: פסקה ראשונה בלי הזחה, השאר עם רווח נשימה */
+.passage p { text-wrap: pretty; }
+
+@media (min-width: 560px) {
+  :root { --fs-en: 19.5px; --fs-en-md: 21px; --fs-en-lg: 25px; }
+}
+
+/* סימוני השורות של מאל"ו בתוך הקטע — מספר שורה, לא חלק מהמשפט */
+.passage .pn { color: var(--dim); font-size: .78em; font-family: "IBM Plex Mono", monospace;
+  vertical-align: .12em; padding: 0 .15em; }

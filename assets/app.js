@@ -423,6 +423,15 @@ function openStudy(cardEl, o) {
 function closeStudy() { const b = $('#study'); if (b) b.remove(); }
 
 const examSentence = (s) => esc(s).replace(/_{2,}/g, '<b>______</b>');
+
+/* קטע קריאה כ-HTML: פסקאות אמיתיות, וסימוני השורות של מאל"ו — (5),
+   (10), (15) — מסומנים כמספרי שורה ולא כחלק מהמשפט. בלי זה הם
+   נקראים כמו מספור אפשרויות בתוך הטקסט. */
+function passageHTML(text) {
+  return String(text).split(/\n{2,}/).map((para) =>
+    '<p>' + esc(para.trim()).replace(/\((\d{1,2})\)/g, '<span class="pn">($1)</span>') + '</p>'
+  ).join('');
+}
 function blankWord(sent, w) {
   const re = new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\w*', 'i');
   return esc(sent).replace(re, '<b>______</b>');
@@ -850,7 +859,7 @@ window.AM = {
   el, esc, clamp, shuffle, toast, render, go, openStudy, closeStudy,
   today, addDays, between, heDate, iso, isOff, isShabbat, isHalf, studyDaysLeft,
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
-  S, dueList, newList, meaning, examSentence, highlightWord: highlight, blankWord,
+  S, dueList, newList, meaning, examSentence, passageHTML, highlightWord: highlight, blankWord,
   plan, untriaged, startTriage, startStudy, editAssoc, markKnown, previewDays,
   state, skeleton, buzz, plural,
   async bank(kind) {

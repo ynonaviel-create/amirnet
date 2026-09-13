@@ -315,8 +315,7 @@ function paintFix() {
 
   if (it.kind === 'rc' && FIX.ps && FIX.ps.get(it.passage)) {
     const p = el('div', 'passage');
-    p.innerHTML = FIX.ps.get(it.passage).text.split(/\n{2,}/)
-      .map((t) => '<p>' + esc(t.trim()) + '</p>').join('');
+    p.innerHTML = A.passageHTML(FIX.ps.get(it.passage).text);
     mid.appendChild(p);
   }
   const stem = el('div', 'ex');

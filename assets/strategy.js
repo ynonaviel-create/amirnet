@@ -359,13 +359,13 @@ function paintFocus() {
   const pass = el('div', 'passage focus');
   pass.innerHTML = '<div class="plab">הפסקה שהשאלה מפנה אליה — ' +
     Math.round(100 * sc.text.length / p.text.length) + '% מהקטע</div>' +
-    '<p>' + esc(sc.text) + '</p>';
+    A.passageHTML(sc.text);
   mid.appendChild(pass);
 
   if (R.full) {
     const rest = el('div', 'passage');
     rest.innerHTML = '<div class="plab dim">שאר הקטע</div>' +
-      sc.all.map((t, k) => k === sc.i ? '' : '<p>' + esc(t) + '</p>').join('');
+      sc.all.map((t, k) => k === sc.i ? '' : A.passageHTML(t)).join('');
     mid.appendChild(rest);
   }
 

@@ -209,8 +209,7 @@ function paint() {
 
   if (S_.passage) {
     const p = el('div', 'passage' + (S_.showText ? '' : ' folded'));
-    p.innerHTML = S_.passage.text.split(/\n{2,}/)
-      .map((t) => '<p>' + esc(t.trim()) + '</p>').join('');
+    p.innerHTML = A.passageHTML(S_.passage.text);
     mid.appendChild(p);
   }
 

@@ -180,8 +180,7 @@ const itemId = (r) => r.kind + ':' + r.exam + ':' + r.sec + ':' + r.n;
    אותו פעם אחת הוא רק דוחף את השאלה מתחת לקפל. */
 function passagePanel(text, folded) {
   const box = el('div', 'passage' + (folded ? ' folded' : ''));
-  box.innerHTML = text.split(/\n{2,}/)
-    .map((t) => '<p>' + esc(t.trim()) + '</p>').join('');
+  box.innerHTML = A.passageHTML(text);
   const tog = el('button', 'hint', folded ? 'פתח את הקטע' : 'קפל');
   tog.onclick = () => {
     const on = box.classList.toggle('folded');
@@ -405,8 +404,8 @@ function paintRC() {
     const box = el('div', 'passage focus');
     box.innerHTML = (para
       ? '<div class="plab">הפסקה שהשאלה מפנה אליה — ' +
-        Math.round(100 * para.length / p.text.length) + '% מהקטע</div><p>' + esc(para) + '</p>'
-      : p.text.split(/\n{2,}/).map((t) => '<p>' + esc(t.trim()) + '</p>').join(''));
+        Math.round(100 * para.length / p.text.length) + '% מהקטע</div>' + A.passageHTML(para)
+      : A.passageHTML(p.text));
     mid.appendChild(box);
   } else {
     mid.appendChild(passagePanel(p.text, RC.i > 0));
