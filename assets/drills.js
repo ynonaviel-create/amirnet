@@ -141,7 +141,7 @@ function rcType(stem) {
 
 /* מתכון התקפה לכל תבנית — נלמד פעם אחת ואז נבדק. */
 const RECIPE = {
-  purpose_para: 'קרא רק את משפט הפתיחה של אותה פסקה. ב־20% מכל שאלות הבנת הנקרא זו התבנית, והתשובה כמעט תמיד שם.',
+  purpose_para: 'קרא רק את משפט הפתיחה של אותה פסקה. זו התבנית השנייה בשכיחות, והתשובה כמעט תמיד שם.',
   purpose_text: 'שאלה גלובלית. חפש את מה שנכון לכל הפסקאות, לא רק לאחת.',
   title:        'כותרת חייבת לכסות את כל הטקסט. פסול כל אפשרות שמתארת פסקה אחת בלבד.',
   vocab:        'אל תתרגם — הצב כל אפשרות בחזרה במשפט ובדוק מה מתאים להקשר.',
@@ -761,18 +761,22 @@ function tile(v, title, sub, fn, badge) {
    RECIPE ישב בקוד מהיום הראשון ונשלף רק בתוך דריל, כלומר אחרי
    שכבר ענית. תבנית נלמדת פעם אחת ונשלפת בכל שאלה — ולכן היא צריכה
    מקום שאפשר לקרוא בו מראש. */
-const PATTERN_ORDER = ['purpose_para', 'purpose_text', 'detail', 'except',
-                       'vocab', 'reference', 'title', 'inference'];
+const PATTERN_ORDER = ['detail', 'purpose_para', 'inference', 'title',
+                       'purpose_text', 'vocab', 'except', 'reference'];
+/* המספרים נמדדו על 572 השאלות בסיווג של rcType עצמו — אותו סיווג
+   שמתייג שאלה בתוך דריל. סיווג אחר היה נותן מספרים אחרים, ושני
+   סיווגים באותו מסך הם בלבול. */
 const PATTERN_SHARE = {
-  purpose_para: '29% משאלות הבנת הנקרא', detail: '25%', except: '11%',
-  vocab: '4%', inference: 'פחות מ-2%', reference: '', title: '', purpose_text: '',
+  detail: '22%', purpose_para: '20%', inference: '12%', title: '7%',
+  purpose_text: '6%', vocab: '6%', except: '5%', reference: '2%',
 };
 function patterns(v) {
   const head = el('div', 'sec');
   head.appendChild(el('span', 'eyebrow', 'תבניות'));
   head.appendChild(el('p', 'note',
-    'שמונה התבניות שמכסות כמעט את כל שאלות הבנת הנקרא, ושתי המסגרות ' +
-    'שמכריעות שאלת השלמת משפטים כשהן נוכחות. נלמד פעם אחת, נשלף בכל שאלה.'));
+    'שמונה התבניות ושתי המסגרות — נלמד פעם אחת, נשלף בכל שאלה. ' +
+    'האחוזים נמדדו על 572 שאלות הבנת הנקרא שבמאגר; עוד 19% מהשאלות ' +
+    'לא נופלות לאף תבנית מובהקת, ולשם צריך קריאה רגילה.'));
   v.appendChild(head);
 
   const rc = el('div', 'sec');
@@ -780,7 +784,7 @@ function patterns(v) {
   PATTERN_ORDER.forEach((k) => {
     const he = (RC_TYPES.find((t) => t[0] === k) || [, , k])[2];
     const d = el('details', 'finding works');
-    d.innerHTML = '<summary><span class="fv">' + esc(PATTERN_SHARE[k] ? PATTERN_SHARE[k].split(' ')[0] : '·') +
+    d.innerHTML = '<summary><span class="fv">' + esc(PATTERN_SHARE[k] || '·') +
       '</span><span class="fn">' + esc(he) + '</span></summary>' +
       '<p>' + esc(RECIPE[k]) + '</p>';
     rc.appendChild(d);
@@ -824,7 +828,7 @@ function menu(v) {
     startTraps);
   tile(v, 'מסך התבניות', 'שמונה תבניות הבנת הנקרא ושתי המסגרות — לקרוא לפני, לא אחרי.',
     () => A.go('pat'));
-  tile(v, 'ספרינט מטרת הפסקה', 'התבנית הבודדת הגדולה ביותר בהבנת הנקרא — 20% מהשאלות.',
+  tile(v, 'ספרינט מטרת הפסקה', 'התבנית השנייה בשכיחות בהבנת הנקרא — 20% מהשאלות, והפסקה נתונה.',
     () => startRC('sprint'));
   tile(v, 'קטע מלא', 'קטע אמיתי וחמש שאלות בסדר המבחן.', () => startRC('full'));
 
