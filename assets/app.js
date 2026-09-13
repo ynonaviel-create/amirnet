@@ -254,6 +254,27 @@ function markKnown(w) {
 }
 
 /* ================= תצוגה ================= */
+/* מצב ריק/שגיאה אחיד. עד עכשיו מסך בלי נתונים היה פשוט ריק, וזה
+   נקרא כתקלה גם כשהכול תקין. */
+function state(head, body, action) {
+  const d = el('div', 'state', '<span class="sh">' + esc(head) + '</span>' + body);
+  if (action) {
+    const b = el('button', 'btn', esc(action.label));
+    b.onclick = action.fn;
+    d.appendChild(b);
+  }
+  return d;
+}
+function skeleton(n) {
+  const d = el('div');
+  for (let i = 0; i < (n || 3); i++) d.appendChild(el('div', 'skel'));
+  return d;
+}
+/* רטט קצר בשיפוט. נכשל בשקט בדפדפנים שלא תומכים, וזה בסדר. */
+function buzz(ms) {
+  try { if (navigator.vibrate && !matchMedia('(prefers-reduced-motion: reduce)').matches) navigator.vibrate(ms || 12); } catch (e) {}
+}
+
 function toast(msg) {
   const t = $('#toast');
   t.textContent = msg; t.hidden = false;
@@ -295,7 +316,7 @@ function nav() {
   n.hidden = false; n.innerHTML = '';
   /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
      לא מסומנת שם ולא ברור איפה נמצאים. */
-  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' || S.view === 'play' ? 'more' : S.view === 'focus' ? 'drill' : S.view;
+  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' || S.view === 'play' ? 'more' : S.view === 'focus' || S.view === 'pat' ? 'drill' : S.view;
   NAV.forEach(([k, t, ic]) => {
     const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
     b.onclick = () => go(k);
@@ -309,7 +330,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, words: viewWords, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, words: viewWords, pat: viewPat, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -581,6 +602,10 @@ function viewFocus(v) {
   if (window.AMDrills) return window.AMDrills.menu(v);
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
+function viewPat(v) {
+  if (window.AMDrills) return window.AMDrills.patterns(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
 function viewPlay(v) {
   if (window.AMDrills) return window.AMDrills.play(v);
   v.appendChild(el('div', 'empty', 'טוען…'));
@@ -653,9 +678,8 @@ function viewMore(v) {
   const ob = el('button', 'btn ghost sm', 'הצג שוב את מסך הפתיחה');
   ob.onclick = () => window.AMOnboard && window.AMOnboard.replay();
   kb.appendChild(ob);
-  v.append(kb);
 
-  v.append(s, th, pr);
+  v.append(s, th, pr, kb);
   seedUI(v);
 }
 
@@ -789,6 +813,7 @@ window.AM = {
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
   S, dueList, newList, meaning, examSentence, highlightWord: highlight, blankWord,
   plan, untriaged, startTriage, startStudy, editAssoc, markKnown, previewDays,
+  state, skeleton, buzz,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;

@@ -38,10 +38,6 @@
      ברכבת לא ימלא אותו שוב. לכן כישלון *רשת* נשמר כאן ונשלח בהזדמנות
      הבאה. כישלון שרת (דחיית RLS, מיגרציה שלא רצה) לא נשמר — הוא לא
      יתוקן מעצמו, וניסיון חוזר רק היה בונה תור נצחי. */
-  const PEND_KEY = 'amirnet.pendingSend';
-  const readPend = () => { try { return JSON.parse(localStorage.getItem(PEND_KEY)) || []; } catch { return []; } };
-  const savePend = (a) => { try { localStorage.setItem(PEND_KEY, JSON.stringify(a.slice(-20))); } catch {} };
-  const stash = (kind, row) => { const a = readPend(); a.push({ kind, row, ts: Date.now() }); savePend(a); };
 
   /* עותק מקומי לא מדבר עם מסד הייצור. זה גם מה שפותח את האתר לבדיקה מקומית:
      REQUIRE_LOGIN נשאר דלוק, אבל השער תלוי ב-Cloud.enabled — ובלי ענן אין
@@ -317,28 +313,12 @@
     finally {
       state.syncing = false;
       emit('cloud:sync');
-      flush();
-      flushPending();   // דיווח/סקר שנתקעו בלי רשת
+      flush();   // דיווח/סקר שנתקעו בלי רשת
     }
   }
 
   /* ---------- session ---------- */
   const NAME_KEY = 'amirnet.name';
-  /* שולח מה שנתקע בלי רשת. רץ אחרי כל סנכרון. שורה שהשרת דוחה נזרקת —
-     אחרת היא הייתה מנסה לנצח. */
-  async function flushPending() {
-    const a = readPend();
-    if (!a.length || !state.session) return;
-    const left = [];
-    for (const it of a) {
-      try {
-        const { error } = await sb.from(it.kind).insert(it.row);
-        if (error) continue;            // דחיית שרת — לא יתוקן מעצמו, מוותרים
-      } catch { left.push(it); }        // עדיין אין רשת — שומרים לפעם הבאה
-    }
-    savePend(left);
-  }
-
   function setSession(session) {
     state.session = session || null;
     if (session) {
@@ -405,7 +385,7 @@
          העדפות מכשיר (ערכת נושא, סיור) נשארות. */
       outbox = []; saveOutbox();
       Object.values(KEYMAP).forEach((k) => { try { localStorage.removeItem(k); } catch {} });
-      [NAME_KEY, PEND_KEY].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+      try { localStorage.removeItem(NAME_KEY); } catch (e) {}
       emit('cloud:merged', { changed: true });   // מפיל את מטמון seenH שבזיכרון ומרנדר
     },
 

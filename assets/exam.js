@@ -82,19 +82,46 @@ function draw(rows, count, byPassage) {
    ============================================================ */
 let RUN = null;
 
+function failed() {
+  const signed = !!(window.Cloud && window.Cloud.user);
+  const c = el('div', 'card'), mid = el('div', 'mid');
+  mid.appendChild(A.state(
+    signed ? 'הפרק לא נטען' : 'צריך להתחבר',
+    signed
+      ? (navigator.onLine
+          ? 'בנק השאלות לא הגיע מהמסד. זה לא אובדן נתונים — ההתקדמות שלך שמורה מקומית.<br>נסה שוב, ואם זה חוזר בדוק את חיבור החשבון תחת <b>עוד</b>.'
+          : 'אין רשת. אוצר המילים, התזמון וההדפסה עובדים אופליין; פרקי אמת דורשים חיבור.')
+      : 'בנק השאלות יושב מאחורי התחברות — חוברות מאל"ו נושאות איסור הפצה. ' +
+        'הכפתור למעלה מימין.',
+    { label: 'חזרה', fn: () => { A.closeStudy(); A.render(); } }));
+  c.appendChild(mid);
+  A.openStudy(c, { i: 0, n: 1, right: '', close: () => A.render() }).className = 'study m-exam';
+  return null;
+}
+
 async function startRun(plan, label) {
   const need = [...new Set(plan)];
   const banks = {};
-  for (const k of need) {
-    banks[k] = await A.bank(k);
-    if (!banks[k] || !banks[k].length) { toast('בנק השאלות לא נטען — התחבר קודם'); return; }
-  }
+  /* מסך טעינה אמיתי. שליפת הבנק בפעם הראשונה בסשן לוקחת רגע, ובלי
+     משוב הכפתור נראה מת. */
+  const wait = el('div', 'card'), wm = el('div', 'mid');
+  wm.appendChild(el('span', 'eyebrow', 'טוען את הפרק'));
+  wm.appendChild(A.skeleton(4));
+  wait.appendChild(wm);
+  A.openStudy(wait, { i: 0, n: 1, right: '', close: () => A.render() }).className = 'study m-exam';
+
   let passages = null;
-  if (plan.includes('rc')) {
-    const ps = await A.bank('passage');
-    if (!ps) { toast('בנק השאלות לא נטען — התחבר קודם'); return; }
-    passages = new Map(ps.map((p) => [p.id, p]));
-  }
+  try {
+    for (const k of need) {
+      banks[k] = await A.bank(k);
+      if (!banks[k] || !banks[k].length) return failed();
+    }
+    if (plan.includes('rc')) {
+      const ps = await A.bank('passage');
+      if (!ps || !ps.length) return failed();
+      passages = new Map(ps.map((p) => [p.id, p]));
+    }
+  } catch (e) { return failed(); }
   await scale();
 
   RUN = { plan, label, banks, passages, s: -1, log: [], recycled: false, sec: null };
@@ -154,10 +181,21 @@ function startClock() {
       c.textContent = fmt(RUN.sec.left);
       c.className = 'clock' + (RUN.sec.left <= 30 ? ' low' : '');
     }
-    if (RUN.sec.left <= 0) { clearInterval(TIMER); closeSection(); }
+    if (RUN.sec.left <= 0) { clearInterval(TIMER); leave(); closeSection(); }
   }, 1000);
 }
 function stopClock() { clearInterval(TIMER); TIMER = null; }
+
+/* המעבר הראשון נסגר כשעוזבים את השאלה, לא בלחיצה הראשונה. הגרסה
+   הקודמת רשמה את הקליק הראשון, ולכן מי שהתלבט בין שתי אפשרויות באותה
+   שאלה נרשם כ"שינה במעבר שני" — וזה בדיוק המדד שאמור לומר לו אם
+   חזרה לשאלה עוזרת לו. */
+function leave() {
+  const S_ = RUN.sec;
+  if (!S_) return;
+  const it = S_.items[S_.i], id = itemId(it);
+  if (id in S_.answers && !(id in S_.first)) S_.first[id] = S_.answers[id];
+}
 
 function paint() {
   const S_ = RUN.sec, spec = SPEC[S_.kind];
@@ -186,8 +224,8 @@ function paint() {
     const b = el('button', 'opt' + (S_.answers[id] === k ? ' pick' : ''),
       '<span class="num">(' + (k + 1) + ')</span>' + esc(o));
     b.onclick = () => {
-      if (!(id in S_.first)) S_.first[id] = k;
       S_.answers[id] = k;
+      A.buzz(10);
       paint();
     };
     box.appendChild(b);
@@ -202,13 +240,14 @@ function paint() {
     const answered = itemId(x) in S_.answers;
     const b = el('button', 'grade' + (k === S_.i ? ' g3' : ''),
       (k + 1) + (answered ? '<small>✓</small>' : '<small>—</small>'));
-    b.onclick = () => { S_.i = k; paint(); };
+    b.onclick = () => { leave(); S_.i = k; paint(); };
     pager.appendChild(b);
   });
   const blank = S_.items.filter((x) => !(itemId(x) in S_.answers)).length;
   const fin = el('button', 'btn' + (blank ? ' ghost' : ''),
     blank ? 'סגור פרק · ' + blank + ' ריקות' : 'סגור פרק');
   fin.onclick = () => {
+    leave();
     if (blank && !confirm(blank + ' שאלות ריקות. אין קנס על טעות והוראת המבחן היא לנחש. לסגור בכל זאת?')) return;
     closeSection();
   };
@@ -363,6 +402,21 @@ function explain(it, chosen) {
   const tip = window.AMStrat && window.AMStrat.ruleFor(it);
   if (tip) h += '<div class="note" style="margin-top:8px">' + tip + '</div>';
   w.innerHTML = h;
+
+  /* קישור לדף המילה מכל אפשרות. שם יושב מה שאין כאן: איפה המילה
+     הופיעה במבחנים אחרים, האסוציאציה, ומתי היא חוזרת. */
+  if (it.kind === 'sc' && window.AMWords) {
+    Array.from(w.querySelectorAll('.opt-row')).forEach((row, k) => {
+      const en = row.querySelector('.en');
+      if (!en || !S.words.has(String(it.options[k]).toLowerCase().trim())) return;
+      en.classList.add('lnk');
+      en.setAttribute('role', 'button');
+      en.setAttribute('tabindex', '0');
+      const open = () => window.AMWords.open(String(it.options[k]).toLowerCase().trim());
+      en.onclick = open;
+      en.onkeydown = (e) => { if (e.key === 'Enter') open(); };
+    });
+  }
   return w;
 }
 function gloss(word) {

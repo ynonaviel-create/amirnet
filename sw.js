@@ -1,9 +1,9 @@
 /* אופליין: cache-first לקליפה ולנתונים, ורשת-תחילה לכלום — האתר סטטי,
    ועדכון מגיע בהחלפת גרסת המטמון. */
-const V = 'amirnet-b86868be';
+const V = 'amirnet-a722f199';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
-  './assets/style.css', './assets/tokens.css', './assets/components.css',
+  './assets/style.css', './assets/tokens.css',
   './assets/app.js', './assets/today.js', './assets/print.js', './assets/progress.js', './assets/exam.js', './assets/words.js', './assets/onboard.js', './assets/strategy.js', './assets/drills.js', './assets/cloud.js', './assets/vendor/supabase.js',
   './data/words.json', './data/quads.json', './data/pairs.json', './data/scale.json',
 ];

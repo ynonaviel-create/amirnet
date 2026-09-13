@@ -85,7 +85,7 @@ fs.writeFileSync('data/words.json', JSON.stringify(words));
    ועדכון פשוט לא מגיע למשתמש — תקלה שקטה שקשה לאבחן אחר כך. */
 const stamp = crypto.createHash('sha1').update(
   ['assets/app.js', 'assets/today.js', 'assets/print.js', 'assets/progress.js', 'assets/exam.js', 'assets/words.js', 'assets/onboard.js', 'assets/strategy.js', 'assets/drills.js', 'assets/cloud.js', 'assets/style.css',
-   'assets/tokens.css', 'assets/components.css', 'index.html', 'sw.js',
+   'assets/tokens.css', 'index.html', 'sw.js',
    'data/words.json', 'data/quads.json', 'data/pairs.json', 'data/scale.json']
     .filter((f) => fs.existsSync(f))
     .map((f) => fs.readFileSync(f)).join('')

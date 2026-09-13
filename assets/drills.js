@@ -401,7 +401,13 @@ function paintRC() {
 
   mid.appendChild(el('span', 'eyebrow', t.he + ' · שאלה ' + (RC.i + 1) + ' מתוך ' + RC.q.length));
   if (RC.mode === 'sprint') {
-    mid.appendChild(el('div', 'passage', esc(paraOf(p.text, q.stem) || p.text)));
+    const para = paraOf(p.text, q.stem);
+    const box = el('div', 'passage focus');
+    box.innerHTML = (para
+      ? '<div class="plab">הפסקה שהשאלה מפנה אליה — ' +
+        Math.round(100 * para.length / p.text.length) + '% מהקטע</div><p>' + esc(para) + '</p>'
+      : p.text.split(/\n{2,}/).map((t) => '<p>' + esc(t.trim()) + '</p>').join(''));
+    mid.appendChild(box);
   } else {
     mid.appendChild(passagePanel(p.text, RC.i > 0));
   }
@@ -751,6 +757,59 @@ function tile(v, title, sub, fn, badge) {
   v.appendChild(b);
 }
 
+/* ---------- מסך התבניות ----------
+   RECIPE ישב בקוד מהיום הראשון ונשלף רק בתוך דריל, כלומר אחרי
+   שכבר ענית. תבנית נלמדת פעם אחת ונשלפת בכל שאלה — ולכן היא צריכה
+   מקום שאפשר לקרוא בו מראש. */
+const PATTERN_ORDER = ['purpose_para', 'purpose_text', 'detail', 'except',
+                       'vocab', 'reference', 'title', 'inference'];
+const PATTERN_SHARE = {
+  purpose_para: '29% משאלות הבנת הנקרא', detail: '25%', except: '11%',
+  vocab: '4%', inference: 'פחות מ-2%', reference: '', title: '', purpose_text: '',
+};
+function patterns(v) {
+  const head = el('div', 'sec');
+  head.appendChild(el('span', 'eyebrow', 'תבניות'));
+  head.appendChild(el('p', 'note',
+    'שמונה התבניות שמכסות כמעט את כל שאלות הבנת הנקרא, ושתי המסגרות ' +
+    'שמכריעות שאלת השלמת משפטים כשהן נוכחות. נלמד פעם אחת, נשלף בכל שאלה.'));
+  v.appendChild(head);
+
+  const rc = el('div', 'sec');
+  rc.appendChild(el('span', 'eyebrow', 'הבנת הנקרא'));
+  PATTERN_ORDER.forEach((k) => {
+    const he = (RC_TYPES.find((t) => t[0] === k) || [, , k])[2];
+    const d = el('details', 'finding works');
+    d.innerHTML = '<summary><span class="fv">' + esc(PATTERN_SHARE[k] ? PATTERN_SHARE[k].split(' ')[0] : '·') +
+      '</span><span class="fn">' + esc(he) + '</span></summary>' +
+      '<p>' + esc(RECIPE[k]) + '</p>';
+    rc.appendChild(d);
+  });
+  v.appendChild(rc);
+
+  const fr = el('div', 'sec');
+  fr.appendChild(el('span', 'eyebrow', 'שתי המסגרות בהשלמת משפטים'));
+  [['המשפט מגדיר את עצמו',
+    'פסוקית, אפוזיציה, נקודתיים או "known as" אומרות מה המילה החסרה. ' +
+    'כשזה קורה אין צורך להכיר את המילה — צריך רק להתאים להגדרה שכבר במשפט. ' +
+    'מופיע ב-9.3% מהפריטים.'],
+   ['יש כאן היפוך',
+    'but · although · despite · unlike · yet. המילה החסרה חייבת להיות בקוטביות ' +
+    'ההפוכה מהחצי השני של המשפט. מופיע ב-8.6% מהפריטים.']].forEach(([t, b]) => {
+    const d = el('details', 'finding works');
+    d.innerHTML = '<summary><span class="fv">·</span><span class="fn">' + esc(t) + '</span></summary><p>' + b + '</p>';
+    fr.appendChild(d);
+  });
+  v.appendChild(fr);
+
+  const warn = el('div', 'sec');
+  warn.appendChild(el('p', 'note',
+    '<b>ושתי המסגרות האלה מכסות 18% מהפרק בלבד.</b> ב-61% מהשאלות אין ' +
+    'שום רמז מבני — רק אוצר מילים ופסילה. מדדתי את זה על כל 464 הפריטים, ' +
+    'והמספר מופיע במסך האסטרטגיה.'));
+  v.appendChild(warn);
+}
+
 function menu(v) {
   const signed = !!(window.Cloud && window.Cloud.user);
   v.appendChild(el('span', 'eyebrow', 'תרגולים ממוקדים'));
@@ -763,6 +822,8 @@ function menu(v) {
   tile(v, 'מסגרות מגלות', 'שני הדפוסים שמכריעים את השאלה כשהם נוכחים.', startFrames);
   tile(v, 'צייד המלכודות', 'ניסוח מחדש — לבחור נכון, ואז להבין למה השאר שגויים. 26% מהניקוד.',
     startTraps);
+  tile(v, 'מסך התבניות', 'שמונה תבניות הבנת הנקרא ושתי המסגרות — לקרוא לפני, לא אחרי.',
+    () => A.go('pat'));
   tile(v, 'ספרינט מטרת הפסקה', 'התבנית הבודדת הגדולה ביותר בהבנת הנקרא — 20% מהשאלות.',
     () => startRC('sprint'));
   tile(v, 'קטע מלא', 'קטע אמיתי וחמש שאלות בסדר המבחן.', () => startRC('full'));
@@ -825,7 +886,7 @@ function reconcile(id) {
 }
 
 window.AMDrills = {
-  menu, play,
+  menu, play, patterns,
   /* משגרים למסך "היום" ולבנק הטעויות — הם מרכיבים משימה מהחלקים האלה
      ולכן צריכים לפתוח אותם ישירות, בלי לעבור דרך התפריט. */
   traps: startTraps,
