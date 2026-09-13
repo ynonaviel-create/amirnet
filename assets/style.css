@@ -542,3 +542,16 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .secbar .clock { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-md);
   font-weight: 600; color: var(--mode, var(--accent)); font-variant-numeric: tabular-nums; }
 .secbar .clock.low { color: var(--bad); }
+
+/* ---- כניסה ראשונה ---- */
+.obt { font-size: var(--fs-xl); font-weight: 700; line-height: 1.25;
+  text-align: center; max-width: 20ch; margin: 6px 0 2px; }
+
+/* ---- באנר אופליין ---- */
+.netbar {
+  position: fixed; inset-inline: 0; bottom: 0; z-index: 60;
+  background: var(--warn-bg, var(--surface-2)); color: var(--text);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-xs); text-align: center; padding: 7px 12px;
+  padding-bottom: calc(7px + env(safe-area-inset-bottom));
+}

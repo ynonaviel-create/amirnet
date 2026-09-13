@@ -626,6 +626,16 @@ function viewMore(v) {
   pg.onclick = () => go('prog');
   pr.appendChild(pg);
 
+  const kb = el('div', 'sec');
+  kb.appendChild(el('span', 'eyebrow', 'מקלדת'));
+  kb.appendChild(el('p', 'note',
+    '<b>1–4</b> בוחרות אפשרות או דרגה · <b>Enter</b> ממשיכה · <b>Esc</b> סוגרת. ' +
+    'שימושי כשמתרגלים מהמחשב.'));
+  const ob = el('button', 'btn ghost sm', 'הצג שוב את מסך הפתיחה');
+  ob.onclick = () => window.AMOnboard && window.AMOnboard.replay();
+  kb.appendChild(ob);
+  v.append(kb);
+
   v.append(s, th, pr);
   seedUI(v);
 }
@@ -739,6 +749,8 @@ async function boot() {
   if (!pref('start', null)) setPref('start', today());
   S.ready = true;
   render();
+  /* כניסה ראשונה — אחרי שהמאגר נטען, כי הצעד השלישי מחשב קצב מולו. */
+  if (window.AMOnboard && window.AMOnboard.needed()) window.AMOnboard.start();
 
   if (window.Cloud && window.Cloud.enabled) { try { await window.Cloud.init(); } catch (e) {} }
   paintAccount();

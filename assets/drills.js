@@ -489,7 +489,11 @@ function towerRound() {
     if (right) { TW.score++; TW.speed = Math.max(2600, TW.speed - 180); }
     else TW.lives--;
     bump({ rev: 0 });
-    setTimeout(towerRound, right ? 260 : 900);
+    /* הסיבוב הבא נדחה, ולכן חייב להיות ניתן לביטול: סגירת המשטח מאפסת
+       את TW, והקריאה הדחויה הייתה נוגעת ב-null, זורקת, ופותחת מחדש
+       משטח שהמשתמש כבר סגר. */
+    clearTimeout(TW._d);
+    TW._d = setTimeout(() => { if (TW) towerRound(); }, right ? 260 : 900);
   };
   opts.forEach((o) => {
     const b = el('button', 'opt', esc(o.def));
@@ -505,9 +509,11 @@ function towerRound() {
   });
   mid.appendChild(box);
   c.appendChild(mid);
-  openMode(c, { i: 1, n: 1, right: 'שיא ' + TW.best, close: () => { clearInterval(TW._t); TW = null; A.render(); } }, 'tower');
+  openMode(c, { i: 1, n: 1, right: 'שיא ' + TW.best, close: () => { clearInterval(TW._t); clearTimeout(TW._d); TW = null; A.render(); } }, 'tower');
   const t0 = Date.now();
+  clearInterval(TW._t);
   TW._t = setInterval(() => {
+    if (!TW) return clearInterval(TW._t);
     const left = 1 - (Date.now() - t0) / TW.speed;
     const bar = document.querySelector('#twbar');
     if (bar) bar.style.width = Math.max(0, left * 100) + '%';
@@ -523,9 +529,18 @@ async function startPairs() {
   const have = pairs.filter((p) => S.words.get(p[0]) && S.words.get(p[1]) &&
                                    S.words.get(p[0]).def && S.words.get(p[1]).def);
   if (have.length < 4) { toast('עוד אין מספיק זוגות עם משמעות'); return; }
-  const pick = shuffle(have.slice()).slice(0, 4);
+  /* אותה מילה מופיעה ביותר מזוג אחד ב-pairs.json. אם שני זוגות בחפיסה
+     חולקים מילה, נוצרים שני כרטיסים זהים והחפיסה בלתי פתירה — מדדתי
+     שזה קרה בכ-10% מהחלוקות. הבחירה כאן חוסמת חזרה על מילה. */
+  const used = new Set(), pick = [];
+  for (const p of shuffle(have.slice())) {
+    if (pick.length >= 4) break;
+    if (used.has(p[0]) || used.has(p[1])) continue;
+    used.add(p[0]); used.add(p[1]); pick.push(p);
+  }
+  if (pick.length < 3) { toast('עוד אין מספיק זוגות נפרדים'); return; }
   const cards = [];
-  pick.forEach(([a, b], gi) => {
+  pick.forEach(([a, b]) => {
     [a, b].forEach((w) => {
       cards.push({ id: w + ':w', g: w, face: w, kind: 'w' });
       cards.push({ id: w + ':d', g: w, face: S.words.get(w).def, kind: 'd' });
@@ -559,7 +574,7 @@ function paintPairs() {
     out.onclick = () => { PR = null; closeStudy(); A.render(); };
     a.append(again, out); c.appendChild(a);
   }
-  openMode(c, { i: done, n: PR.pairsN, right: '', close: () => { PR = null; A.render(); } }, 'pair');
+  openMode(c, { i: done, n: PR.pairsN, right: '', close: () => { clearTimeout(PR._d); PR = null; A.render(); } }, 'pair');
 }
 function flip(i) {
   PR.open.push(i);
@@ -567,7 +582,10 @@ function flip(i) {
     PR.moves++;
     const [a, b] = PR.open.map((k) => PR.cards[k]);
     if (a.g === b.g && a.kind !== b.kind) { PR.matched[a.g] = 1; PR.open = []; }
-    else setTimeout(() => { PR.open = []; paintPairs(); }, 900);
+    else {
+      clearTimeout(PR._d);
+      PR._d = setTimeout(() => { if (!PR) return; PR.open = []; paintPairs(); }, 900);
+    }
   }
   paintPairs();
 }
