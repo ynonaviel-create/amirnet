@@ -114,7 +114,7 @@ async function view(v) {
 
   if (est) {
     head.appendChild(el('div', 'figs',
-      '<div class="fig"><span class="n">' + lo + '–' + hi + '</span><span class="k">טווח משוער</span></div>' +
+      '<div class="fig"><span class="n rng">' + lo + '–' + hi + '</span><span class="k">טווח משוער</span></div>' +
       '<div class="fig ' + (est >= 134 ? 'new' : 'due') + '"><span class="n">' + est + '</span><span class="k">אמצע</span></div>' +
       '<div class="fig"><span class="n">' + total + '</span><span class="k">שאלות</span></div>'));
     head.appendChild(el('div', 'note', est >= 134

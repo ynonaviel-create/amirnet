@@ -565,13 +565,29 @@ function editAssoc(w, done) {
     if (val.length < 3) { toast('קצר מדי'); return; }
     put('assoc', w, { text: val, at: Date.now() });
     const cd = card(w); if (cd) { cd.af = 0; cd.at = Date.now(); put('cards', w, cd); }
+    box.dispatchEvent(new Event('am:close'));
     box.remove(); if (done) done();
   };
-  no.onclick = () => { box.remove(); if (done) done(); };
+  no.onclick = () => { box.dispatchEvent(new Event('am:close')); box.remove(); if (done) done(); };
   f.append(ok, no);
   c.appendChild(f); box.appendChild(c);
   $('#layer').appendChild(box);
-  setTimeout(() => { const t = $('#ae'); if (t) t.focus(); }, 60);
+  setTimeout(() => {
+    const t = $('#ae');
+    if (!t) return;
+    t.focus();
+    /* ב-iOS המקלדת עולה מעל שכבה ב-position:fixed ומכסה בדיוק את
+       השדה שזה עתה קיבל פוקוס. visualViewport הוא החלק שבאמת נראה,
+       ולכן גלילה אליו מחזירה את התיבה מעל המקלדת. */
+    const bring = () => t.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setTimeout(bring, 260);
+    if (window.visualViewport) {
+      const vv = window.visualViewport;
+      const on = () => bring();
+      vv.addEventListener('resize', on);
+      box.addEventListener('am:close', () => vv.removeEventListener('resize', on));
+    }
+  }, 60);
 }
 
 function finish() {
@@ -673,7 +689,7 @@ function viewMore(v) {
   const kb = el('div', 'sec');
   kb.appendChild(el('span', 'eyebrow', 'מקלדת'));
   kb.appendChild(el('p', 'note',
-    '<b>1–4</b> בוחרות אפשרות או דרגה · <b>Enter</b> ממשיכה · <b>Esc</b> סוגרת. ' +
+    '<b class="rng">1–4</b> בוחרות אפשרות או דרגה · <b>Enter</b> ממשיכה · <b>Esc</b> סוגרת. ' +
     'שימושי כשמתרגלים מהמחשב.'));
   const ob = el('button', 'btn ghost sm', 'הצג שוב את מסך הפתיחה');
   ob.onclick = () => window.AMOnboard && window.AMOnboard.replay();

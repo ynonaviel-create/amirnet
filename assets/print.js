@@ -45,11 +45,11 @@ function ranges() {
   const runs = offRuns(today(), 40);
   const out = [];
   const single = runs.find((r) => r[0] === r[1]);
-  if (single) out.push({ k: 'shabbat', he: 'השבת הקרובה', upto: single[1], days: 1, when: heDate(single[0]) });
+  if (single) out.push({ k: 'shabbat', he: 'השבת הקרובה', upto: single[1], days: 1, when: esc(heDate(single[0])) });
   const long = runs.find((r) => r[0] !== r[1]);
   if (long) out.push({ k: 'chag', he: 'החג הקרוב', upto: long[1],
-    days: between(long[0], long[1]) + 1, when: heDate(long[0]) + ' – ' + heDate(long[1]) });
-  out.push({ k: 'week', he: 'השבוע הקרוב', upto: addDays(today(), 7), days: 7, when: 'עד ' + heDate(addDays(today(), 7)) });
+    days: between(long[0], long[1]) + 1, when: '<span class="rng">' + heDate(long[0]) + ' – ' + heDate(long[1]) + '</span>' });
+  out.push({ k: 'week', he: 'השבוע הקרוב', upto: addDays(today(), 7), days: 7, when: 'עד ' + esc(heDate(addDays(today(), 7))) });
   return out;
 }
 
@@ -223,7 +223,7 @@ function view(v) {
   R.forEach((r) => {
     const b = el('button', 'pick' + (r.k === range.k ? ' on' : ''));
     b.innerHTML = '<span class="pt">' + esc(r.he) + '</span>' +
-      '<span class="pd">' + esc(r.when) + ' · ' + r.days + (r.days === 1 ? ' יום' : ' ימים') + '</span>';
+      '<span class="pd">' + r.when + ' · ' + r.days + (r.days === 1 ? ' יום' : ' ימים') + '</span>';
     b.onclick = () => { save({ range: r.k }); A.render(); };
     s1.appendChild(b);
   });

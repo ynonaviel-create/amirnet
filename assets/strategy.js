@@ -180,7 +180,7 @@ function paintElim() {
     const m = el('div', 'oddsbar');
     m.innerHTML =
       '<div class="lab">הסיכוי שלך עכשיו</div>' +
-      '<div class="val">' + odds(E.out.size) + '%</div>' +
+      '<div class="val rng">' + odds(E.out.size) + '%</div>' +
       '<div class="steps">' + [0, 1, 2, 3].map((n) =>
         '<i class="' + (n <= E.out.size ? 'on' : '') + '">' + odds(n) + '%</i>').join('') + '</div>';
     mid.appendChild(m);

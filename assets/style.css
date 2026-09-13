@@ -635,3 +635,13 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
   text-decoration-style: dotted; text-underline-offset: 3px;
   text-decoration-color: var(--dim); }
 .opt-row .en.lnk:hover { text-decoration-color: var(--accent); }
+
+/* טווח מספרי בתוך טקסט עברי. בלי בידוד מפורש אלגוריתם הכיוון דוחף את
+   המספר הימני לשמאל — "50–150" נצבע על המסך כ-"150–50", ו-"114–128"
+   כ-"128–114". זה לא עיצוב, זה מידע הפוך. */
+.rng { unicode-bidi: isolate; direction: ltr; display: inline-block;
+  font-variant-numeric: tabular-nums; }
+
+/* שכבת האסוציאציה גוללת, כדי שהשדה יוכל לעלות מעל מקלדת הטלפון */
+.study { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.study > .card { min-height: 0; }
