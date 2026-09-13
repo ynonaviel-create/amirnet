@@ -645,3 +645,6 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* שכבת האסוציאציה גוללת, כדי שהשדה יוכל לעלות מעל מקלדת הטלפון */
 .study { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .study > .card { min-height: 0; }
+
+.lead { font-size: var(--fs-md); line-height: 1.6; color: var(--text); margin-top: 8px; }
+.lead b { font-weight: 700; }

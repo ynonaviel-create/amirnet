@@ -105,7 +105,7 @@ function view(v) {
       return;
     }
     list.appendChild(el('div', 'tiny dim', hits.length >= 200
-      ? 'מוצגות 200 הראשונות — צמצם בחיפוש' : hits.length + ' מילים'));
+      ? 'מוצגות 200 הראשונות — צמצם בחיפוש' : A.plural(hits.length, 'מילה אחת', 'מילים')));
     hits.forEach((w) => {
       const o = S.words.get(w), cd = card(w);
       const b = el('button', 'wrow');
@@ -147,8 +147,8 @@ async function openWord(w) {
     const left = between(today(), cd.d || today());
     state.appendChild(el('div', 'statgrid',
       '<div class="stat"><div class="v">' + esc(BUCKET_HE[bucket(cd)]) + '</div>' +
-      '<div class="l">בשלות</div><div class="s">יציבות ' + Math.round(cd.st || 0) + ' ימים</div></div>' +
-      '<div class="stat"><div class="v">' + (left <= 0 ? 'היום' : left + ' ימים') + '</div>' +
+      '<div class="l">בשלות</div><div class="s">יציבות ' + A.plural(Math.round(cd.st || 0), 'יום אחד', 'ימים') + '</div></div>' +
+      '<div class="stat"><div class="v">' + (left <= 0 ? 'היום' : A.plural(left, 'מחר', 'ימים')) + '</div>' +
       '<div class="l">החזרה הבאה</div><div class="s">' + esc(heDate(cd.d || today())) + '</div></div>' +
       '<div class="stat"><div class="v">' + (cd.r || 0) + '</div>' +
       '<div class="l">חזרות</div><div class="s">' + (cd.l || 0) + ' נפילות</div></div>' +

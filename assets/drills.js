@@ -559,7 +559,7 @@ function paintPairs() {
   const c = el('div', 'card');
   const mid = el('div', 'mid');
   const done = Object.keys(PR.matched).length;
-  mid.innerHTML = '<span class="eyebrow">זוגות מבלבלים · ' + done + '/' + PR.pairsN + ' · ' + PR.moves + ' מהלכים</span>' +
+  mid.innerHTML = '<span class="eyebrow">זוגות מבלבלים · ' + done + '/' + PR.pairsN + ' · ' + A.plural(PR.moves, 'מהלך אחד', 'מהלכים') + '</span>' +
     '<div class="tiny dim">התאם כל מילה למשמעות שלה. החפיסה נזרעה בזוגות שהמבחן באמת מבלבל ביניהם.</div>';
   const grid = el('div');
   grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:7px;width:100%;max-width:46ch';
@@ -882,7 +882,7 @@ function reconcile(id) {
     });
     bump({ rev: n, ok: n });
     b.reconciled = Date.now(); put('print', id, b);
-    closeStudy(); toast(n + ' מילים עודכנו'); A.render();
+    closeStudy(); toast(A.plural(n, 'מילה אחת עודכנה', 'מילים עודכנו')); A.render();
   };
   acts.appendChild(save);
   c.append(mid, acts);

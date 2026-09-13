@@ -297,7 +297,7 @@ function finishElim() {
     '<span class="eyebrow">סיכום</span>' +
     '<div class="big">' + E.hit + '/' + E.n + '</div>' +
     '<div class="note" style="text-align:center;max-width:44ch">' +
-      'דיוק הפסילה שלך: <b>' + acc + '%</b> מתוך ' + E.rej + ' פסילות.' +
+      'דיוק הפסילה שלך: <b>' + acc + '%</b> מתוך ' + A.plural(E.rej, 'פסילה אחת', 'פסילות') + '.' +
       (E.fatal ? ' פסלת את התשובה הנכונה <b>' + E.fatal + '</b> פעמים.' : ' לא פסלת אף תשובה נכונה.') +
       '<br><br>' + verdict(acc, E.fatal, E.rej) + '</div>';
   const acts = el('div', 'acts');
@@ -408,7 +408,7 @@ function paintFocus() {
     const nx = el('button', 'btn', R.i + 1 < R.items.length ? 'הבא' : 'סיום');
     nx.onclick = () => {
       if (R.i + 1 >= R.items.length) { const h = R.hit, n = R.n, op = R.opened; R = null; closeStudy(); A.render();
-        toast(h + '/' + n + ' · פתחת את הקטע המלא ' + op + ' פעמים'); return; }
+        toast(h + '/' + n + ' · פתחת את הקטע המלא ' + A.plural(op, 'פעם אחת', 'פעמים')); return; }
       R.i++; R.pick = null; R.full = false; paintFocus();
     };
     acts.appendChild(nx);
@@ -469,7 +469,7 @@ function view(v) {
     st.appendChild(el('span', 'eyebrow', 'דיוק הפסילה שלך'));
     const g = el('div', 'statgrid');
     const acc = pct(s.good, s.rej);
-    [['דיוק פסילה', acc + '%', s.rej + ' פסילות'],
+    [['דיוק פסילה', acc + '%', A.plural(s.rej, 'פסילה אחת', 'פסילות')],
      ['פסילות קטלניות', String(s.fatal), 'פעמים שפסלת את הנכונה'],
      ['הצלחה', pct(s.hit, s.n) + '%', s.n + ' פריטים'],
      ['פסילות לפריט', (s.rej / s.n).toFixed(1), 'ממוצע']]

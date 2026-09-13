@@ -291,7 +291,9 @@ function view(v) {
       'הדפסת דף ולא סימנת מה זכרת. בלי זה התזמון לא יודע מה קרה בשבת ' +
       'והמילים יחזרו כאילו לא נגעת בהן. שלושים שניות לכל הדף.'));
     open.forEach((k) => {
-      const b = el('button', 'btn', 'סמן מה זכרת · ' + (batch[k].words || []).length + ' מילים · ' + heDate(new Date(batch[k].at).toISOString().slice(0, 10)));
+      const b = el('button', 'btn', 'סמן מה זכרת · ' +
+        A.plural((batch[k].words || []).length, 'מילה אחת', 'מילים') + ' · ' +
+        heDate(new Date(batch[k].at).toISOString().slice(0, 10)));
       b.onclick = () => window.AMDrills.reconcile(k);
       s5.appendChild(b);
     });

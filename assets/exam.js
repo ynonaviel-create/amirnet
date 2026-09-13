@@ -248,7 +248,8 @@ function paint() {
     blank ? 'סגור פרק · ' + blank + ' ריקות' : 'סגור פרק');
   fin.onclick = () => {
     leave();
-    if (blank && !confirm(blank + ' שאלות ריקות. אין קנס על טעות והוראת המבחן היא לנחש. לסגור בכל זאת?')) return;
+    if (blank && !confirm(A.plural(blank, 'שאלה אחת ריקה', 'שאלות ריקות') +
+      '. אין קנס על טעות והוראת המבחן היא לנחש. לסגור בכל זאת?')) return;
     closeSection();
   };
   acts.append(pager, fin);
@@ -338,11 +339,11 @@ function finishRun() {
   mid.innerHTML = h;
 
   if (blank) mid.appendChild(el('div', 'note',
-    '<b style="color:var(--bad)">' + blank + ' שאלות נשארו ריקות.</b> ' +
+    '<b style="color:var(--bad)">' + A.plural(blank, 'שאלה אחת נשארה ריקה', 'שאלות נשארו ריקות') + '.</b> ' +
     'אין קנס על טעות וההוראה הרשמית היא לנחש — בתוחלת ויתרת על ' +
     (Math.round(blank * 0.25 * 10) / 10) + ' תשובות נכונות.'));
   if (cg || cb) mid.appendChild(el('div', 'note',
-    'שינית ' + (cg + cb) + ' תשובות אחרי המעבר הראשון: <b>' + cg + '</b> לטובה, <b>' + cb + '</b> לרעה.' +
+    'שינית ' + A.plural(cg + cb, 'תשובה אחת', 'תשובות') + ' אחרי המעבר הראשון: <b>' + cg + '</b> לטובה, <b>' + cb + '</b> לרעה.' +
     (cg + cb >= 4 ? (cg > cb ? ' השינוי עובד לך.' : cb > cg ? ' התחושה הראשונה שלך טובה יותר.' : '') : '')));
 
   const grid = el('div', 'statgrid');

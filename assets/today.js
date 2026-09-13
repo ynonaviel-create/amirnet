@@ -131,7 +131,7 @@ function home(v) {
       ? '<b>' + p.dueN + '</b> כרטיסים בפירעון היום' + (p.newN ? ' ו‑<b>' + p.newN + '</b> חדשים' : '') +
         '. כרטיס שנדחה יורד ביציבות ומחייב חזרה מוקדמת יותר.'
       : '<b>' + p.newN + '</b> מילים חדשות. אין כרגע חוב חזרות.',
-    done: d.rev ? d.rev + ' כרטיסים כבר נעשו היום' : null,
+    done: d.rev ? A.plural(d.rev, 'כרטיס אחד כבר נעשה היום', 'כרטיסים כבר נעשו היום') : null,
     go: A.startStudy,
   });
 
@@ -216,7 +216,7 @@ function home(v) {
     'משימת היום' + (bud.why ? ' · ' + bud.why : '') + (M.length ? ' · ' + M.length + ' משימות' : '')));
   if (!M.length) {
     sec.appendChild(el('div', 'empty', 'הכול נקי להיום. ' +
-      (left > 0 ? left + ' ימים למבחן.' : '')));
+      (left > 0 ? A.plural(left, 'יום אחד למבחן.', 'ימים למבחן.') : '')));
   } else {
     const short = !!(bud.min && bud.min < 30);
     const cut = short ? M.slice(0, 2) : M.slice(0, 4);
@@ -311,7 +311,7 @@ function paintFix() {
   const c = el('div', 'card'), mid = el('div', 'mid');
   mid.innerHTML =
     '<span class="eyebrow">בנק הטעויות · ' + (FIX.i + 1) + ' מתוך ' + FIX.items.length + '</span>' +
-    (prev.back ? '<div class="tiny dim">חזרת לשאלה הזו ' + prev.back + ' פעמים</div>' : '');
+    (prev.back ? '<div class="tiny dim">חזרת לשאלה הזו ' + A.plural(prev.back, 'פעם אחת', 'פעמים') + '</div>' : '');
 
   if (it.kind === 'rc' && FIX.ps && FIX.ps.get(it.passage)) {
     const p = el('div', 'passage');

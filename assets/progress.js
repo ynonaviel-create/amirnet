@@ -146,7 +146,7 @@ async function view(v) {
     const row = el('div', 'item');
     row.innerHTML = '<div class="b"><b>' + esc(he) + '</b> · ' + w + ' מתוך ' + TOTALQ +
       ' שאלות · ' + Math.round(100 * w / TOTALQ) + '% מהציון' +
-      '<br><span class="tiny muted">' + (ex[k].n ? ex[k].n + ' שאלות נענו' : 'טרם נענו שאלות') + '</span></div>' +
+      '<br><span class="tiny muted">' + (ex[k].n ? A.plural(ex[k].n, 'שאלה אחת נענתה', 'שאלות נענו') : 'טרם נענו שאלות') + '</span></div>' +
       (p == null ? '<div class="pill">—</div>'
         : '<div class="pill ' + (p >= 86 ? 'good' : 'bad') + '">' + p + '%</div>');
     s3.appendChild(row);
@@ -166,9 +166,9 @@ async function view(v) {
     const pk = pct(pass.keep[0], nk), pc = pct(pass.change[0], nc);
     s4.appendChild(el('div', 'statgrid',
       '<div class="stat"><div class="v">' + (pk == null ? '—' : pk + '%') + '</div>' +
-      '<div class="l">נשארת עם הראשונה</div><div class="s">' + nk + ' שאלות</div></div>' +
+      '<div class="l">נשארת עם הראשונה</div><div class="s">' + A.plural(nk, 'שאלה אחת', 'שאלות') + '</div></div>' +
       '<div class="stat"><div class="v">' + (pc == null ? '—' : pc + '%') + '</div>' +
-      '<div class="l">שינית תשובה</div><div class="s">' + nc + ' שאלות</div></div>'));
+      '<div class="l">שינית תשובה</div><div class="s">' + A.plural(nc, 'שאלה אחת', 'שאלות') + '</div></div>'));
     s4.appendChild(el('div', 'note', pc == null || pk == null ? '' :
       pc > pk + 5 ? 'שינוי התשובה <b>עוזר לך</b>. אל תיצמד לתחושה הראשונה — יש לך זמן, השתמש בו.'
       : pk > pc + 5 ? 'התחושה הראשונה שלך <b>טובה יותר</b>. שנה רק כשמצאת נימוק חדש, לא כשהתלבטת.'

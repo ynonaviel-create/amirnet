@@ -275,6 +275,10 @@ function buzz(ms) {
   try { if (navigator.vibrate && !matchMedia('(prefers-reduced-motion: reduce)').matches) navigator.vibrate(ms || 12); } catch (e) {}
 }
 
+/* עברית סופרת אחרת באחד. "שינית 1 תשובות" ו-"רצף של 1 ימים" הם
+   בדיוק סוג הפרט שגורם לאפליקציה להרגיש לא גמורה. */
+const plural = (n, one, many) => (n === 1 ? one : n + ' ' + many);
+
 function toast(msg) {
   const t = $('#toast');
   t.textContent = msg; t.hidden = false;
@@ -316,7 +320,8 @@ function nav() {
   n.hidden = false; n.innerHTML = '';
   /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
      לא מסומנת שם ולא ברור איפה נמצאים. */
-  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' || S.view === 'play' ? 'more' : S.view === 'focus' || S.view === 'pat' ? 'drill' : S.view;
+  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' || S.view === 'play' || S.view === 'about' ? 'more'
+    : S.view === 'focus' || S.view === 'pat' ? 'drill' : S.view;
   NAV.forEach(([k, t, ic]) => {
     const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
     b.onclick = () => go(k);
@@ -330,7 +335,7 @@ function render() {
   const v = $('#view');
   v.innerHTML = '';
   if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, words: viewWords, pat: viewPat, more: viewMore }[S.view] || viewHome)(v);
+  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, words: viewWords, pat: viewPat, about: viewAbout, more: viewMore }[S.view] || viewHome)(v);
 }
 
 /* ---------- בית ---------- */
@@ -352,6 +357,10 @@ function viewProg(v) {
 }
 function viewWords(v) {
   if (window.AMWords) return window.AMWords.view(v);
+  v.appendChild(el('div', 'empty', 'טוען…'));
+}
+function viewAbout(v) {
+  if (window.AMAbout) return window.AMAbout.view(v);
   v.appendChild(el('div', 'empty', 'טוען…'));
 }
 
@@ -596,7 +605,7 @@ function finish() {
   c.innerHTML = '<div class="mid"><span class="eyebrow">סיימת</span>' +
     '<div class="head-en">' + SESS.done + '</div>' +
     '<div class="he">כרטיסים · ' + acc + '% דיוק</div>' +
-    '<div class="tiny dim">רצף של ' + Math.max(1, streak()) + ' ימים</div></div>';
+    '<div class="tiny dim">רצף של ' + plural(Math.max(1, streak()), 'יום אחד', 'ימים') + '</div></div>';
   const a = el('div', 'acts');
   const b = el('button', 'btn', 'חזרה למסך הבית');
   b.onclick = endSession;
@@ -678,6 +687,13 @@ function viewMore(v) {
     '<div class="tiny muted" style="font-weight:400;margin-top:2px">אומדן ציון, מגמה, דיוק לפי פרק, ומפת המלכודות שלך.</div>';
   pg.onclick = () => go('prog');
   pr.appendChild(pg);
+
+  const ab = el('button', 'btn ghost');
+  ab.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
+  ab.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">מה זה, ואיך משתמשים</div>' +
+    '<div class="tiny muted" style="font-weight:400;margin-top:2px">המבחן בארבעה מספרים, חמשת המסכים, ומה לעשות ביום רגיל.</div>';
+  ab.onclick = () => go('about');
+  pr.appendChild(ab);
 
   const gm = el('button', 'btn ghost');
   gm.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
@@ -815,6 +831,9 @@ async function boot() {
   paintAccount();
   loadSentences();
 
+  const brand = $('#brand');
+  if (brand) brand.onclick = () => go('home');
+
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
@@ -829,7 +848,7 @@ window.AM = {
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
   S, dueList, newList, meaning, examSentence, highlightWord: highlight, blankWord,
   plan, untriaged, startTriage, startStudy, editAssoc, markKnown, previewDays,
-  state, skeleton, buzz,
+  state, skeleton, buzz, plural,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;
