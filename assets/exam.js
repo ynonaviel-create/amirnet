@@ -440,7 +440,25 @@ async function view(v) {
     'ואין חזרה אחרי סגירה. פריט שכבר ראית לא יחזור עד שהמאגר ייגמר.'));
   v.appendChild(head);
   if (!signed) {
-    v.appendChild(el('div', 'note', 'בנק השאלות דורש התחברות — הכפתור למעלה מימין.'));
+    const box = el('div', 'sec');
+    box.appendChild(A.state('צריך להתחבר',
+      'חוברות הבחינה של מאל"ו נושאות איסור העתקה והפצה, ולכן בנק השאלות ' +
+      'לא יושב בקוד הפומבי אלא במסד מאחורי התחברות.<br><br>' +
+      'מה שכן עובד בלי חשבון: <b>אוצר המילים, המילון, התזמון וההדפסה</b>.',
+      { label: 'התחברות', fn: () => window.Cloud && window.Cloud.login && window.Cloud.login() }));
+    v.appendChild(box);
+    const what = el('div', 'sec');
+    what.appendChild(el('span', 'eyebrow', 'מה מחכה שם'));
+    what.appendChild(el('div', 'statgrid',
+      '<div class="stat"><div class="v rng">116</div><div class="l">השלמת משפטים</div>' +
+      '<div class="s">פרקים של 4 שאלות</div></div>' +
+      '<div class="stat"><div class="v rng">77</div><div class="l">ניסוח מחדש</div>' +
+      '<div class="s">פרקים של 3 שאלות</div></div>' +
+      '<div class="stat"><div class="v rng">108</div><div class="l">הבנת הנקרא</div>' +
+      '<div class="s">קטעים עם 5 שאלות</div></div>' +
+      '<div class="stat"><div class="v rng">38</div><div class="l">סימולציות מלאות</div>' +
+      '<div class="s">בלי חזרה על פריט</div></div>'));
+    v.appendChild(what);
     return;
   }
 
