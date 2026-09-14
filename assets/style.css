@@ -198,7 +198,8 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
   font-size: var(--fs-en); font-family: var(--font-en); line-height: var(--lh-en);
   min-height: 48px;
 }
-.opt.pick  { border-color: var(--accent); background: var(--accent-sl); }
+.opt.pick  { border-color: var(--accent); background: var(--accent-sl);
+             box-shadow: inset 0 0 0 1px var(--accent); }
 .opt.right { border-color: var(--good); background: var(--good-bg); font-weight: 500; }
 .opt.wrong { border-color: var(--bad);  background: var(--bad-bg); }
 .opt .num { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm); color: var(--dim); margin-inline-end: 10px; }
@@ -266,22 +267,25 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
    התצוגה המקדימה היא ספירה ולא הערכה. */
 
 /* --- בוררים --- */
-.pick {
+/* שם המחלקה הזאת היה .pick, והוא התנגש עם .opt.pick של אפשרות נבחרת
+   בפרק: text-align:right וריפוד משלה דלפו על כל תשובה שנבחרה, והטקסט
+   יושר לצד הלא נכון. שתי מחלקות עם אותו שם לשני דברים שונים. */
+.choice {
   display: block; width: 100%; text-align: right; cursor: pointer;
   background: var(--surface); color: var(--text);
   border: 1px solid var(--line); border-radius: 10px;
   padding: 11px 13px; margin-bottom: 6px; font: inherit;
 }
-.pick.on { border-color: var(--accent); background: var(--accent-sl); }
-.pick.off { opacity: .5; }
-.pick .pt { display: flex; align-items: baseline; gap: 8px; font-weight: 600; font-size: var(--fs-md); }
-.pick .pt .cnt { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm);
+.choice.on { border-color: var(--accent); background: var(--accent-sl); }
+.choice.off { opacity: .5; }
+.choice .pt { display: flex; align-items: baseline; gap: 8px; font-weight: 600; font-size: var(--fs-md); }
+.choice .pt .cnt { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm);
   font-weight: 600; color: var(--accent); margin-inline-start: auto; }
-.pick .pd { display: block; font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
-.pick.multi .pt::before {
+.choice .pd { display: block; font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
+.choice.multi .pt::before {
   content: "\2610"; font-family: "IBM Plex Mono", monospace; color: var(--dim);
 }
-.pick.multi.on .pt::before { content: "\2611"; color: var(--accent); }
+.choice.multi.on .pt::before { content: "\2611"; color: var(--accent); }
 
 .tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
 .tally > div { background: var(--surface-2); border: 1px solid var(--line);
@@ -380,18 +384,27 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .study.m-quad  { --mode:#0d8b84; --mode-bg:#dff2f0; }
 .study.m-tower { --mode:#c2185b; --mode-bg:#fce4ec; }
 .study.m-pair  { --mode:#1a7f6b; --mode-bg:#ddf2ec; }
-:root[data-theme="dark"] .study.m-exam  { --mode-bg:#131f33; }
-:root[data-theme="dark"] .study.m-frame { --mode-bg:#2b2312; }
-:root[data-theme="dark"] .study.m-trap  { --mode-bg:#2e1712; }
-:root[data-theme="dark"] .study.m-read  { --mode-bg:#221a33; }
-:root[data-theme="dark"] .study.m-quad  { --mode-bg:#0f2b28; }
-:root[data-theme="dark"] .study.m-tower { --mode-bg:#2e1220; }
-:root[data-theme="dark"] .study.m-pair  { --mode-bg:#0d2a24; }
+/* בכהה שני הערכים משתנים, לא רק הרקע: הגוון המלא נועד לרקע לבן
+   ועל צפחה הוא כהה מדי, והרקע העדין כויל מול שחור כמעט טהור. */
+:root[data-theme="dark"] .study.m-exam  { --mode:#8ab0e6; --mode-bg:#1f2c40; }
+:root[data-theme="dark"] .study.m-frame { --mode:#e0b75f; --mode-bg:#332b17; }
+:root[data-theme="dark"] .study.m-trap  { --mode:#ef9480; --mode-bg:#38231d; }
+:root[data-theme="dark"] .study.m-read  { --mode:#b49ce0; --mode-bg:#2a2340; }
+:root[data-theme="dark"] .study.m-quad  { --mode:#3fc4ba; --mode-bg:#16332f; }
+:root[data-theme="dark"] .study.m-tower { --mode:#f286ae; --mode-bg:#381e2a; }
+:root[data-theme="dark"] .study.m-pair  { --mode:#4cc3a8; --mode-bg:#14322b; }
+:root[data-theme="dark"] .study.m-elim  { --mode:#4fc0a4; --mode-bg:#16332c; }
 
 .study .sbar { background: var(--mode-bg); border-bottom-color: transparent; }
 .study .sbar .prog i { background: var(--mode); }
 .study .eyebrow { color: var(--mode); }
-.study .opt.pick { border-color: var(--mode); background: var(--mode-bg); }
+.study .opt.pick {
+  border-color: var(--mode); background: var(--mode-bg);
+  /* מסגרת כפולה ולא רק צבע: על רקע כהה הפרש הגוון לבדו כמעט לא נראה,
+     והמשתמש לא בטוח שהבחירה נקלטה. */
+  box-shadow: inset 0 0 0 1px var(--mode);
+}
+.study .opt.pick .num { color: var(--mode); font-weight: 600; }
 .study .grade.on { border-color: var(--mode); background: var(--mode-bg); color: var(--mode); }
 .study .btn { background: var(--mode); }
 .study .btn.ghost { background: none; color: var(--mode); border-color: var(--mode); }
@@ -613,13 +626,13 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .study.m-trap .ex, .study.m-elim .ex { line-height: 1.6; }
 
 /* יעדי מגע — 44 פיקסלים הוא המינימום שאפשר לפגוע בו בביטחון בטלפון. */
-.chip, .hint, .grade, .btn, .opt, .pick, .mission, .wrow, .acct { min-height: 44px; }
+.chip, .hint, .grade, .btn, .opt, .choice, .mission, .wrow, .acct { min-height: 44px; }
 .sbar .x { min-width: 44px; min-height: 44px; }
 
 /* מעברים קצרים, ובכיבוד מלא של prefers-reduced-motion שכבר מוגדר למעלה. */
 .study { animation: rise .16s ease-out; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.opt, .chip, .pick, .mission { transition: background .12s ease, border-color .12s ease; }
+.opt, .chip, .choice, .mission { transition: background .12s ease, border-color .12s ease; }
 
 /* מצבי ריק ושגיאה */
 .state {
@@ -734,3 +747,39 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .ctl { margin-top: 14px; }
 .ctl > .f { display: block; font-size: var(--fs-sm); font-weight: 600;
   color: var(--muted); margin-bottom: 6px; }
+
+/* ================= ניווט בתוך פרק =================
+
+   הגרסה הקודמת הציעה רק רשת מספרים קטנה, ואת המעבר בין שאלות היה
+   צריך לכוון אליה. כאן שני חצים ברוחב מלא של יעד מגע, והמספרים
+   באמצע נשארים לקפיצה ישירה ולסימון מה כבר נענה. */
+.qzone { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+
+.qnav {
+  display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px;
+  align-items: center; width: 100%; max-width: 52ch; margin: 0 auto 8px;
+}
+.qarrow {
+  min-height: 44px; min-width: 44px; font-size: 26px; line-height: 1;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface-2); color: var(--mode, var(--accent));
+  display: grid; place-items: center;
+}
+.qarrow:disabled { opacity: .3; color: var(--dim); }
+.qdots { display: flex; gap: 6px; justify-content: center; }
+.qdot {
+  flex: 1 1 0; min-height: 44px; max-width: 64px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface-2); color: var(--muted);
+  font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm); font-weight: 600;
+}
+.qdot.done { color: var(--text); border-color: var(--line); background: var(--surface-solid); }
+.qdot.on {
+  border-color: var(--mode, var(--accent)); color: var(--mode, var(--accent));
+  background: var(--mode-bg, var(--accent-sl)); box-shadow: inset 0 0 0 1px var(--mode, var(--accent));
+}
+.qdot.done::after { content: " ✓"; font-size: .8em; opacity: .55; }
+.qdot.on.done::after { opacity: 1; }
+
+/* הקטע נשאר על המסך ושומר על הגלילה הפנימית שלו בין שאלות */
+#pass { flex: none; }

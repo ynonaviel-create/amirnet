@@ -221,7 +221,7 @@ function view(v) {
   const s1 = el('div', 'sec');
   s1.appendChild(el('span', 'eyebrow', 'טווח'));
   R.forEach((r) => {
-    const b = el('button', 'pick' + (r.k === range.k ? ' on' : ''));
+    const b = el('button', 'choice' + (r.k === range.k ? ' on' : ''));
     b.innerHTML = '<span class="pt">' + esc(r.he) + '</span>' +
       '<span class="pd">' + r.when + ' · ' + r.days + (r.days === 1 ? ' יום' : ' ימים') + '</span>';
     b.onclick = () => { save({ range: r.k }); A.render(); };
@@ -235,7 +235,7 @@ function view(v) {
   SOURCES.forEach(([k, he, sub]) => {
     const on = srcSet.has(k);
     const n = sourceWords(new Set([k]), range.upto).length;
-    const b = el('button', 'pick multi' + (on ? ' on' : '') + (n ? '' : ' off'));
+    const b = el('button', 'choice multi' + (on ? ' on' : '') + (n ? '' : ' off'));
     b.innerHTML = '<span class="pt">' + esc(he) + '<b class="cnt">' + n + '</b></span>' +
       '<span class="pd">' + esc(sub) + '</span>';
     b.onclick = () => {
@@ -254,7 +254,7 @@ function view(v) {
   const s3 = el('div', 'sec');
   s3.appendChild(el('span', 'eyebrow', 'פריסה'));
   Object.keys(LAYOUT).forEach((k) => {
-    const b = el('button', 'pick' + (c.layout === k ? ' on' : ''));
+    const b = el('button', 'choice' + (c.layout === k ? ' on' : ''));
     b.innerHTML = '<span class="pt">' + esc(LAYOUT[k].he) + '</span>' +
       '<span class="pd">' + esc(LAYOUT[k].sub) + '</span>';
     b.onclick = () => { save({ layout: k }); A.render(); };

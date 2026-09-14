@@ -165,7 +165,7 @@ function nextSection() {
     ended: false, showText: true,
   });
   startClock();
-  paint();
+  mountSection();
 }
 
 /* השעון נבנה מחדש בכל פרק. clearInterval לפני setInterval הוא חובה
@@ -197,65 +197,157 @@ function leave() {
   if (id in S_.answers && !(id in S_.first)) S_.first[id] = S_.answers[id];
 }
 
-function paint() {
+/* ---------- ציור הפרק ----------
+   שתי פונקציות ולא אחת, וזו הנקודה: mountSection בונה את הקליפה פעם
+   אחת לכל פרק — כותרת, שעון, קטע הקריאה וסרגל הניווט — ו-paintQuestion
+   מחליף רק את גוף השאלה.
+
+   הגרסה הקודמת ציירה מחדש את כל הכרטיס בכל הקלקה. המשמעות בטלפון:
+   בוחרים תשובה בשאלת הבנת הנקרא, והגלילה קופצת בחזרה לראש הקטע. גם
+   הקטע עצמו נבנה מחדש ואיבד את הגלילה הפנימית שלו. זה מה שהפך את
+   הפרק למסורבל. */
+
+function mountSection() {
   const S_ = RUN.sec, spec = SPEC[S_.kind];
-  const it = S_.items[S_.i], id = itemId(it);
   const c = el('div', 'card'), mid = el('div', 'mid');
 
-  mid.innerHTML =
-    '<div class="secbar"><span class="eyebrow">' + esc(spec.he) +
-      (RUN.plan.length > 1 ? ' · פרק ' + (RUN.s + 1) + ' מתוך ' + RUN.plan.length : '') + '</span>' +
-    '<span class="clock" id="clock">' + fmt(S_.left) + '</span></div>';
+  const bar = el('div', 'secbar');
+  bar.innerHTML = '<span class="eyebrow">' + esc(spec.he) +
+    (RUN.plan.length > 1 ? ' · פרק ' + (RUN.s + 1) + ' מתוך ' + RUN.plan.length : '') + '</span>' +
+    '<span class="clock" id="clock">' + fmt(S_.left) + '</span>';
+  mid.appendChild(bar);
 
   if (S_.passage) {
-    const p = el('div', 'passage' + (S_.showText ? '' : ' folded'));
+    const p = el('div', 'passage');
+    p.id = 'pass';
     p.innerHTML = A.passageHTML(S_.passage.text);
     mid.appendChild(p);
   }
 
+  const zone = el('div', 'qzone');
+  zone.id = 'qzone';
+  mid.appendChild(zone);
+
+  /* סרגל הניווט. "הקודם" ו"הבא" הם יעדי מגע מלאים, והמספרים באמצע
+     נותנים קפיצה ישירה — ניווט חופשי בתוך הפרק הוא מה שהמבחן מתיר. */
+  const acts = el('div', 'acts');
+  const navbar = el('div', 'qnav');
+  navbar.id = 'qnav';
+  acts.appendChild(navbar);
+
+  const fin = el('button', 'btn');
+  fin.id = 'finbtn';
+  fin.onclick = () => {
+    leave();
+    const blank = S_.items.filter((x) => !(itemId(x) in S_.answers)).length;
+    if (blank && !confirm(A.plural(blank, 'שאלה אחת ריקה', 'שאלות ריקות') +
+      '. אין קנס על טעות והוראת המבחן היא לנחש. לסגור בכל זאת?')) return;
+    closeSection();
+  };
+  acts.appendChild(fin);
+
+  c.append(mid, acts);
+  const box = A.openStudy(c, { i: S_.i, n: S_.items.length, right: '', close: quit });
+  box.className = 'study m-' + spec.mode;
+  paintQuestion();
+}
+
+function paintQuestion() {
+  const S_ = RUN.sec;
+  if (!S_) return;
+  const it = S_.items[S_.i], id = itemId(it);
+  const zone = document.querySelector('#qzone');
+  if (!zone) return mountSection();
+
+  zone.innerHTML = '';
   const stem = el('div', 'ex');
-  stem.style.fontSize = S_.kind === 'sc' ? 'var(--fs-lg)' : 'var(--fs-md)';
+  if (S_.kind === 'sc') stem.style.fontSize = 'var(--fs-en-md)';
   stem.innerHTML = S_.kind === 'sc' ? A.examSentence(it.stem) : esc(it.stem);
-  mid.appendChild(stem);
+  zone.appendChild(stem);
 
   const box = el('div', 'opts');
   it.options.forEach((o, k) => {
     const b = el('button', 'opt' + (S_.answers[id] === k ? ' pick' : ''),
       '<span class="num">(' + (k + 1) + ')</span>' + esc(o));
-    b.onclick = () => {
-      S_.answers[id] = k;
-      A.buzz(10);
-      paint();
-    };
+    b.onclick = () => choose(k);
     box.appendChild(b);
   });
-  mid.appendChild(box);
+  zone.appendChild(box);
+  paintNav();
+}
 
-  /* ניווט חופשי בתוך הפרק — בדיוק מה שהמבחן מתיר, ומה שצריך לאמן. */
-  const acts = el('div', 'acts');
-  const pager = el('div', 'grades');
-  pager.style.gridTemplateColumns = 'repeat(' + S_.items.length + ',1fr)';
-  S_.items.forEach((x, k) => {
-    const answered = itemId(x) in S_.answers;
-    const b = el('button', 'grade' + (k === S_.i ? ' g3' : ''),
-      (k + 1) + (answered ? '<small>✓</small>' : '<small>—</small>'));
-    b.onclick = () => { leave(); S_.i = k; paint(); };
-    pager.appendChild(b);
-  });
+/* בחירה לא מציירת מחדש: היא מחליפה מחלקה על ארבעה כפתורים ומתקדמת.
+   ההשהיה קצרה בכוונה — מספיק כדי לראות שהבחירה נקלטה, לא מספיק כדי
+   להרגיש המתנה. */
+function choose(k) {
+  const S_ = RUN.sec;
+  if (!S_ || S_.ended) return;
+  const id = itemId(S_.items[S_.i]);
+  S_.answers[id] = k;
+  A.buzz(10);
+  const opts = document.querySelectorAll('#qzone .opt');
+  opts.forEach((b, i) => b.classList.toggle('pick', i === k));
+  paintNav();
+
+  clearTimeout(S_._adv);
+  const nextUnanswered = S_.items.findIndex((x, i) => i > S_.i && !(itemId(x) in S_.answers));
+  if (nextUnanswered > -1) {
+    S_._adv = setTimeout(() => {
+      if (!RUN || RUN.sec !== S_ || S_.ended) return;
+      goTo(nextUnanswered);
+    }, 280);
+  }
+}
+
+function goTo(i) {
+  const S_ = RUN.sec;
+  if (!S_ || i === S_.i) return;
+  clearTimeout(S_._adv);
+  leave();
+  S_.i = i;
+  paintQuestion();
+  /* הגלילה נשארת איפה שהיא. בהבנת הנקרא זה בדיוק הרצוי — הקטע למעלה
+     והשאלה החדשה בדיוק במקום שבו הייתה הקודמת. */
+}
+
+function paintNav() {
+  const S_ = RUN.sec;
+  const nav = document.querySelector('#qnav');
+  const fin = document.querySelector('#finbtn');
+  if (!nav || !S_) return;
+  const n = S_.items.length;
+  const answeredAll = S_.items.every((x) => itemId(x) in S_.answers);
   const blank = S_.items.filter((x) => !(itemId(x) in S_.answers)).length;
-  const fin = el('button', 'btn' + (blank ? ' ghost' : ''),
-    blank ? 'סגור פרק · ' + blank + ' ריקות' : 'סגור פרק');
-  fin.onclick = () => {
-    leave();
-    if (blank && !confirm(A.plural(blank, 'שאלה אחת ריקה', 'שאלות ריקות') +
-      '. אין קנס על טעות והוראת המבחן היא לנחש. לסגור בכל זאת?')) return;
-    closeSection();
-  };
-  acts.append(pager, fin);
-  c.append(mid, acts);
 
-  const box2 = A.openStudy(c, { i: S_.i, n: S_.items.length, right: '', close: quit });
-  box2.className = 'study m-' + spec.mode;
+  nav.innerHTML = '';
+  /* משולשים ולא גרשיים זוויתיים: ‹ ו-› הם תווים ניטרליים שהאלגוריתם
+     הדו-כיווני הופך, כלומר הקוד אמר דבר אחד והמסך הראה את ההפך.
+     ▸ ו-◂ אינם מתהפכים, ולכן מה שכתוב הוא מה שנראה. בעברית "אחורה"
+     הוא ימינה. */
+  const prev = el('button', 'qarrow', '▸');
+  prev.setAttribute('aria-label', 'השאלה הקודמת');
+  prev.disabled = S_.i === 0;
+  prev.onclick = () => goTo(S_.i - 1);
+
+  const dots = el('div', 'qdots');
+  S_.items.forEach((x, k) => {
+    const done = itemId(x) in S_.answers;
+    const b = el('button', 'qdot' + (k === S_.i ? ' on' : '') + (done ? ' done' : ''), String(k + 1));
+    b.setAttribute('aria-label', 'שאלה ' + (k + 1) + (done ? ', נענתה' : ', ריקה'));
+    b.onclick = () => goTo(k);
+    dots.appendChild(b);
+  });
+
+  const next = el('button', 'qarrow', '◂');
+  next.setAttribute('aria-label', 'השאלה הבאה');
+  next.disabled = S_.i === n - 1;
+  next.onclick = () => goTo(S_.i + 1);
+
+  nav.append(prev, dots, next);
+
+  fin.className = 'btn' + (answeredAll ? '' : ' ghost');
+  fin.textContent = answeredAll ? 'סגור פרק'
+    : 'סגור פרק · ' + A.plural(blank, 'אחת ריקה', 'ריקות');
 }
 
 function quit() {
