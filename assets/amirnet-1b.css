@@ -1,0 +1,165 @@
+/* ===== אמירנט · 1b "מסלול היום" =====
+   שכבה נוספת, לא החלפה. נטענת אחרי style.css:
+
+     <link rel="stylesheet" href="assets/tokens.css">
+     <link rel="stylesheet" href="assets/style.css">
+     <link rel="stylesheet" href="assets/amirnet-1b.css">   <-- חדש
+
+   אין שינוי ב-JS ואין שינוי במרקאפ: כל הסלקטורים כאן הם מחלקות שכבר
+   נוצרות ב-app.js / today.js. הכלל של הפרויקט נשמר — אין צבע קשיח
+   מחוץ לבלוקי הטוקנים למטה.
+   ==================================================================== */
+
+/* ---------- 1. צבע-זהות: סגול מולקולרי ---------- */
+:root{
+  --accent:#7b71d8;
+  --accent-dk:#5c51b8;
+  --accent-sl:#eceaf9;
+  --bg:#f3f2fa;
+  --bg-tint:#ecebf7;
+  --line:rgba(70,60,120,.16);
+  --line-soft:rgba(70,60,120,.08);
+  --text:#1c1830;
+  --muted:#5d5878;
+  --dim:#8a85a5;
+  --shadow:0 2px 8px rgba(40,30,80,.06), 0 16px 40px rgba(40,30,80,.10);
+  --shadow-lg:0 4px 12px rgba(40,30,80,.08), 0 28px 64px rgba(40,30,80,.14);
+}
+
+/* ---------- 2. הכהה: צפחה סגלגלה, לא שחור ----------
+   זו הבעיה שהתחלנו ממנה. הרקע עולה ב-8 ערכי בהירות ומקבל גוון סגול,
+   המשטחים הופכים שקופים-למחצה (זכוכית), והניגודיות יורדת לכ-12:1 —
+   עדיין מעל התקן, ונוח הרבה יותר לפרק קריאה של עשר דקות. */
+:root[data-theme="dark"]{
+  --bg:#1b1a28;
+  --bg-tint:#222030;
+  --surface:rgba(124,116,182,.16);
+  --surface-2:rgba(134,126,192,.20);
+  --surface-solid:#262435;
+  --line:rgba(192,186,236,.18);
+  --line-soft:rgba(192,186,236,.09);
+  --glass-edge:rgba(255,255,255,.20);
+  --glass-shine:rgba(255,255,255,.09);
+  --text:#eae7f6;
+  --muted:#b4adcf;
+  --dim:#8b84aa;
+  --accent:#9a92ee;
+  --accent-dk:#5d51b0;   /* כהה מהמבטא — .btn נושא טקסט לבן */
+  --accent-sl:#2a2750;
+  --topic-bg:#2b2857;
+  --topic-ln:#474394;
+  --topic-tx:#c3bdf8;
+}
+
+/* ---------- 3. הילת הרקע ---------- */
+body{
+  background:
+    radial-gradient(75% 38% at 18% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%),
+    radial-gradient(60% 34% at 100% 12%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--bg);
+  background-attachment:fixed;
+}
+
+/* ---------- 4. משטחי זכוכית ---------- */
+.figs, .stat, .mission, .choice, .sample, .ex, .passage, .nav, .rung, .tally > div{
+  backdrop-filter:blur(22px) saturate(1.6);
+  -webkit-backdrop-filter:blur(22px) saturate(1.6);
+  box-shadow:inset 0 1px 0 var(--glass-shine), var(--shadow);
+}
+.figs{ background:var(--surface); border-radius:var(--radius); }
+.fig{ padding:15px 6px; }
+.stat, .rung, .tally > div{ background:var(--surface); border-radius:var(--radius-sm); }
+.ex, .passage, .sample{ background:var(--surface); }
+
+/* ---------- 5. אוויר ---------- */
+.wrap{ padding-block:20px calc(104px + env(safe-area-inset-bottom)); }
+.sec{ margin-top:30px; }
+.eyebrow{ color:var(--accent); margin-bottom:11px; }
+.sec .note:first-of-type{ margin-top:2px; }
+
+/* ---------- 6. כפתור ראשי: עדשה זוהרת ---------- */
+.btn{
+  border-radius:16px; padding:16px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 92%, #fff 8%), var(--accent-dk));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28), var(--shadow);
+}
+.btn.ghost{
+  background:var(--surface); box-shadow:inset 0 1px 0 var(--glass-shine);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+}
+
+/* ---------- 7. המסלול ----------
+   המשימות הן כבר .mission זו אחרי זו בתוך .sec — כאן הן הופכות
+   לתחנות על ציר: נקודה לכל תחנה, וקו שמחבר ביניהן. בלי נגיעה ב-JS. */
+.sec{ position:relative; }
+.mission{
+  position:relative;
+  margin-inline-start:26px;
+  margin-bottom:12px;
+  border-inline-start:1px solid var(--line);
+  background:var(--surface);
+  border-radius:var(--radius);
+  padding:16px 18px;
+}
+.mission::before{                       /* הנקודה */
+  content:""; position:absolute; top:22px; inset-inline-start:-33px;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--surface-2); border:1px solid var(--line);
+}
+.mission::after{                        /* הקו אל התחנה הבאה */
+  content:""; position:absolute; top:34px; inset-inline-start:-28px;
+  width:2px; height:calc(100% + 12px); background:var(--line-soft);
+}
+.mission:last-of-type::after{ display:none; }
+/* התחנה הפעילה — הראשונה ברשימה היא "עכשיו" */
+.sec .mission:first-of-type{
+  border-inline-start-color:color-mix(in srgb, var(--accent) 45%, transparent);
+  padding:20px 18px;
+}
+.sec .mission:first-of-type::before{
+  width:18px; height:18px; inset-inline-start:-36px; top:22px;
+  background:var(--accent); border-color:transparent;
+  box-shadow:0 0 0 5px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.mission .mt{ font-size:var(--fs-lg); letter-spacing:-.3px; }
+.sec .mission:not(:first-of-type) .mt{ font-size:var(--fs-md); }
+.mission .mw{ margin-top:5px; }
+
+/* ---------- 8. ספינת הימים ---------- */
+.spine{ padding-bottom:14px; }
+.spine-left b{ font-size:var(--fs-xl); color:var(--accent); font-weight:500;
+  font-family:"IBM Plex Mono","Assistant",sans-serif; }
+.tick{ border-radius:2px; }
+.tick.today{ background:var(--accent); }
+
+/* ---------- 9. ניווט תחתון: קפסולת זכוכית צפה ---------- */
+.nav{
+  inset-inline:14px; bottom:14px;
+  border:1px solid var(--line); border-radius:22px;
+  background:color-mix(in srgb, var(--surface-solid) 78%, transparent);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+}
+.nav button{ border-radius:16px; padding:7px 2px; }
+.nav button.on{ background:var(--accent-sl); color:var(--accent); }
+.toast{ bottom:calc(96px + env(safe-area-inset-bottom)); }
+
+/* ---------- 10. משטח הלימוד ----------
+   רגוע בכוונה, אבל כבר לא שטוח: אותה הילה, שורת עליונה שקופה. */
+.study{
+  background:
+    radial-gradient(70% 34% at 50% 0%, color-mix(in srgb, var(--mode, var(--accent)) 20%, transparent), transparent 72%),
+    var(--bg);
+}
+.study .sbar{ background:transparent; }
+.study .sbar .clock{ font-size:var(--fs-lg); color:var(--mode, var(--accent)); }
+.opt{ border-radius:16px; background:var(--surface); color:var(--text);
+  box-shadow:inset 0 1px 0 var(--glass-shine); }
+.grade{ border-radius:16px; background:var(--surface);
+  box-shadow:inset 0 1px 0 var(--glass-shine); min-height:60px; }
+.assoc{ border-radius:var(--radius); }
+
+/* מצב כהה: הגוונים הסגולים של מסכי המצב, מכוילים על צפחה ולא על שחור */
+:root[data-theme="dark"] .study.m-exam { --mode:#9a92ee; --mode-bg:#2a2750; }
+:root[data-theme="dark"] .study.m-trap { --mode:#f08f7c; --mode-bg:#3a2320; }
+:root[data-theme="dark"] .study.m-read { --mode:#b9a4ec; --mode-bg:#2c2545; }
+:root[data-theme="dark"] .study.m-elim { --mode:#57c4a8; --mode-bg:#16332c; }
