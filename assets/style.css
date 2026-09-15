@@ -465,13 +465,13 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .study.m-trap .ex, .study.m-elim .ex { line-height: 1.6; }
 
 /* יעדי מגע — 44 פיקסלים הוא המינימום שאפשר לפגוע בו בביטחון בטלפון. */
-.chip, .hint, .grade, .btn, .opt, .choice, .mission, .wrow, .acct { min-height: 44px; }
+.chip, .hint, .grade, .btn, .opt, .wrow, .acct { min-height: 44px; }
 .sbar .x { min-width: 44px; min-height: 44px; }
 
 /* מעברים קצרים, ובכיבוד מלא של prefers-reduced-motion שכבר מוגדר למעלה. */
 .study { animation: rise .16s ease-out; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.opt, .chip, .choice, .mission { transition: background .12s ease, border-color .12s ease; }
+.opt, .chip { transition: background .12s ease, border-color .12s ease; }
 
 /* מצבי ריק ושגיאה */
 .state {

@@ -9,7 +9,7 @@
 (function () {
 
 const A = window.AM;
-const { el, esc, S, today, between, heDate, studyDaysLeft, pref } = A;
+const { el, esc, S } = A;
 
 const SCREENS = [
   ['בית', 'הלומדה, ועד שלוש משימות שנבחרו לפי מה שהכי חסר עכשיו.'],

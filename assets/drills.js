@@ -12,8 +12,7 @@
 (function () {
 
 const A = window.AM;
-const { el, esc, shuffle, toast, openStudy, closeStudy, today, addDays, between,
-        heDate, ns, put, pref, setPref, bump, day, streak, card, S } = A;
+const { el, esc, shuffle, toast, openStudy, closeStudy, today, heDate, ns, put, pref, setPref, bump, card, S } = A;
 
 
 /* ---------- משטח עם זהות צבע ---------- */
@@ -683,7 +682,7 @@ function paintQuads() {
 /* --- בליץ 90: מיקרו-סשן לתור בסופר --- */
 async function startBlitz() {
   /* רק מילים שיש מה להציג להן. בלי הסינון הזה הבליץ היה מבקש שיפוט
-     על מילה בלי הגדרה, וכותב על סמך זה מצב FSRS — כלומר מזיז תזמון
+     על מילה בלי הגדרה, וכותב על סמך זה מצב בלומדה — כלומר מזיז תזמון
      לפי ניחוש עיוור. */
   const has = (w) => { const o = S.words.get(w); return o && (o.def || o.he); };
   const due = A.dueList().filter(has);

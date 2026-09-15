@@ -1,11 +1,11 @@
 /* אופליין: cache-first לקליפה ולנתונים, ורשת-תחילה לכלום — האתר סטטי,
    ועדכון מגיע בהחלפת גרסת המטמון. */
-const V = 'amirnet-green-1';
+const V = 'amirnet-35f09888';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './assets/style.css', './assets/tokens.css',
   './assets/app.js', './assets/lomda.js', './assets/today.js', './assets/progress.js', './assets/exam.js', './assets/words.js', './assets/about.js', './assets/onboard.js', './assets/strategy.js', './assets/drills.js', './assets/cloud.js', './assets/vendor/supabase.js',
-  './data/words.json', './data/quads.json', './data/pairs.json', './data/scale.json',
+  './assets/favicon.svg', './assets/icon-192.png', './data/words.json', './data/quads.json', './data/pairs.json', './data/scale.json',
 ];
 /* cache:'reload' על כל קובץ בקליפה, ולא addAll רגיל. בלעדיו ההתקנה
    מושכת דרך מטמון ה-HTTP של הדפדפן — ו-GitHub Pages מגיש נכסים עם

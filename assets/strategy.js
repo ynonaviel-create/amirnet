@@ -15,8 +15,7 @@
 (function () {
 
 const A = window.AM;
-const { el, esc, shuffle, toast, openStudy, closeStudy, ns, put, pref, setPref,
-        bump, S } = A;
+const { el, esc, shuffle, toast, openStudy, closeStudy, put, pref, setPref, bump, S } = A;
 
 /* ---------- הממצאים ----------
    name  · הכלל

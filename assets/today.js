@@ -12,7 +12,7 @@
 (function () {
 
 const A = window.AM;
-const { el, esc, toast, ns, put, pref, setPref, card, S, today, between, isOff } = A;
+const { el, esc, toast, ns, put, pref, card, S, today, between, isOff } = A;
 
 /* ---------- דיוק לפי סוג פרק ----------
    רק ניסיונות אמיתיים על פריטי מבחן. פחות משמונה ניסיונות זה רעש ולא

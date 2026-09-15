@@ -14,8 +14,7 @@
 (function () {
 
 const A = window.AM;
-const { el, esc, ns, pref, card, bucket, S, today, addDays, between, heDate,
-        studyDaysLeft } = A;
+const { el, esc, ns, S, heDate } = A;
 
 const KIND = [['sc', 'השלמת משפטים', 12], ['rs', 'ניסוח מחדש', 6], ['rc', 'הבנת הנקרא', 5]];
 const TOTALQ = 23;

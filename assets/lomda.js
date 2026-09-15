@@ -228,7 +228,9 @@ function ask(q, frame, onDone, opts) {
     answered = true;
     buzz(ok ? 10 : 30);
     if (opts.silent) return onDone(ok);          // מבחן רמה: בלי משוב, זורמים
-    if (ok) { setTimeout(() => onDone(true), 550); return; }
+    /* ההמשך האוטומטי בודק שהשאלה עדיין על המסך: סגירה בחצי השנייה הזו
+       איפסה את מצב הסבב, והקריאה הדחויה הייתה נופלת עליו. */
+    if (ok) { setTimeout(() => { if (c.isConnected) onDone(true); }, 550); return; }
     const o = q.o;
     const fb = el('div', 'fb');
     fb.innerHTML = '<span class="eyebrow">' + (chosen === null ? 'התשובה' : 'לא בדיוק') + '</span>' +
@@ -238,7 +240,7 @@ function ask(q, frame, onDone, opts) {
        הוא חצי מהלימוד. רק "לא יודע" יורד. */
     acts.querySelectorAll('.btn').forEach((b) => b.remove());
     const go = el('button', 'btn', 'המשך');
-    go.onclick = () => onDone(false);
+    go.onclick = () => { if (c.isConnected) onDone(false); };
     acts.appendChild(go);
     setTimeout(() => go.focus(), 30);
   };
@@ -588,7 +590,8 @@ function pickPractice() {
 
 function practiceMenu() {
   const last = pref('lomda.kind', '');
-  const order = Object.keys(KINDS);
+  /* השלמת משפט דורשת את משפטי המבחן, שמגיעים רק למשתמש מחובר */
+  const order = Object.keys(KINDS).filter((k) => k !== 'sent' || S.sent.size);
   const suggested = order[(order.indexOf(last) + 1) % order.length];
   const c = el('div', 'card');
   const mid = el('div', 'mid',
