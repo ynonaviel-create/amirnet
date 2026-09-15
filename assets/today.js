@@ -4,19 +4,15 @@
    לעשות עכשיו, ומערכת שלא זוכרת על מה טעית נותנת לטעות לחזור עשר פעמים
    בשקט.
 
-   מסך "היום" לא מציע — הוא מחליט. הוא סופר מה בפירעון, מה לא מוין,
-   באיזה פרק הדיוק הנמוך ביותר, כמה טעויות פתוחות, וכמה זמן באמת נשאר
-   היום (ערב שבת וערב חג מקצרים את המשימה). התוצאה היא שלוש-ארבע
-   משימות עם סיבה מספרית לכל אחת. מתחת להן "משהו אחר" — שום מסלול
-   לא נחסם, אבל צריך להיות ברור מה הכי שווה עכשיו.
+   מסך הבית לא מציע רשימה — הוא מחליט: הלומדה, ועד שלוש משימות
+   שנבחרו לפי מה שהכי חסר.
    ============================================================== */
 'use strict';
 
 (function () {
 
 const A = window.AM;
-const { el, esc, toast, ns, put, pref, setPref, card, bucket, S,
-        today, addDays, between, isOff, isHalf, studyDaysLeft } = A;
+const { el, esc, toast, ns, put, pref, setPref, card, S, today, between, isOff } = A;
 
 /* ---------- דיוק לפי סוג פרק ----------
    רק ניסיונות אמיתיים על פריטי מבחן. פחות משמונה ניסיונות זה רעש ולא
@@ -61,177 +57,48 @@ const stuckWords = () => {
   return out.sort((a, b) => ((cs[b].af || 0) + (cs[b].l || 0)) - ((cs[a].af || 0) + (cs[a].l || 0)));
 };
 
-/* ---------- כמה זמן יש היום ----------
-   ערב שבת וערב חג הם ימים קצרים בפועל, ומשימה שלא מתכווצת בהם היא
-   משימה שלא תיעשה. */
-function budget() {
-  const t = today();
-  if (isOff(t)) return { min: 0, why: 'שבת או חג' };
-  if (isHalf(t)) return { min: 20, why: 'ערב שבת או ערב חג' };
-  return { min: 45, why: null };
-}
-const mmss = (min) => min >= 60 ? Math.round(min / 60 * 10) / 10 + ' שעות' : Math.round(min) + ' דק\'';
-
 /* ============================================================
-   מסך היום
-   ============================================================ */
+   הבית
+   ============================================================
+   שלושה דברים, לא יותר: מי אתה ומתי המבחן, הלומדה, ועד שלוש
+   משימות תרגול שנבחרו לפי מה שהכי חסר עכשיו. */
 
-function missionCard(v, m) {
-  const b = el('button', 'mission m-' + (m.mode || 'exam'));
-  b.innerHTML =
-    '<div class="mh"><span class="mt">' + esc(m.title) + '</span>' +
-    '<span class="mm">' + esc(m.time) + '</span></div>' +
-    '<div class="mw">' + m.why + '</div>' +
-    (m.done ? '<div class="mdone">✓ ' + esc(m.done) + '</div>' : '');
-  b.onclick = m.go;
-  v.appendChild(b);
+function greeting() {
+  const h = new Date().getHours();
+  const hi = h < 5 ? 'לילה טוב' : h < 12 ? 'בוקר טוב' : h < 17 ? 'צהריים טובים' : h < 21 ? 'ערב טוב' : 'לילה טוב';
+  const C = window.Cloud;
+  const name = C && C.user && C.user.firstName;
+  return hi + (name ? ', ' + name : '');
 }
 
 function home(v) {
   const left = between(today(), S.exam);
-  const bud = budget();
-  const acc = accuracy();
-  const mist = MISTAKES(), stuck = stuckWords();
+  const t = today();
+  const rounds = A.day().rounds || 0;
+  const sub = left < 0 ? 'המבחן מאחוריך'
+    : left === 0 ? 'היום המבחן. בהצלחה!'
+    : isOff(t) ? 'שבת או חג — סבב קצר אחד מספיק היום'
+    : rounds >= 4 ? 'עברת את היעד היומי. כל סבב נוסף הוא בונוס.'
+    : rounds ? 'עשית ' + A.plural(rounds, 'סבב אחד', 'סבבים') + ' היום. היעד: 4.'
+    : 'היעד להיום: 4 סבבים קצרים.';
+  A.head(v, greeting(), sub);
 
-  /* הלומדה ראשונה: אוצר מילים הוא 12 מתוך 23 השאלות */
   if (window.AMLomda) window.AMLomda.homeCard(v);
 
-  if (!bud.min) {
-    v.appendChild(el('div', 'sec',
-      '<span class="eyebrow">' + esc(bud.why) + '</span>' +
-      '<p class="note">אין משימה היום. אם הכנת דף הדפסה, הוא ממתין לך תחת <b>עוד ← הדפסה</b>, ' +
-      'והפיוס אחרי השבת יעדכן את התור.</p>'));
-  }
-
-  /* ---- בניית המשימה ---- */
+  const acc = accuracy(), mist = MISTAKES();
   const M = [];
-
-  /* פרק אמת. זה הליבה של התוכנית — קורסים, מילים, והרבה פרקים —
-     ולכן הוא במשימה כל יום ולא רק כשמשהו חלש. */
-  M.push({
-    title: 'פרק אמת', mode: 'exam', time: '5 דק\'',
-    why: 'פרק בפורמט המבחן: ניווט חופשי, שעון, ואין חזרה אחרי סגירה. ' +
-         'במאגר <b>116</b> פרקי השלמה, <b>77</b> ניסוח ו-<b>108</b> קטעים — ' +
-         'פריט שראית לא יחזור עד שייגמרו.',
-    go: () => A.go('drill'),
-  });
-
-  /* הפרק החלש — נבחר לפי דיוק, ומוצג עם המשקל שלו בציון */
-  const weak = Object.keys(KIND)
-    .filter((k) => acc[k].n >= 8)
+  const weak = Object.keys(KIND).filter((k) => acc[k].n >= 8)
     .sort((a, b) => acc[a].pct - acc[b].pct)[0];
-  if (weak && acc[weak].pct < 80) {
-    const K = KIND[weak];
-    M.push({
-      title: 'הפרק החלש שלך — ' + K.he, mode: K.mode,
-      time: '4 דק\'',
-      why: 'הדיוק שלך שם <b>' + acc[weak].pct + '%</b> על ' + acc[weak].n + ' שאלות, והפרק שווה <b>' +
-           Math.round(100 * K.weight / TOTALQ) + '%</b> מהציון (' + K.weight + ' מתוך ' + TOTALQ + ' שאלות).',
-      go: () => weak === 'rc' ? window.AMDrills.rc('sprint') : window.AMDrills.section(weak),
-    });
-  }
+  if (mist.length >= 3) M.push(['בנק הטעויות', A.plural(mist.length, 'שאלה אחת פתוחה', 'שאלות פתוחות') + ' — לסגור לפני שהן חוזרות במבחן', () => A.go('fix')]);
+  if (weak && acc[weak].pct < 80) M.push(['חיזוק: ' + KIND[weak].he, 'הדיוק שלך ' + acc[weak].pct + '% · ' +
+    Math.round(100 * KIND[weak].weight / TOTALQ) + '% מהציון', () => window.AMExam.run([weak], 'פרק ' + KIND[weak].he)]);
+  M.push(['פרק אמת', 'שאלות ממבחני עבר בפורמט המבחן, עם שעון', () => A.go('drill')]);
+  const E = pref('elim', {});
+  if (!E.n) M.push(['דריל פסילה', 'לפסול שתיים מארבע שווה 75% — חמש דקות', () => window.AMStrat.elim('sc', 8)]);
 
-  if (mist.length >= 3) M.push({
-    title: 'בנק הטעויות', mode: 'trap',
-    time: mmss(Math.min(mist.length, 8) * 45 / 60),
-    why: '<b>' + mist.length + '</b> שאלות שטעית בהן ולא סגרת. שאלה שנשארת פתוחה חוזרת במבחן.',
-    go: () => A.go('fix'),
-  });
-
-  /* פסילה — נכנסת כשלא נוגעים בה, או כשהדיוק שלה נמוך */
-  const E = Object.assign({ n: 0, rej: 0, good: 0, fatal: 0 }, pref('elim', {}));
-  const eacc = E.rej ? Math.round(100 * E.good / E.rej) : null;
-  if (!E.n) M.push({
-    title: 'דריל פסילה', mode: 'elim', time: '5 דק\'',
-    why: 'עוד לא ניסית. ידיעה של שתיים מארבע האפשרויות, בלי לדעת מי הנכונה, שווה <b>75%</b> — ' +
-         'וזה 12 מתוך 23 השאלות במבחן.',
-    go: () => window.AMStrat.elim('sc', 8),
-  });
-  else if (eacc != null && eacc < 85) M.push({
-    title: 'דריל פסילה', mode: 'elim', time: '5 דק\'',
-    why: 'דיוק הפסילה שלך <b>' + eacc + '%</b>' + (E.fatal ? ' ופסלת את התשובה הנכונה <b>' + E.fatal + '</b> פעמים' : '') +
-         '. ברמה הזו הפסילה מנחשת ולא מרוויחה.',
-    go: () => window.AMStrat.elim('sc', 8),
-  });
-
-  /* הדפסה נכנסת למשימה רק כשיש יום סגור קרוב ואין אצווה שממתינה לפיוס —
-     אחרת היא רעש. */
-  const soonOff = (() => {
-    for (let i = 1; i <= 3; i++) { const d = addDays(today(), i); if (isOff(d)) return d; }
-    return null;
-  })();
-  const openBatch = Object.keys(ns('print')).filter((k) => !ns('print')[k].reconciled);
-  if (openBatch.length) M.unshift({
-    title: 'סמן מה זכרת', mode: 'read', time: '1 דק\'',
-    why: 'הדפסת דף ולא סימנת. בלי זה התזמון לא יודע מה קרה בשבת, ו‑<b>' +
-         (ns('print')[openBatch[0]].words || []).length + '</b> מילים יחזרו כאילו לא נגעת בהן.',
-    go: () => window.AMDrills.reconcile(openBatch[0]),
-  });
-  else if (soonOff) M.push({
-    title: 'הכן דף לשבת', mode: 'read', time: '2 דק\'',
-    why: '<b>' + A.heDate(soonOff) + '</b> הוא יום סגור. שלוש פריסות: גיליון לימוד, ' +
-         'כרטיסיות מתקפלות או דף תרגול עם מפתח.',
-    go: () => A.go('print'),
-  });
-
-  if (stuck.length >= 5 && M.length < 4) M.push({
-    title: 'מילים תקועות', mode: 'read',
-    time: mmss(Math.min(stuck.length, 12) * 25 / 60),
-    why: '<b>' + stuck.length + '</b> מילים שהאסוציאציה שלהן לא מצילה אותך. כתיבה מחדש היא התיקון היחיד שעובד.',
-    go: () => A.go('fix'),
-  });
-
-  /* קיצוץ לפי הזמן שבאמת יש היום */
-  const sec = el('div', 'sec');
-  sec.appendChild(el('span', 'eyebrow',
-    'משימת היום' + (bud.why ? ' · ' + bud.why : '') + (M.length ? ' · ' + M.length + ' משימות' : '')));
-  if (!M.length) {
-    sec.appendChild(el('div', 'empty', 'הכול נקי להיום. ' +
-      (left > 0 ? A.plural(left, 'יום אחד למבחן.', 'ימים למבחן.') : '')));
-  } else {
-    const short = !!(bud.min && bud.min < 30);
-    const cut = short ? M.slice(0, 2) : M.slice(0, 4);
-    cut.forEach((m) => missionCard(sec, m));
-    const rest = M.length - cut.length;
-    if (rest) {
-      sec.appendChild(el('p', 'note',
-        (rest === 1 ? 'עוד משימה אחת ממתינה' : 'עוד ' + rest + ' משימות ממתינות') +
-        (short ? '. היום קצר — אלה הכי שוות.' : '. אלה הכי שוות עכשיו.')));
-    }
-  }
-  const other = el('button', 'btn ghost', 'משהו אחר');
-  other.onclick = () => A.go('drill');
-  sec.appendChild(other);
-  v.appendChild(sec);
-
-  if (left <= 12 && left >= 0) {
-    v.appendChild(el('div', 'note',
-      '<b style="color:var(--warn)">מצב סגירה.</b> נשארו ' + left +
-      ' ימים. זה הזמן לתרגל יותר ולסנן פחות — ואף מילה לא מתוזמנת אחרי המבחן.'));
-  }
-
-  maturity(v);
-}
-
-/* ---------- המאגר לפי רמות ----------
-   פס לכל רמה: כמה ממנה כבר מאחוריך (ידועה, בתרגול, שוחררה, מתחת לכניסה). */
-function maturity(v) {
-  const L = window.AMLomda;
-  if (!L || !L.startLevel()) return;
-  const sec = el('div', 'sec');
-  const top = L.maxLevel(), cur = L.currentLevel();
-  sec.appendChild(el('span', 'eyebrow', 'המאגר · ' + top + ' רמות'));
-  const grid = el('div', 'lvgrid');
-  for (let lv = 1; lv <= top; lv++) {
-    const st = L.levelStats(lv);
-    const done = st.total - st.new;
-    const pct = st.total ? Math.round(done / st.total * 100) : 0;
-    grid.appendChild(el('div', 'lv' + (lv === cur ? ' cur' : '') + (pct === 100 ? ' full' : ''),
-      '<b>' + lv + '</b><i style="height:' + pct + '%"></i>'));
-  }
-  sec.appendChild(grid);
-  sec.appendChild(el('p', 'note', 'רמה נמוכה = מילה נפוצה יותר = משפיעה יותר על הציון. ' +
-    'זה בסדר גמור לא להגיע לרמות הגבוהות — העיקר להתקדם.'));
+  const sec = el('div', 'sec list');
+  sec.appendChild(el('span', 'eyebrow', 'להמשך היום'));
+  M.slice(0, 3).forEach(([title, why, fn]) => A.tile(sec, title, why, fn));
   v.appendChild(sec);
 }
 
@@ -374,16 +241,11 @@ function step() {
 function fix(v) {
   const mist = MISTAKES(), stuck = stuckWords(), acc = accuracy();
 
-  const head = el('div', 'sec');
-  head.appendChild(el('span', 'eyebrow', 'בנק הטעויות'));
-  head.appendChild(el('p', 'note',
-    'כל שאלה שטעית בה נשארת כאן עד שתסמן "הבנתי" — תשובה נכונה אחת בחזרה היא ראיה, לא סגירה. ' +
-    'בלי הלולאה הזו אפשר לטעות באותה שאלה עשר פעמים בלי שאיש ידע.'));
-  v.appendChild(head);
+  A.head(v, 'בנק הטעויות', 'כל שאלה שטעית בה נשארת כאן עד שתסמן "הבנתי".');
 
   const by = { sc: 0, rs: 0, rc: 0 };
   mist.forEach((m) => { if (m.kind in by) by[m.kind]++; });
-  const g = el('div', 'statgrid');
+  const g = el('div', 'statgrid sec');
   Object.keys(KIND).forEach((k) => {
     g.innerHTML += '<div class="stat"><div class="v">' + by[k] + '</div>' +
       '<div class="l">' + esc(KIND[k].he) + '</div>' +

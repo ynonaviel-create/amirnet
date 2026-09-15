@@ -3,7 +3,7 @@
    הנושא עובדות בלי לכתוב שום דבר פעמיים.
 
    האנגלית היא מושא הלימוד ולכן מקבלת סריף אמיתי בגודל גדול; העברית היא
-   ממשק ולכן Assistant; מספרים וטיימרים במונוספייס עם ספרות טבלאיות. */
+   ממשק ולכן Assistant, גם למספרים (ספרות טבלאיות). */
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -18,6 +18,7 @@ body {
   line-height: 1.55;
   min-height: 100dvh;
   overscroll-behavior-y: none;
+  font-variant-numeric: tabular-nums;
 }
 
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
@@ -27,7 +28,7 @@ input, textarea, select { font: inherit; color: inherit; }
 
 .en   { font-family: var(--font-en); direction: ltr; unicode-bidi: isolate;
         font-size: var(--fs-en); line-height: var(--lh-en); }
-.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 .dim   { color: var(--dim); }
 .tiny  { font-size: var(--fs-sm); }
@@ -42,8 +43,9 @@ input, textarea, select { font: inherit; color: inherit; }
 /* ---------- topbar ---------- */
 .topbar {
   position: sticky; top: 0; z-index: 30;
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line-soft);
   padding-top: env(safe-area-inset-top);
 }
 .topbar-in {
@@ -55,69 +57,58 @@ input, textarea, select { font: inherit; color: inherit; }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 700;
   min-height: 44px; }   /* יעד מגע — הסמל הוא גם קישור הביתה */
 .brand-mark {
-  width: 26px; height: 26px; border-radius: 8px;
-  background: var(--accent); color: #fff;
+  width: 28px; height: 28px; border-radius: 9px;
+  background: var(--accent); color: var(--on-accent);
   display: grid; place-items: center; font-size: 15px; font-weight: 700;
 }
 .brand-txt { font-size: var(--fs-md); letter-spacing: -.01em; }
 .acct {
   font-size: var(--fs-sm); font-weight: 600; color: var(--accent);
-  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px;
+  background: var(--accent-sl); border-radius: 999px; padding: 5px 14px;
 }
-.acct.in { color: var(--text); }
+.acct.in { color: var(--text); background: var(--surface-2); }
 .sync { font-size: var(--fs-xs); color: var(--dim); }
 
-/* ---------- ספינת הימים ----------
-   טיק אחד לכל יום עד המבחן. שבתות וחגים בצבע נפרד — הימים שבהם לא לומדים
-   הם מידע, לא קישוט: הם מסבירים למה הקצב היומי גבוה ממה שנראה. */
-.spine { max-width: 620px; margin: 0 auto; padding: 0 16px 9px; }
-.spine-head {
-  display: flex; align-items: baseline; justify-content: space-between;
-  gap: 8px; margin-bottom: 6px;
-}
-.spine-left { font-size: var(--fs-sm); color: var(--muted); }
-.spine-left b { font-size: var(--fs-lg); color: var(--text); font-weight: 700; }
-.spine-date { font-size: var(--fs-xs); color: var(--dim); letter-spacing: .04em; }
-.ruler { display: flex; gap: 2px; align-items: flex-end; height: 15px; }
-.tick { flex: 1 1 0; height: 6px; border-radius: 1px; background: var(--line); }
-.tick.off   { background: var(--warn); opacity: .45; }
-.tick.past  { background: var(--dim); opacity: .45; height: 4px; }
-.tick.today { background: var(--accent); height: 15px; }
+/* ---------- ימים למבחן ---------- */
+.days { font-size: var(--fs-sm); color: var(--muted); white-space: nowrap; }
+.days b { color: var(--text); font-weight: 700; }
 
 /* ---------- מספרי היום ---------- */
 .figs {
-  display: flex; background: var(--surface-solid);
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  overflow: hidden;
+  display: flex; background: var(--surface-2);
+  border-radius: var(--radius-sm); overflow: hidden;
 }
-.fig { flex: 1 1 0; padding: 11px 6px; text-align: center; border-inline-start: 1px solid var(--line); }
+.fig { flex: 1 1 0; padding: 10px 4px; text-align: center; border-inline-start: 1px solid var(--line-soft); }
 .fig:first-child { border-inline-start: 0; }
 .fig .n {
-  display: block; line-height: 1.15; font-size: var(--fs-xl); font-weight: 500;
-  font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums;
+  display: block; line-height: 1.15; font-size: var(--fs-lg); font-weight: 700;
+  font-family: var(--font-num); font-variant-numeric: tabular-nums;
 }
 .fig .k { font-size: var(--fs-xs); color: var(--dim); }
-.fig.due .n { color: var(--warn); }
+.fig.due .n { color: var(--text); }
 .fig.new .n { color: var(--accent); }
 
 /* ---------- כפתורים ---------- */
 .btn {
   display: block; width: 100%; text-align: center;
-  background: var(--accent); color: #fff;
-  padding: 15px; border-radius: var(--radius-sm);
+  background: var(--accent); color: var(--on-accent);
+  padding: 14px; border-radius: 999px;
   font-size: var(--fs-md); font-weight: 700;
-  margin-top: 10px;
+  margin-top: 10px; transition: background .12s ease, transform .08s ease;
 }
+.btn:active { transform: scale(.99); }
+@media (hover: hover) { .btn:not(:disabled):not(.ghost):hover { background: var(--accent-dk); } }
 .btn:disabled { background: var(--surface-2); color: var(--dim); cursor: default; }
-.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--line); font-size: var(--fs-base); padding: 12px; }
+.btn.ghost { background: var(--surface); color: var(--accent); border: 1px solid var(--line); font-size: var(--fs-base); padding: 12px; }
 .btn.sm { padding: 10px; font-size: var(--fs-base); }
 
-.sec { margin-top: 24px; }
+.sec { margin-top: 26px; }
 .eyebrow {
-  display: block; font-size: var(--fs-xs); font-weight: 600;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--dim);
-  margin-bottom: 9px;
+  display: block; font-size: var(--fs-sm); font-weight: 700;
+  color: var(--muted); margin-bottom: 10px;
 }
+.page-title { font-size: var(--fs-xl); font-weight: 700; margin: 6px 0 2px; letter-spacing: -.01em; }
+.page-sub { font-size: var(--fs-sm); color: var(--muted); margin: 0; }
 h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: balance; }
 .note { font-size: var(--fs-sm); color: var(--muted); line-height: 1.5; margin-top: 8px; }
 .note b { color: var(--text); }
@@ -134,8 +125,8 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
 .sbar .x { font-size: 24px; line-height: 1; color: var(--dim); padding: 0 6px; }
 .sbar .prog { flex: 1; height: 4px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
 .sbar .prog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
-.sbar .cnt { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xs); color: var(--dim); }
-.sbar .clock { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-base); font-weight: 500; }
+.sbar .cnt { font-family: var(--font-num); font-size: var(--fs-xs); color: var(--dim); }
+.sbar .clock { font-family: var(--font-num); font-size: var(--fs-base); font-weight: 500; }
 .sbar .clock.low { color: var(--bad); }
 
 .card { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 18px 18px 10px; }
@@ -151,8 +142,8 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
 .pos { font-family: var(--font-en); font-style: italic; direction: ltr; color: var(--dim); font-size: var(--fs-en-sm); }
 .def { font-family: var(--font-en); direction: ltr; font-size: var(--fs-en-lg); line-height: 1.4;
        max-width: 34ch; text-wrap: balance; }
-.syn { font-family: "IBM Plex Mono", monospace; direction: ltr; font-size: var(--fs-sm); color: var(--dim); }
-.he  { font-size: var(--fs-md); font-weight: 600; color: var(--accent); }
+.syn { font-family: var(--font-en); font-style: italic; direction: ltr; font-size: var(--fs-en-sm); color: var(--muted); }
+.he  { font-size: var(--fs-lg); font-weight: 700; color: var(--accent); }
 .ex {
   font-family: var(--font-en); direction: ltr; text-align: left;
   font-size: var(--fs-en); line-height: var(--lh-en-loose); color: var(--text);
@@ -180,7 +171,7 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
   border: 1px solid var(--line); background: var(--surface-solid);
   font-weight: 600; font-size: var(--fs-sm); min-height: 56px;
 }
-.grade small { display: block; font-family: "IBM Plex Mono", monospace; font-weight: 400;
+.grade small { display: block; font-family: var(--font-num); font-weight: 400;
                font-size: 11px; color: var(--dim); margin-top: 2px; }
 .grade.g1 { border-color: var(--bad-ln);  color: var(--bad); }
 .grade.g3 { border-color: var(--accent);  color: var(--accent); }
@@ -202,7 +193,7 @@ h2 { font-size: var(--fs-lg); margin: 0 0 4px; font-weight: 700; text-wrap: bala
              box-shadow: inset 0 0 0 1px var(--accent); }
 .opt.right { border-color: var(--good); background: var(--good-bg); font-weight: 500; }
 .opt.wrong { border-color: var(--bad);  background: var(--bad-bg); }
-.opt .num { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm); color: var(--dim); margin-inline-end: 10px; }
+.opt .num { font-family: var(--font-num); font-size: var(--fs-sm); color: var(--dim); margin-inline-end: 10px; }
 
 /* ---------- טפסים ---------- */
 label.f { display: block; font-size: var(--fs-sm); color: var(--muted); font-weight: 600; margin-bottom: 5px; }
@@ -242,160 +233,30 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
    משהו שלא מרוויח את מקומו. */
 .nav {
   position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
-  display: flex; background: var(--surface-solid); border-top: 1px solid var(--line);
-  padding-bottom: env(safe-area-inset-bottom);
+  display: flex; background: var(--surface); border-top: 1px solid var(--line-soft);
+  padding: 4px max(6px, calc((100vw - 620px) / 2)) env(safe-area-inset-bottom);
 }
-.nav button { flex: 1 1 0; padding: 8px 2px 10px; font-size: 11.5px; font-weight: 600; color: var(--dim); }
+.nav button { flex: 1 1 0; padding: 6px 2px 8px; font-size: 12px; font-weight: 600; color: var(--dim);
+  display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.nav .ic { display: grid; place-items: center; width: 44px; height: 28px; border-radius: 999px; }
+.nav .ic svg { width: 21px; height: 21px; }
 .nav button.on { color: var(--accent); }
-.nav .ic { display: block; font-size: 18px; line-height: 1.3; }
+.nav button.on .ic { background: var(--accent-sl); }
 
 /* ---------- toast ---------- */
 .toast {
   position: fixed; z-index: 90; inset-inline: 0; bottom: calc(78px + env(safe-area-inset-bottom));
   margin: 0 auto; width: max-content; max-width: 86%;
   background: var(--text); color: var(--bg);
-  padding: 9px 16px; border-radius: 999px; font-size: var(--fs-sm);
+  padding: 10px 18px; border-radius: 999px; font-size: var(--fs-sm); font-weight: 600;
   box-shadow: var(--shadow);
 }
 
-/* ---------- הדפסה ----------
-   דף לשבת. שחור על לבן, בלי רקעים ובלי צללים — דיו עולה כסף והרקעים
-   של המסך הופכים לאפור מלוכלך. */
-/* ================= הדפסה =================
-   הפריסות נבנות כרצף עמודים ולא כזרם אחד. על המסך העמוד הוא דף לבן עם
-   צל, וגם במצב כהה — נייר הוא נייר. בהדפסה אותו מבנה בדיוק, ולכן
-   התצוגה המקדימה היא ספירה ולא הערכה. */
-
-/* --- בוררים --- */
-/* שם המחלקה הזאת היה .pick, והוא התנגש עם .opt.pick של אפשרות נבחרת
-   בפרק: text-align:right וריפוד משלה דלפו על כל תשובה שנבחרה, והטקסט
-   יושר לצד הלא נכון. שתי מחלקות עם אותו שם לשני דברים שונים. */
-.choice {
-  display: block; width: 100%; text-align: right; cursor: pointer;
-  background: var(--surface); color: var(--text);
-  border: 1px solid var(--line); border-radius: 10px;
-  padding: 11px 13px; margin-bottom: 6px; font: inherit;
-}
-.choice.on { border-color: var(--accent); background: var(--accent-sl); }
-.choice.off { opacity: .5; }
-.choice .pt { display: flex; align-items: baseline; gap: 8px; font-weight: 600; font-size: var(--fs-md); }
-.choice .pt .cnt { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm);
-  font-weight: 600; color: var(--accent); margin-inline-start: auto; }
-.choice .pd { display: block; font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
-.choice.multi .pt::before {
-  content: "\2610"; font-family: "IBM Plex Mono", monospace; color: var(--dim);
-}
-.choice.multi.on .pt::before { content: "\2611"; color: var(--accent); }
-
-.tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
-.tally > div { background: var(--surface-2); border: 1px solid var(--line);
-  border-radius: 10px; padding: 10px; text-align: center; }
-.tally b { display: block; font-family: "IBM Plex Mono", monospace;
-  font-size: var(--fs-lg); font-weight: 600; }
-.tally span { font-size: var(--fs-xs); color: var(--muted); }
-
-.picklist { display: flex; flex-direction: column; gap: 5px; width: 100%;
-  max-width: 46ch; max-height: 48vh; overflow-y: auto; margin-top: 8px; }
-
-/* --- העמוד --- */
-/* העמוד תמיד 210×297 מ"מ, גם על המסך. הקנה מידה נעשה ב-transform ולא
-   בהקטנת התיבה — אחרת הגופנים, שנקובים במילימטרים, היו נשארים בגודלם
-   בתוך תיבה קטנה יותר, ומדידת מספר השורות לעמוד הייתה משקרת. כך
-   התצוגה המקדימה היא מודל נאמן של הדף שייצא. */
-.sheet { display: flex; flex-direction: column; gap: 18px; align-items: center; --k: 1; }
-.pageframe {
-  width: 100%; max-width: 210mm; aspect-ratio: 210 / 297; overflow: hidden;
-  border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 12px 32px -20px rgba(0,0,0,.5);
-  background: #fff;
-}
-.page {
-  background: #fff; color: #14161a;
-  width: 210mm; height: 297mm; padding: 14mm 13mm;
-  overflow: hidden; font-size: 3.1mm; line-height: 1.45;
-  transform: scale(var(--k)); transform-origin: top right;
-}
-.page .phead {
-  display: flex; justify-content: space-between; align-items: baseline;
-  border-bottom: .6pt solid #14161a; padding-bottom: 2mm; margin-bottom: 3.5mm;
-  font-weight: 700; font-size: 3.6mm;
-}
-.page .phead .ps { font-weight: 400; font-size: 2.7mm; color: #5b616a; }
-
-.page .prow {
-  display: grid; grid-template-columns: 6mm 32mm 1fr; gap: 3mm;
-  padding: 1.9mm 0; border-bottom: .3pt solid #c9ccd1; break-inside: avoid;
-}
-.page .prow .box { width: 4mm; height: 4mm; border: .6pt solid #14161a; margin-top: .8mm; }
-.page .prow .w { font-family: var(--font-en); direction: ltr;
-  font-size: 3.6mm; font-weight: 500; }
-.page .prow .m { font-size: 3mm; }
-.page .prow .a { font-size: 2.8mm; color: #4a5058; margin-top: .4mm; }
-
-/* כרטיסיות: החצי התחתון מסובב, כדי שאחרי קיפול לאחור הוא ייקרא נכון */
-.page .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0; height: 100%; }
-/* מסגרת מלאה = קו גזירה, מקווקו = קו קיפול. ההוראה בראש העמוד מסתמכת
-   על ההבחנה הזאת. */
-.page .fcard { border: .5pt solid #14161a; display: grid;
-  grid-template-rows: 1fr 0 1fr; break-inside: avoid; }
-.page .fcard .face { display: grid; place-items: center; padding: 2mm; text-align: center; }
-.page .fcard .fold { border-top: .5pt dashed #14161a; }
-.page .fcard .back { transform: rotate(180deg); }
-.page .fcard .fw { font-family: var(--font-en); direction: ltr;
-  font-size: 5.2mm; font-weight: 500; }
-.page .fcard .fm { font-size: 3mm; line-height: 1.35; }
-
-/* דף תרגול */
-.page .q { break-inside: avoid; padding: 2mm 0 2.4mm; border-bottom: .3pt solid #d6d9de; }
-.page .q .qs { font-family: var(--font-en); direction: ltr;
-  font-size: 3.4mm; line-height: 1.5; }
-.page .q .qs b { font-family: "IBM Plex Mono", monospace; font-size: 2.9mm; }
-.page .q .blank { display: inline-block; width: 22mm; border-bottom: .6pt solid #14161a; }
-.page .q .qo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm;
-  direction: ltr; font-family: var(--font-en); font-size: 3.1mm; margin-top: 1.4mm; }
-.page .q .qo i { font-style: normal; font-family: "IBM Plex Mono", monospace;
-  font-size: 2.6mm; color: #5b616a; }
-.page .keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.6mm 5mm;
-  direction: ltr; font-family: var(--font-en); font-size: 3.2mm; }
-.page .keys b { font-family: "IBM Plex Mono", monospace; font-size: 2.9mm; }
-
-@media print {
-  .topbar, .nav, .toast, .btn, .hints, .sec, #layer, #spine { display: none !important; }
-  body { background: #fff; color: #000; }
-  .wrap { max-width: none; padding: 0; }
-  /* השוליים שייכים לעמוד עצמו ולא ל-@page, ולכן המסך וההדפסה מודדים
-     בדיוק את אותה תיבה. */
-  @page { margin: 0; size: A4; }
-  .sheet { display: block; gap: 0; --k: 1; }
-  .pageframe { max-width: none; width: auto; aspect-ratio: auto;
-    overflow: visible; box-shadow: none; border-radius: 0; break-after: page; }
-  .pageframe:last-child { break-after: auto; }
-  .page { transform: none; }
-}
-
-/* ===== זהות צבע לפי מצב =====
-   משטח הלימוד רגוע בכוונה — שם צריך ריכוז. המשחקים מקבלים צבע, כי משחק
-   שנראה כמו מבחן לא ירגיש כמו משחק. כל מצב מקבל --mode משלו והמשטח
-   מושך ממנו. */
+/* ===== משטח הלימוד =====
+   צבע אחד לכל המצבים: ירוק. ההבחנה בין מצבים עוברת בכותרת, לא בצבע. */
 .study { --mode: var(--accent); --mode-bg: var(--accent-sl); }
-.study.m-exam  { --mode:#3d6bb3; --mode-bg:#e6edf9; }
-.study.m-frame { --mode:#b07d1a; --mode-bg:#fbf1dc; }
-.study.m-trap  { --mode:#b8452f; --mode-bg:#fbe8e3; }
-.study.m-read  { --mode:#6a4b9c; --mode-bg:#efeafa; }
-.study.m-quad  { --mode:#0d8b84; --mode-bg:#dff2f0; }
-.study.m-tower { --mode:#c2185b; --mode-bg:#fce4ec; }
-.study.m-pair  { --mode:#1a7f6b; --mode-bg:#ddf2ec; }
-/* בכהה שני הערכים משתנים, לא רק הרקע: הגוון המלא נועד לרקע לבן
-   ועל צפחה הוא כהה מדי, והרקע העדין כויל מול שחור כמעט טהור. */
-:root[data-theme="dark"] .study.m-exam  { --mode:#8ab0e6; --mode-bg:#1f2c40; }
-:root[data-theme="dark"] .study.m-frame { --mode:#e0b75f; --mode-bg:#332b17; }
-:root[data-theme="dark"] .study.m-trap  { --mode:#ef9480; --mode-bg:#38231d; }
-:root[data-theme="dark"] .study.m-read  { --mode:#b49ce0; --mode-bg:#2a2340; }
-:root[data-theme="dark"] .study.m-quad  { --mode:#3fc4ba; --mode-bg:#16332f; }
-:root[data-theme="dark"] .study.m-tower { --mode:#f286ae; --mode-bg:#381e2a; }
-:root[data-theme="dark"] .study.m-pair  { --mode:#4cc3a8; --mode-bg:#14322b; }
-:root[data-theme="dark"] .study.m-elim  { --mode:#4fc0a4; --mode-bg:#16332c; }
 
-.study .sbar { background: var(--mode-bg); border-bottom-color: transparent; }
+.study .sbar { background: var(--bg); border-bottom-color: var(--line-soft); }
 .study .sbar .prog i { background: var(--mode); }
 .study .eyebrow { color: var(--mode); }
 .study .opt.pick {
@@ -406,13 +267,13 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 }
 .study .opt.pick .num { color: var(--mode); font-weight: 600; }
 .study .grade.on { border-color: var(--mode); background: var(--mode-bg); color: var(--mode); }
-.study .btn { background: var(--mode); }
+.study .btn { background: var(--mode); color: var(--on-accent); }
 .study .btn.ghost { background: none; color: var(--mode); border-color: var(--mode); }
 
 /* כותרת מצב — נותנת לכל מסך זהות במקום עוד רשימה */
 .hero { background: var(--mode-bg); border-radius: var(--radius); padding: 16px; width: 100%;
         max-width: 46ch; text-align: center; }
-.hero .big { font-family:"IBM Plex Mono",monospace; font-size: var(--fs-2xl); font-weight:500;
+.hero .big { font-family:var(--font-num); font-size: var(--fs-2xl); font-weight:500;
              color: var(--mode); line-height:1.05; font-variant-numeric: tabular-nums; }
 .hero .cap { font-size: var(--fs-sm); color: var(--muted); margin-top: 2px; }
 
@@ -423,7 +284,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .opt-row { display:grid; grid-template-columns:22px 1fr; gap:8px; padding:8px 0;
            border-top:1px solid var(--line); align-items:start; }
 .opt-row:first-of-type { border-top:0; }
-.opt-row .mk { font-family:"IBM Plex Mono",monospace; font-size:var(--fs-sm); color:var(--dim); }
+.opt-row .mk { font-family:var(--font-num); font-size:var(--fs-sm); color:var(--dim); }
 .opt-row.ok  .mk { color:var(--good); }
 .opt-row.no  .mk { color:var(--bad); }
 .opt-row .en { font-family:var(--font-en); direction:ltr; font-size:var(--fs-en); line-height:var(--lh-en); }
@@ -448,7 +309,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .fold { font-size:var(--fs-sm); color:var(--mode); padding:6px 2px; }
 
 /* קומבו במשחקי קצב */
-.combo { font-family:"IBM Plex Mono",monospace; font-weight:500; color:var(--mode); }
+.combo { font-family:var(--font-num); font-weight:500; color:var(--mode); }
 .pop { animation: pop .28s ease-out; }
 @keyframes pop { 0%{transform:scale(.82);opacity:.4} 100%{transform:scale(1);opacity:1} }
 
@@ -461,7 +322,6 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
    אפשרות פסולה נשארת על המסך מחוקה ולא נעלמת — לראות מה פסלת הוא חצי
    מהאימון. */
 
-.study.m-elim { --mode: var(--accent); --mode-bg: var(--accent-sl); }
 
 .opt.struck {
   opacity: .5; text-decoration: line-through;
@@ -474,10 +334,10 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* מד הסיכוי */
 .oddsbar { width: 100%; max-width: 52ch; margin-top: 12px; text-align: center; }
 .oddsbar .lab { font-size: var(--fs-xs); color: var(--muted); letter-spacing: .04em; }
-.oddsbar .val { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xl);
+.oddsbar .val { font-family: var(--font-num); font-size: var(--fs-xl);
   font-weight: 600; color: var(--mode, var(--accent)); line-height: 1.1; }
 .oddsbar .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
-.oddsbar .steps i { font-style: normal; font-family: "IBM Plex Mono", monospace;
+.oddsbar .steps i { font-style: normal; font-family: var(--font-num);
   font-size: var(--fs-xs); padding: 3px 0; border-radius: 6px;
   background: var(--surface-2); color: var(--dim); }
 .oddsbar .steps i.on { background: var(--mode-bg, var(--accent-sl)); color: var(--mode, var(--accent)); font-weight: 600; }
@@ -486,14 +346,14 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .ladder { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
 .rung { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
   padding: 8px 4px; text-align: center; }
-.rung b { display: block; font-family: "IBM Plex Mono", monospace; font-size: var(--fs-md);
+.rung b { display: block; font-family: var(--font-num); font-size: var(--fs-md);
   color: var(--accent); }
 .rung span { font-size: var(--fs-xs); color: var(--muted); }
 
 /* לוח המדדים */
 .statgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
 .stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
-.stat .v { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-lg); font-weight: 600; }
+.stat .v { font-family: var(--font-num); font-size: var(--fs-lg); font-weight: 600; }
 .stat .l { font-size: var(--fs-sm); font-weight: 600; margin-top: 2px; }
 .stat .s { font-size: var(--fs-xs); color: var(--muted); }
 
@@ -503,7 +363,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .finding > summary { display: grid; grid-template-columns: 4.4em 1fr auto; gap: 8px;
   align-items: baseline; padding: 10px 0; cursor: pointer; list-style: none; }
 .finding > summary::-webkit-details-marker { display: none; }
-.finding .fv { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: var(--fs-sm); }
+.finding .fv { font-family: var(--font-num); font-weight: 600; font-size: var(--fs-sm); }
 .finding.works .fv { color: var(--good); }
 .finding.dead  .fv { color: var(--bad); }
 .finding .fn { font-size: var(--fs-sm); font-weight: 600; }
@@ -518,29 +378,8 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .passage .plab { font-size: var(--fs-xs); color: var(--mode, var(--accent));
   font-weight: 600; margin-bottom: 6px; }
 .passage .plab.dim { color: var(--dim); font-weight: 400; }
-.mid .big { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-2xl);
+.mid .big { font-family: var(--font-num); font-size: var(--fs-2xl);
   font-weight: 500; line-height: 1; margin: 6px 0; }
-
-/* ================= משימת היום ================= */
-.mission {
-  display: block; width: 100%; text-align: right; cursor: pointer;
-  background: var(--surface); border: 1px solid var(--line);
-  border-inline-start: 3px solid var(--mode, var(--accent));
-  border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
-  font: inherit; color: var(--text);
-}
-.mission:active { transform: scale(.995); }
-.mission.m-exam { --mode: var(--accent); }
-.mission.m-trap { --mode: var(--bad); }
-.mission.m-read { --mode: var(--warn); }
-.mission.m-elim { --mode: var(--good); }
-.mission .mh { display: flex; align-items: baseline; gap: 8px; }
-.mission .mt { font-weight: 700; font-size: var(--fs-md); flex: 1; }
-.mission .mm { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xs);
-  color: var(--mode, var(--accent)); white-space: nowrap; }
-.mission .mw { font-size: var(--fs-sm); color: var(--muted); line-height: 1.55; margin-top: 3px; }
-.mission .mw b { color: var(--text); font-weight: 600; }
-.mission .mdone { font-size: var(--fs-xs); color: var(--good); margin-top: 5px; }
 
 .opt.oldpick { border-style: dashed; }
 
@@ -550,7 +389,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .trend .tgt { stroke: var(--good); stroke-width: 1; stroke-dasharray: 3 3; }
 .trend .ln  { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
 .trend .pt  { fill: var(--accent); }
-.trend .axl { fill: var(--dim); font-family: "IBM Plex Mono", monospace; font-size: 8px; }
+.trend .axl { fill: var(--dim); font-family: var(--font-num); font-size: 8px; }
 .trend .tlab { display: flex; justify-content: space-between; gap: 8px;
   font-size: var(--fs-xs); color: var(--dim); margin-top: 2px; }
 .trend .tlab span:nth-child(2) { color: var(--good); }
@@ -558,7 +397,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 /* ---- שורת הפרק: שם הפרק והשעון ---- */
 .secbar { display: flex; align-items: baseline; justify-content: space-between;
   gap: 12px; width: 100%; max-width: 52ch; }
-.secbar .clock { font-family: "IBM Plex Mono", monospace; font-size: var(--fs-md);
+.secbar .clock { font-family: var(--font-num); font-size: var(--fs-md);
   font-weight: 600; color: var(--mode, var(--accent)); font-variant-numeric: tabular-nums; }
 .secbar .clock.low { color: var(--bad); }
 
@@ -605,7 +444,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 .occ { display: grid; grid-template-columns: 18px 1fr; gap: 8px;
   padding: 9px 0; border-top: 1px solid var(--line); }
 .occ:first-of-type { border-top: 0; }
-.occ .mk { font-family: "IBM Plex Mono", monospace; color: var(--dim); font-size: var(--fs-sm); }
+.occ .mk { font-family: var(--font-num); color: var(--dim); font-size: var(--fs-sm); }
 .occ.ok .mk { color: var(--good); }
 .occ .en { font-family: var(--font-en); direction: ltr;
   font-size: var(--fs-sm); line-height: 1.5; }
@@ -711,7 +550,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 }
 
 /* סימוני השורות של מאל"ו בתוך הקטע — מספר שורה, לא חלק מהמשפט */
-.passage .pn { color: var(--dim); font-size: .78em; font-family: "IBM Plex Mono", monospace;
+.passage .pn { color: var(--dim); font-size: .78em; font-family: var(--font-num);
   vertical-align: .12em; padding: 0 .15em; }
 
 /* ================= שליטה בטיפוגרפיה האנגלית =================
@@ -723,18 +562,6 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 :root[data-en-size="s"]  { --fs-en-sm: 15px;   --fs-en: 17px;   --fs-en-md: 18.5px; --fs-en-lg: 21px; }
 :root[data-en-size="l"]  { --fs-en-sm: 17.5px; --fs-en: 20.5px; --fs-en-md: 22px;   --fs-en-lg: 25px; }
 :root[data-en-size="xl"] { --fs-en-sm: 19px;   --fs-en: 22.5px; --fs-en-md: 24px;   --fs-en-lg: 27px; }
-
-/* סאנס: גופן המערכת. על אייפון זה SF Pro, ואין מה להוריד. */
-:root[data-en-face="sans"] {
-  --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-/* "כמו במבחן": חוברות מאל"ו מודפסות בסריף בסגנון Times. */
-:root[data-en-face="exam"] {
-  --font-en: "Times New Roman", Times, Georgia, "Liberation Serif", serif;
-}
-
-:root[data-en-lead="loose"] { --lh-en: 1.82; --lh-en-loose: 1.95; }
-:root[data-en-lead="tight"] { --lh-en: 1.45; --lh-en-loose: 1.5; }
 
 /* דוגמית חיה בתוך הבורר */
 .sample {
@@ -771,7 +598,7 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
   flex: 1 1 0; min-height: 44px; max-width: 64px;
   border: 1px solid var(--line); border-radius: 10px;
   background: var(--surface-2); color: var(--muted);
-  font-family: "IBM Plex Mono", monospace; font-size: var(--fs-sm); font-weight: 600;
+  font-family: var(--font-num); font-size: var(--fs-sm); font-weight: 600;
 }
 .qdot.done { color: var(--text); border-color: var(--line); background: var(--surface-solid); }
 .qdot.on {
@@ -809,19 +636,91 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
 
-.lomda-home { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-.lomda-home .figs { margin-top: 10px; }
-.lomda-home .btn { margin-top: 10px; width: 100%; }
-.lomda-home .bar { margin-top: 6px; }
-.lh-t { font-weight: 700; font-size: var(--fs-md); margin-top: 2px; }
-.lh-row { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--muted); margin-top: 6px; }
+.lvtag { font-family: var(--font-num); font-size: .7em; color: var(--dim); font-weight: 400; }
 
-.lvgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 5px; }
-.lv { position: relative; height: 44px; border-radius: 7px; background: var(--surface-2); overflow: hidden;
+/* ================= שפת העיצוב: נקי וירוק =================
+   משטחים לבנים על רקע ירקרק כמעט-לבן, קו דק אחד, ירוק רק לפעולה
+   ולהתקדמות. בלי צללים כבדים, בלי מסגרות צבעוניות. */
+
+
+.phead { margin: 4px 0 18px; }
+.phead .page-sub b { color: var(--text); }
+
+/* שורת בחירה */
+.list { display: flex; flex-direction: column; gap: 0; }
+.list > .eyebrow { margin-bottom: 8px; }
+.tile {
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "t c" "s c";
+  align-items: center; column-gap: 12px; width: 100%; text-align: right;
+  background: var(--surface); border: 1px solid var(--line);
+  padding: 13px 16px; min-height: 60px; color: var(--text);
+  border-radius: 0; margin-top: -1px; transition: background .12s ease;
+}
+.list > .tile:first-of-type, .list > .eyebrow + .tile { border-start-start-radius: var(--radius-sm); border-start-end-radius: var(--radius-sm); margin-top: 0; }
+.list > .tile:last-child { border-end-start-radius: var(--radius-sm); border-end-end-radius: var(--radius-sm); }
+.tile .tt { grid-area: t; font-weight: 700; font-size: var(--fs-md); }
+.tile .ts { grid-area: s; font-size: var(--fs-sm); color: var(--muted); margin-top: 1px; }
+.tile .chev { grid-area: c; font-size: 22px; line-height: 1; color: var(--dim); }
+.tile .pill { vertical-align: 2px; margin-inline-start: 4px; }
+@media (hover: hover) { .tile:hover { background: var(--surface-2); } }
+.tile:active { background: var(--surface-2); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px; }
+.panel .btn { margin-top: 12px; }
+.panel .ctl { margin-top: 16px; }
+
+.seg { display: flex; gap: 4px; background: var(--surface-2); border-radius: 999px; padding: 4px; }
+.seg button { flex: 1; min-height: 38px; border-radius: 999px; font-size: var(--fs-sm); font-weight: 600; color: var(--muted); }
+.seg button.on { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
+
+/* כרטיס הלומדה */
+.lcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 4px; }
+.lc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lc-k { font-size: var(--fs-sm); color: var(--muted); font-weight: 600; }
+.lc-t { font-size: var(--fs-lg); font-weight: 800; margin-top: 6px; letter-spacing: -.01em; }
+.lc-s { font-size: var(--fs-sm); color: var(--muted); margin: 2px 0 0; min-height: 1em; }
+.lc-bar { margin-top: 14px; height: 6px; }
+.lc-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: var(--fs-xs); color: var(--muted); }
+.lc-meta .hot { color: var(--bad); font-weight: 600; }
+.lcard .btn { margin-top: 16px; }
+.rdots { display: inline-flex; gap: 5px; }
+.rdots i { width: 9px; height: 9px; border-radius: 50%; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); }
+.rdots i.on { background: var(--accent); box-shadow: none; }
+
+/* מפת הרמות */
+.lvgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+.lv { position: relative; height: 46px; border-radius: 10px; background: var(--surface); overflow: hidden;
       border: 1px solid var(--line); }
-.lv i { position: absolute; inset-inline: 0; bottom: 0; background: var(--accent); opacity: .35; }
-.lv.full i { background: var(--good); opacity: .45; }
-.lv b { position: relative; z-index: 1; display: block; text-align: center; line-height: 42px;
-        font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xs); }
+.lv i { position: absolute; inset-inline: 0; bottom: 0; background: var(--accent-sl); }
+.lv.full i { background: var(--accent); opacity: .22; }
+.lv b { position: relative; display: block; text-align: center; line-height: 44px; font-size: var(--fs-sm); font-weight: 700; color: var(--muted); }
 .lv.cur { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-.lvtag { font-family: "IBM Plex Mono", monospace; font-size: .7em; color: var(--dim); font-weight: 400; }
+.lv.cur b { color: var(--accent); }
+
+/* רכיבים קיימים, מיושרים לשפה */
+.stat, .rung { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.stat .v { font-weight: 800; }
+.opt, .grade, .kind, .t, .ex, .passage, .sample, .wrow { border-color: var(--line); }
+.opt { background: var(--surface); }
+@media (hover: hover) { .opt:not(:disabled):not(.right):not(.wrong):hover { border-color: var(--accent); } }
+.grade { background: var(--surface); border-radius: var(--radius-sm); }
+.grade.g3 { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.grade.g1 { background: var(--surface); }
+.chip { background: var(--surface); }
+.chip.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.t:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-sl); }
+.wrow { background: none; }
+.bar { background: var(--surface-2); }
+.finding.works .fv { color: var(--accent); }
+.item { border-top-color: var(--line-soft); }
+.sbar .x { color: var(--muted); }
+.kind.on { background: var(--accent-sl); }
+.kind small { color: var(--accent); font-weight: 600; }
+.lvtag { color: var(--dim); }
+a { color: var(--accent); }
+.netbar { bottom: calc(62px + env(safe-area-inset-bottom)); border-radius: 999px; inset-inline: 16px; border: 0; box-shadow: var(--shadow-lg); }
+.wrap { padding-top: 16px; }
+.state { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+
+.study .opt.he-opt { display: flex; align-items: baseline; gap: 12px; direction: rtl; text-align: right; }
+.study .opt.he-opt .num { margin: 0; }

@@ -93,6 +93,7 @@ async function view(v) {
   const { ex, traps, days, pass } = split();
   const total = KIND.reduce((s, [k]) => s + ex[k].n, 0);
 
+  A.head(v, 'התקדמות');
   const head = el('div', 'sec');
   head.appendChild(el('span', 'eyebrow', 'האם אני בקצב ל-134?'));
   if (!total) {

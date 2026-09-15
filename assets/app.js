@@ -14,6 +14,7 @@
 
 /* ---------- קבועים ---------- */
 const EXAM_DEFAULT = '2026-10-22';
+const OWNER = 'ynonaviel@gmail.com';
 const DAY = 86400000;
 
 /* ימים שבהם לא לומדים, עד המבחן. חול המועד (27.9-2.10) הוא זמן לימוד
@@ -57,7 +58,7 @@ function studyDaysLeft(from, to) {
 
 /* ================= תזמון =================
    המנוע — רמות, סינון, שינון ותרגול — יושב ב-lomda.js. כאן רק עטיפות
-   שדרכן שאר הקבצים (בליץ, הדפסה, מסך המילים) מדברים איתו. */
+   שדרכן שאר הקבצים (בליץ, מסך המילים) מדברים איתו. */
 const L = () => window.AMLomda;
 const bucket = (c) => (L() ? L().bucket(c) : (c ? 'young' : 'new'));
 
@@ -115,11 +116,13 @@ function flushNow() {
   dirty.clear();
 }
 
-document.addEventListener('cloud:merged', () => {
+document.addEventListener('cloud:merged', (e) => {
   flushNow();
   Object.keys(cache).forEach((k) => delete cache[k]);
   S.exam = pref('exam', EXAM_DEFAULT);
-  render();
+  /* רינדור רק כשהמיזוג שינה משהו. הסנכרון רץ עכשיו גם בכל חזרה ללשונית,
+     ורינדור סתמי היה מוחק חיפוש שהקלדת באמצע. */
+  if (!e.detail || e.detail.changed) { applyTypo(); render(); }
 });
 
 /* ================= מצב ================= */
@@ -196,82 +199,99 @@ function toast(msg) {
   toast._t = setTimeout(() => { t.hidden = true; }, 2400);
 }
 
+/* ימים למבחן — מספר אחד בפינה, במקום סרגל ימים שלם */
 function spine() {
-  const box = $('#spine');
-  if (!S.ready) { box.hidden = true; return; }
-  box.hidden = false;
+  const d = $('#days');
+  if (!d) return;
+  if (!S.ready) { d.hidden = true; return; }
   const left = Math.max(0, between(today(), S.exam));
-  $('#dLeft').textContent = left;
-  $('#dDate').textContent = heDate(S.exam);
-  const start = pref('start', today());
-  const span = Math.max(1, between(start, S.exam));
-  const passed = clamp(between(start, today()), 0, span);
-  const r = $('#ruler');
-  r.innerHTML = '';
-  for (let i = 0; i <= span; i++) {
-    const d = addDays(start, i);
-    const cls = i === passed ? 'today' : i < passed ? 'past' : isOff(d) ? 'off' : '';
-    const tick = el('i', 'tick' + (cls ? ' ' + cls : ''));
-    tick.title = heDate(d) + (HOLIDAYS[d] ? ' — ' + HOLIDAYS[d] : isShabbat(d) ? ' — שבת' : '');
-    r.appendChild(tick);
-  }
+  d.hidden = false;
+  d.innerHTML = '<b>' + left + '</b> ימים למבחן';
+  d.title = heDate(S.exam);
 }
 
+/* אייקונים בקו אחד, בלי ספריות */
+const ICON = {
+  home:  '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  lomda: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M9 8h7M9 12h5"/>',
+  drill: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+  play:  '<rect x="3" y="7" width="18" height="12" rx="4"/><path d="M8 11v4M6 13h4"/><circle cx="16" cy="12" r="1"/><circle cx="18" cy="14.5" r="1"/>',
+  more:  '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+};
+const svg = (k) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[k] + '</svg>';
+
 const NAV = [
-  ['home',  'בית',    '◧'],
-  ['strat', 'אסטרטגיה', '⊘'],
-  ['drill', 'פרקים',  '◆'],
-  ['words', 'מילים',  '✦'],
-  ['more',  'עוד',    '≡'],
+  ['home',  'בית'],
+  ['lomda', 'לומדה'],
+  ['drill', 'תרגול'],
+  ['play',  'משחקים'],
+  ['more',  'עוד'],
 ];
+/* מסכי-בן ולשונית האם שלהם */
+const PARENT = { words: 'lomda', fix: 'drill', focus: 'drill', prog: 'more', strat: 'more', pat: 'more', about: 'more' };
 function nav() {
   const n = $('#nav');
   if (!S.ready) { n.hidden = true; return; }
   n.hidden = false; n.innerHTML = '';
-  /* 'fix' הוא מסך-בן של הבית ולא לשונית בפני עצמה; בלי זה שום לשונית
-     לא מסומנת שם ולא ברור איפה נמצאים. */
-  const at = S.view === 'fix' ? 'home' : S.view === 'print' || S.view === 'prog' || S.view === 'play' || S.view === 'about' ? 'more'
-    : S.view === 'focus' || S.view === 'pat' ? 'drill' : S.view;
-  NAV.forEach(([k, t, ic]) => {
-    const b = el('button', at === k ? 'on' : '', '<span class="ic">' + ic + '</span>' + t);
+  const at = PARENT[S.view] || S.view;
+  NAV.forEach(([k, t]) => {
+    const b = el('button', at === k ? 'on' : '', '<span class="ic">' + svg(k) + '</span>' + t);
+    if (at === k) b.setAttribute('aria-current', 'page');
     b.onclick = () => go(k);
     n.appendChild(b);
   });
 }
 function go(v) { S.view = v; render(); window.scrollTo(0, 0); }
 
+const VIEWS = {
+  home:  () => window.AMToday && window.AMToday.home,
+  fix:   () => window.AMToday && window.AMToday.fix,
+  lomda: () => window.AMLomda && window.AMLomda.hub,
+  words: () => window.AMLomda && window.AMLomda.hub,
+  drill: () => window.AMExam && window.AMExam.view,
+  focus: () => window.AMExam && window.AMExam.view,
+  play:  () => window.AMDrills && window.AMDrills.play,
+  pat:   () => window.AMDrills && window.AMDrills.patterns,
+  strat: () => window.AMStrat && window.AMStrat.view,
+  prog:  () => window.AMProgress && window.AMProgress.view,
+  about: () => window.AMAbout && window.AMAbout.view,
+  more:  () => viewMore,
+};
+
+/* כל רינדור מקבל מכל חדש משלו. מסך שנבנה באסינכרוני (פרקים, התקדמות)
+   ממשיך לכתוב לתוך המכל שלו גם אחרי שעברנו מסך — אבל המכל כבר מנותק
+   מהדף, ולכן שום דבר לא דולף למסך אחר. */
 function render() {
   spine(); nav();
   const v = $('#view');
   v.innerHTML = '';
-  if (!S.ready) { v.appendChild(el('div', 'empty', 'טוען…')); return; }
-  ({ home: viewHome, strat: viewStrat, drill: viewDrill, play: viewPlay, fix: viewFix, print: viewPrint, prog: viewProg, focus: viewFocus, words: viewWords, pat: viewPat, about: viewAbout, more: viewMore }[S.view] || viewHome)(v);
+  const box = el('div', 'screen');
+  v.appendChild(box);
+  if (!S.ready) { box.appendChild(skeleton(4)); return; }
+  const fn = (VIEWS[S.view] || VIEWS.home)();
+  if (!fn) { box.appendChild(skeleton(3)); return; }
+  try { fn(box); } catch (e) {
+    console.error(e);
+    box.appendChild(state('משהו השתבש במסך הזה', 'ההתקדמות שמורה. נסה לחזור לבית.', { label: 'לבית', fn: () => go('home') }));
+  }
 }
 
-/* ---------- בית ---------- */
-function viewHome(v) {
-  if (window.AMToday) return window.AMToday.home(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
+/* שורת בחירה אחידה לכל התפריטים */
+function tile(v, title, sub, fn, badge) {
+  const b = el('button', 'tile');
+  b.innerHTML = '<span class="tt">' + esc(title) +
+    (badge ? ' <span class="pill good">' + esc(badge) + '</span>' : '') + '</span>' +
+    (sub ? '<span class="ts">' + esc(sub) + '</span>' : '') +
+    '<span class="chev" aria-hidden="true">‹</span>';
+  b.onclick = fn;
+  v.appendChild(b);
+  return b;
 }
-function viewFix(v) {
-  if (window.AMToday) return window.AMToday.fix(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewPrint(v) {
-  if (window.AMPrint) return window.AMPrint.view(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewProg(v) {
-  if (window.AMProgress) return window.AMProgress.view(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewWords(v) {
-  if (window.AMWords) return window.AMWords.view(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewAbout(v) {
-  if (window.AMAbout) return window.AMAbout.view(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
+function head(v, title, sub) {
+  const h = el('div', 'phead');
+  h.innerHTML = '<h1 class="page-title">' + esc(title) + '</h1>' + (sub ? '<p class="page-sub">' + sub + '</p>' : '');
+  v.appendChild(h);
+  return h;
 }
 
 /* ---------- טיפוגרפיה אנגלית ----------
@@ -280,7 +300,7 @@ function viewAbout(v) {
    יהיה הבזק של גודל ברירת המחדל. */
 function applyTypo() {
   const r = document.documentElement;
-  [['enSize', 'data-en-size'], ['enFace', 'data-en-face'], ['enLead', 'data-en-lead']]
+  [['enSize', 'data-en-size']]
     .forEach(([k, attr]) => {
       const v = pref(k, '');
       v ? r.setAttribute(attr, v) : r.removeAttribute(attr);
@@ -325,10 +345,11 @@ function highlight(sent, w) {
   return esc(sent).replace(re, '<b>$1</b>');
 }
 function meaning(o, withEx) {
-  return (o.pos ? '<div class="pos">' + esc(o.pos) + '</div>' : '') +
+  /* העברית ראשונה: היא מה שהלומד מחפש בעין. ההגדרה והנרדפות מתחתיה. */
+  return (o.he ? '<div class="he">' + esc(o.he) + '</div>' : '') +
+    (o.pos ? '<div class="pos">' + esc(o.pos) + '</div>' : '') +
     (o.def ? '<div class="def">' + esc(o.def) + '</div>' : '') +
     (o.syn && o.syn.length ? '<div class="syn">' + o.syn.map(esc).join('  ·  ') + '</div>' : '') +
-    (o.he ? '<div class="he">' + esc(o.he) + '</div>' : '') +
     (withEx && sentOf(o.w) ? '<div class="ex"><span class="ex-lab">from a real exam</span>' + highlight(sentOf(o.w), o.w) + '</div>' : '');
 }
 
@@ -372,133 +393,85 @@ function editAssoc(w, done) {
   }, 60);
 }
 
-/* ---------- מעבדת אסוציאציות ---------- */
-/* ---------- מסכים שמוגשים על ידי הקבצים האחרים ---------- */
-function viewStrat(v) {
-  if (window.AMStrat) return window.AMStrat.view(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewDrill(v) {
-  if (window.AMExam) return window.AMExam.view(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewFocus(v) {
-  if (window.AMDrills) return window.AMDrills.menu(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewPat(v) {
-  if (window.AMDrills) return window.AMDrills.patterns(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-function viewPlay(v) {
-  if (window.AMDrills) return window.AMDrills.play(v);
-  v.appendChild(el('div', 'empty', 'טוען…'));
-}
-
 function viewMore(v) {
+  head(v, 'עוד');
+
+  const links = el('div', 'sec list');
+  tile(links, 'התקדמות', 'אומדן ציון, מגמה ודיוק לפי פרק', () => go('prog'));
+  tile(links, 'אסטרטגיה', 'מה נמדד על 1,267 שאלות אמיתיות — ומה לא עובד', () => go('strat'));
+  tile(links, 'תבניות הבנת הנקרא', 'שמונה תבניות ושתי מסגרות, לקרוא לפני', () => go('pat'));
+  tile(links, 'איך זה עובד', 'המבחן בארבעה מספרים, ומה לעשות ביום רגיל', () => go('about'));
+  v.appendChild(links);
+
   const s = el('div', 'sec');
-  s.appendChild(el('span', 'eyebrow', 'כיול'));
-  const row = el('div');
-  row.innerHTML =
+  s.appendChild(el('span', 'eyebrow', 'הגדרות'));
+  const card = el('div', 'panel');
+  card.innerHTML =
     '<label class="f" for="exd">תאריך המבחן</label>' +
-    '<input class="t mono" id="exd" type="date" value="' + S.exam + '">';
-  const save = el('button', 'btn ghost', 'עדכן');
-  save.onclick = () => {
-    S.exam = $('#exd').value || EXAM_DEFAULT;
+    '<input class="t" id="exd" type="date" value="' + S.exam + '">';
+  $('#exd', card).onchange = (e) => {
+    S.exam = e.target.value || EXAM_DEFAULT;
     setPref('exam', S.exam);
-    toast('עודכן'); render();
+    toast('תאריך המבחן עודכן'); spine();
   };
-  s.append(row, save);
 
-  const th = el('div', 'sec');
-  th.appendChild(el('span', 'eyebrow', 'תצוגה'));
-  const modes = [['auto', 'אוטומטי'], ['light', 'בהיר'], ['dark', 'כהה']];
-  const g = el('div', 'grades g3');
-  modes.forEach(([m, t]) => {
-    const b = el('button', 'grade' + (pref('theme', 'auto') === m ? ' g3' : ''), esc(t));
-    b.onclick = () => {
-      setPref('theme', m);
-      try { localStorage.setItem('amirnet.theme', m); } catch (e) {}
-      const r = m === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : m;
-      document.documentElement.setAttribute('data-theme', r);
-      document.documentElement.setAttribute('data-theme-mode', m);
-      render();
-    };
-    g.appendChild(b);
-  });
-  th.appendChild(g);
-
-  /* ---- שליטה בטיפוגרפיה האנגלית ----
-     כל תוכן המבחן הוא אנגלית, וטיפוגרפיה טובה היא לא אותו דבר לכל
-     עין ולכל מסך. שלושה בוררים, ודוגמית שמשתנה מתחתיהם מיד. */
-  const TYPO = [
-    ['enSize', 'גודל', [['s', 'קטן'], ['', 'רגיל'], ['l', 'גדול'], ['xl', 'ענק']]],
-    ['enFace', 'גופן', [['', 'סריף'], ['sans', 'סאנס'], ['exam', 'כמו במבחן']]],
-    ['enLead', 'רווח שורה', [['tight', 'צפוף'], ['', 'רגיל'], ['loose', 'רחב']]],
-  ];
-  const sample = el('div', 'sample',
-    'Peanut butter was once <b>considered</b> a delicacy and served ' +
-    'only in the finest restaurants.');
-
-  TYPO.forEach(([key, label, opts]) => {
-    const wrap = el('div', 'ctl');
-    wrap.appendChild(el('span', 'f', esc(label)));
-    const row = el('div', 'grades');
-    row.style.gridTemplateColumns = 'repeat(' + opts.length + ',1fr)';
-    const cur = pref(key, '');
+  const seg = (label, opts, cur, onPick) => {
+    const w = el('div', 'ctl');
+    w.appendChild(el('span', 'f', esc(label)));
+    const row = el('div', 'seg');
     opts.forEach(([val, txt]) => {
-      const b = el('button', 'grade' + (cur === val ? ' g3' : ''), esc(txt));
-      b.onclick = () => { setPref(key, val); applyTypo(); render(); };
+      const b = el('button', cur === val ? 'on' : '', esc(txt));
+      b.onclick = () => onPick(val);
       row.appendChild(b);
     });
-    wrap.appendChild(row);
-    th.appendChild(wrap);
+    w.appendChild(row);
+    card.appendChild(w);
+  };
+  seg('ערכת נושא', [['auto', 'אוטומטי'], ['light', 'בהיר'], ['dark', 'כהה']], pref('theme', 'auto'), (m) => {
+    setPref('theme', m);
+    try { localStorage.setItem('amirnet.theme', m); } catch (e) {}
+    const r = m === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : m;
+    document.documentElement.setAttribute('data-theme', r);
+    document.documentElement.setAttribute('data-theme-mode', m);
+    render();
   });
-  th.appendChild(sample);
-  const reset = el('button', 'btn ghost sm', 'אפס לברירת המחדל');
-  reset.onclick = () => { ['enSize', 'enFace', 'enLead'].forEach((k) => setPref(k, '')); applyTypo(); render(); };
-  th.appendChild(reset);
+  seg('גודל האנגלית', [['s', 'קטן'], ['', 'רגיל'], ['l', 'גדול'], ['xl', 'ענק']], pref('enSize', ''), (val) => {
+    setPref('enSize', val); applyTypo(); render();
+  });
+  card.appendChild(el('div', 'sample',
+    'Peanut butter was once <b>considered</b> a delicacy.'));
+  s.appendChild(card);
+  v.appendChild(s);
 
-  const pr = el('div', 'sec');
-  pr.appendChild(el('span', 'eyebrow', 'עוד מסכים'));
-  const pb = el('button', 'btn ghost');
-  pb.style.cssText = 'text-align:right;padding:14px';
-  pb.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">הדפסה</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">טווח, מקור ושלוש פריסות — עם תצוגה מקדימה וספירת עמודים.</div>';
-  pb.onclick = () => go('print');
-  pr.appendChild(pb);
+  const C = window.Cloud;
+  const acc = el('div', 'sec');
+  acc.appendChild(el('span', 'eyebrow', 'חשבון וסנכרון'));
+  const ap = el('div', 'panel');
+  if (!C || !C.enabled) {
+    ap.appendChild(el('p', 'note', 'העותק הזה עובד מקומית בלבד. באתר עצמו אפשר להתחבר ולסנכרן בין מכשירים.'));
+  } else if (!C.user) {
+    ap.appendChild(el('p', 'note', 'התחבר עם Google כדי לסנכרן בין הטלפון למחשב ולפתוח את פרקי האמת.'));
+    const b = el('button', 'btn', 'התחברות עם Google');
+    b.onclick = () => C.login();
+    ap.appendChild(b);
+  } else {
+    const st = C.status();
+    ap.appendChild(el('p', 'note', 'מחובר כ‑<b>' + esc(C.user.email) + '</b><br>' +
+      (st.syncing ? 'מסנכרן עכשיו…' : st.pending ? st.pending + ' שינויים ממתינים לשליחה' :
+        st.lastSync ? 'מסונכרן · ' + new Date(st.lastSync).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) : 'ממתין לסנכרון')));
+    const sy = el('button', 'btn ghost', 'סנכרן עכשיו');
+    sy.onclick = () => { C.syncNow && C.syncNow(); toast('מסנכרן…'); };
+    const out = el('button', 'btn ghost', 'התנתקות');
+    out.onclick = () => { if (confirm('להתנתק? ההתקדמות שמורה בענן.')) { flushNow(); C.logout(); } };
+    ap.append(sy, out);
+  }
+  acc.appendChild(ap);
+  v.appendChild(acc);
 
-  const pg = el('button', 'btn ghost');
-  pg.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
-  pg.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">התקדמות</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">אומדן ציון, מגמה, דיוק לפי פרק, ומפת המלכודות שלך.</div>';
-  pg.onclick = () => go('prog');
-  pr.appendChild(pg);
-
-  const ab = el('button', 'btn ghost');
-  ab.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
-  ab.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">מה זה, ואיך משתמשים</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">המבחן בארבעה מספרים, חמשת המסכים, ומה לעשות ביום רגיל.</div>';
-  ab.onclick = () => go('about');
-  pr.appendChild(ab);
-
-  const gm = el('button', 'btn ghost');
-  gm.style.cssText = 'text-align:right;padding:14px;margin-top:6px';
-  gm.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">משחקים</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">רביעיות · מגדל המילים · זוגות מבלבלים · בליץ 90.</div>';
-  gm.onclick = () => go('play');
-  pr.appendChild(gm);
-
-  const kb = el('div', 'sec');
-  kb.appendChild(el('span', 'eyebrow', 'מקלדת'));
-  kb.appendChild(el('p', 'note',
-    '<b class="rng">1–4</b> בוחרות אפשרות או דרגה · <b>Enter</b> ממשיכה · <b>Esc</b> סוגרת. ' +
-    'שימושי כשמתרגלים מהמחשב.'));
   const ob = el('button', 'btn ghost sm', 'הצג שוב את מסך הפתיחה');
   ob.onclick = () => window.AMOnboard && window.AMOnboard.replay();
-  kb.appendChild(ob);
+  v.appendChild(ob);
 
-  v.append(s, th, pr, kb);
   seedUI(v);
 }
 
@@ -511,7 +484,7 @@ function paintAccount() {
   if (C.user) {
     b.textContent = (C.user.firstName || 'החשבון שלי');
     b.className = 'acct in';
-    b.onclick = () => { if (confirm('להתנתק?')) C.logout(); };
+    b.onclick = () => go('more');
   } else {
     b.textContent = 'התחברות'; b.className = 'acct';
     b.onclick = () => C.login();
@@ -542,18 +515,11 @@ document.addEventListener('cloud:user', () => { if (S.ready) loadSentences(); })
    הקבצים נבחרים מהדיסק ונכתבים למסד. ה-RLS מתיר את זה לבעלים בלבד. */
 function seedUI(v) {
   const C = window.Cloud;
+  /* כלי תחזוקה של בעל האתר בלבד. ה-RLS ממילא חוסם כל אחד אחר, אז אין
+     טעם להציג לו אותו. */
+  if (!C || !C.enabled || !C.user || C.user.email !== OWNER) return;
   const sec = el('div', 'sec');
-  sec.appendChild(el('span', 'eyebrow', 'בנק השאלות'));
-
-  /* אבחון במקום כישלון שקט: אם משהו חוסם, שיהיה כתוב מה. */
-  if (!C || !C.enabled) {
-    sec.appendChild(el('div', 'note', 'הענן כבוי בעותק הזה. פתח את האתר בכתובת האמיתית.'));
-    v.appendChild(sec); return;
-  }
-  if (!C.user) {
-    sec.appendChild(el('div', 'note', 'צריך להתחבר קודם — הכפתור למעלה מימין.'));
-    v.appendChild(sec); return;
-  }
+  sec.appendChild(el('span', 'eyebrow', 'בנק השאלות (מנהל)'));
 
   const have = S.sent.size;
   sec.appendChild(el('div', 'note',
@@ -612,15 +578,17 @@ async function boot() {
   if (!pref('start', null)) setPref('start', today());
   S.ready = true;
   render();
-  /* האירוע הזה, ולא קריאה ישירה ל-AMOnboard.start. boot() רץ בסוף
-     app.js, בעוד onboard.js נטען אחריו — ועל השרת החי, שבו שירות
-     העובד מגיש את המילון מהמטמון, ה-await חוזר לפני ששאר קבצי
-     ה-script בכלל התחילו לרוץ. התוצאה הייתה שמסך הכניסה הראשונה
-     לא נפתח בדיוק במקום היחיד שבו הוא חשוב. */
-  document.dispatchEvent(new CustomEvent('am:ready'));
 
+  /* הענן לפני am:ready: מסך הפתיחה צריך לדעת אם המשתמש מחובר, אחרת
+     מכשיר חדש של משתמש ותיק היה מקבל שוב פתיחה ומבחן רמה לפני שהמיזוג
+     הספיק להביא את ההתקדמות שלו. init חסום ב-1.5 שניות. */
   if (window.Cloud && window.Cloud.enabled) { try { await window.Cloud.init(); } catch (e) {} }
   paintAccount();
+  /* אירוע ולא קריאה ישירה: onboard.js נטען אחרי app.js, ועל השרת החי
+     ה-await כאן יכול לחזור לפני שהוא רץ. */
+  S.fired = true;
+  document.dispatchEvent(new CustomEvent('am:ready'));
+  render();   // המסכים שנטענו אחרי app.js מוכנים עכשיו
   loadSentences();
 
   const brand = $('#brand');
@@ -651,7 +619,7 @@ window.AM = {
   ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, bucket, gradeWord,
   S, dueList, newList, meaning, examSentence, passageHTML, highlightWord: highlight, blankWord,
   editAssoc, markKnown,
-  state, skeleton, buzz, plural, applyTypo,
+  state, skeleton, buzz, plural, applyTypo, tile, head, flushNow,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];
     const C = window.Cloud;

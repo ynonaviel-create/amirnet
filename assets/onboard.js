@@ -183,7 +183,7 @@ function paintNet() {
   let b = document.querySelector('#netbar');
   if (!navigator.onLine) {
     if (!b) {
-      b = el('div', 'netbar', 'אין רשת — אוצר מילים, תזמון והדפסה עובדים. פרקי אמת ידרשו חיבור.');
+      b = el('div', 'netbar', 'אין רשת — הלומדה והמשחקים עובדים. פרקי אמת יחזרו עם החיבור.');
       b.id = 'netbar';
       b.setAttribute('role', 'status');
       document.body.appendChild(b);
@@ -197,9 +197,22 @@ paintNet();
 const needed = () => !pref('onboarded', 0);
 /* שני מסלולים בכוונה: אם app.js כבר סיים לפני שהקובץ הזה נטען,
    S.ready כבר דלוק והאירוע כבר נורה; אם לא, האירוע יגיע. */
-function maybeStart() { if (needed() && !ST) start(); }
+/* משתמש מחובר שעוד לא סונכרן במכשיר הזה — מחכים למיזוג. אולי הוא כבר
+   עבר פתיחה ומבחן רמה בטלפון, ואז אין סיבה להציג לו אותם שוב. */
+function maybeStart() {
+  if (!needed() || ST) return;
+  const C = window.Cloud;
+  if (C && C.enabled && C.user && !C.status().lastSync) {
+    let fired = false;
+    const once = () => { if (fired) return; fired = true; if (needed() && !ST) start(); };
+    document.addEventListener('cloud:merged', once, { once: true });
+    setTimeout(once, 6000);
+    return;
+  }
+  start();
+}
 document.addEventListener('am:ready', maybeStart);
-if (S.ready) setTimeout(maybeStart, 0);
+if (S.fired) setTimeout(maybeStart, 0);
 
 window.AMOnboard = { start, needed, replay: start };
 

@@ -422,45 +422,22 @@ function paintFocus() {
    המסך
    ============================================================ */
 
-function tile(v, title, sub, fn, badge) {
-  const b = el('button', 'btn ghost');
-  b.style.cssText = 'text-align:right;padding:14px';
-  b.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">' + esc(title) +
-    (badge ? ' <span class="pill good">' + esc(badge) + '</span>' : '') + '</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">' + esc(sub) + '</div>';
-  b.onclick = fn;
-  v.appendChild(b);
-}
-
 function view(v) {
   const signed = !!(window.Cloud && window.Cloud.user);
 
   /* ---- הפתיח: המספר שמחליף את "ללמוד 1500 מילים" ---- */
-  const head = el('div', 'sec');
-  head.appendChild(el('span', 'eyebrow', 'אסטרטגיה'));
-  head.appendChild(el('p', 'note',
+  const head = A.head(v, 'אסטרטגיה',
     'המבחן לא בודק כמה מילים אתה יודע — הוא בודק כמה תשובות אתה יכול לפסול. ' +
-    'ידיעה של שתיים מארבע האפשרויות, בלי לדעת מי הנכונה, שווה <b>75%</b> הצלחה.'));
+    'ידיעה של שתיים מארבע האפשרויות שווה <b>75%</b> הצלחה.');
   const lad = el('div', 'ladder');
   [[0, '25%', 'ניחוש מלא'], [1, '33%', 'פסילה אחת'], [2, '50%', 'שתי פסילות'], [3, '100%', 'שלוש']]
     .forEach(([n, p, t]) => {
       lad.innerHTML += '<div class="rung"><b>' + p + '</b><span>' + t + '</span></div>';
     });
   head.appendChild(lad);
-  v.appendChild(head);
-
-  if (!signed) v.appendChild(el('div', 'note', 'בנק השאלות דורש התחברות — הכפתור למעלה מימין.'));
-
-  /* ---- הדרילים ---- */
-  const dr = el('div', 'sec');
-  dr.appendChild(el('span', 'eyebrow', 'לאמן את הפסילה'));
-  tile(dr, 'דריל פסילה — השלמת משפטים', 'לפסול לפני שבוחרים. 12 מתוך 23 השאלות — 52% מהניקוד.',
-    () => startElim('sc', 8), 'הליבה');
-  tile(dr, 'דריל פסילה — ניסוח מחדש', 'כאן שני כללים נמדדים חותכים אפשרות עוד לפני הקריאה.',
-    () => startElim('rs', 6));
-  tile(dr, 'קריאה ממוקדת', 'שאלה קודם, ואז הפסקה שהיא מציינת. לאתר במקום להבין.',
-    startFocus, '29% לשאלה');
-  v.appendChild(dr);
+  const tr = el('button', 'btn', 'לדרילי הפסילה');
+  tr.onclick = () => A.go('drill');
+  head.appendChild(tr);
 
   /* ---- דיוק הפסילה שלך ---- */
   const s = stats();

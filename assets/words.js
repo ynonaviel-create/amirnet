@@ -27,8 +27,9 @@ const FILTERS = [
   ['new',    'חדשות'],
 ];
 
-const st = () => Object.assign({ q: '', f: 'all' }, pref('wordsUI', {}));
-const save = (p) => setPref('wordsUI', Object.assign(st(), p));
+/* מצב החיפוש נשאר במכשיר. כהעדפה מסונכרנת כל הקשה הייתה נשלחת לענן. */
+const st = () => { try { return Object.assign({ q: '', f: 'all' }, JSON.parse(localStorage.getItem('amirnet.wordsUI')) || {}); } catch (e) { return { q: '', f: 'all' }; } };
+const save = (p) => { try { localStorage.setItem('amirnet.wordsUI', JSON.stringify(Object.assign(st(), p))); } catch (e) {} };
 
 const L = () => window.AMLomda;
 function matches(w, o, f) {
@@ -65,7 +66,7 @@ function view(v) {
   const c = st();
 
   const head = el('div', 'sec');
-  head.appendChild(el('span', 'eyebrow', 'המילים · ' + S.words.size + ' במאגר'));
+  head.appendChild(el('span', 'eyebrow', 'המילון · ' + S.words.size.toLocaleString('en-US') + ' מילים'));
   const q = el('input', 't');
   q.type = 'search';
   q.placeholder = 'חפש באנגלית או בעברית…';
@@ -77,7 +78,7 @@ function view(v) {
   const tabs = el('div', 'chips');
   FILTERS.forEach(([k, he]) => {
     const b = el('button', 'chip' + (c.f === k ? ' on' : ''), esc(he));
-    b.onclick = () => { save({ f: k }); A.render(); };
+    b.onclick = () => { save({ f: k }); tabs.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === b)); c.f = k; paint(); };
     tabs.appendChild(b);
   });
   head.appendChild(tabs);
@@ -130,12 +131,7 @@ async function openWord(w) {
   const c = el('div', 'card'), mid = el('div', 'mid');
   mid.style.justifyContent = 'flex-start';
 
-  let h = '<div class="head-en">' + esc(w) + '</div>';
-  if (o.pos) h += '<div class="pos">' + esc(o.pos) + '</div>';
-  if (o.def) h += '<div class="def">' + esc(o.def) + '</div>';
-  if (o.syn && o.syn.length) h += '<div class="syn">' + o.syn.map(esc).join('  ·  ') + '</div>';
-  if (o.he) h += '<div class="he">' + esc(o.he) + '</div>';
-  mid.innerHTML = h;
+  mid.innerHTML = '<div class="head-en">' + esc(w) + '</div>' + A.meaning(o, false);
 
   /* מצב בלומדה */
   const state = el('div', 'sec');

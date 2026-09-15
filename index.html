@@ -16,7 +16,7 @@
       document.documentElement.setAttribute('data-theme-mode', mode);
       /* טיפוגרפיית האנגלית נקבעת כאן מאותה סיבה: בלי זה הטקסט נצבע
          פעם אחת בגודל ברירת המחדל ואז קופץ לגודל שנבחר. */
-      ['enSize:data-en-size', 'enFace:data-en-face', 'enLead:data-en-lead'].forEach(function (pair) {
+      ['enSize:data-en-size'].forEach(function (pair) {
         var p = pair.split(':');
         var v = localStorage.getItem('amirnet.' + p[0]);
         if (v) document.documentElement.setAttribute(p[1], v);
@@ -27,15 +27,15 @@
 
 <title>אמירנט</title>
 <meta name="description" content="מאמן אוצר מילים ואסטרטגיה לבחינת אמירנט">
-<meta name="theme-color" content="#eef2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#182029" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1612" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
 
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/style.css">
@@ -50,15 +50,9 @@
       <span class="brand-txt">אמירנט</span>
     </button>
     <div class="spacer"></div>
+    <span class="days" id="days" hidden></span>
     <span class="sync" id="sync" hidden title="מצב סנכרון"></span>
     <button class="acct" id="acct" type="button">התחברות</button>
-  </div>
-  <div class="spine" id="spine" hidden>
-    <div class="spine-head">
-      <span class="spine-left"><b id="dLeft">—</b> ימים לאמירנט</span>
-      <span class="spine-date mono" id="dDate"></span>
-    </div>
-    <div class="ruler" id="ruler" aria-hidden="true"></div>
   </div>
 </header>
 
@@ -74,7 +68,6 @@
 <script src="assets/app.js"></script>
 <script src="assets/lomda.js"></script>
 <script src="assets/today.js"></script>
-<script src="assets/print.js"></script>
 <script src="assets/progress.js"></script>
 <script src="assets/exam.js"></script>
 <script src="assets/words.js"></script>

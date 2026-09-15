@@ -514,16 +514,18 @@ function towerRound() {
   });
   mid.appendChild(box);
   c.appendChild(mid);
-  openMode(c, { i: 1, n: 1, right: 'שיא ' + TW.best, close: () => { clearInterval(TW._t); clearTimeout(TW._d); TW = null; A.render(); } }, 'tower');
+  openMode(c, { i: 1, n: 1, right: 'שיא ' + TW.best, close: () => { if (TW) { clearInterval(TW._t); clearTimeout(TW._d); } TW = null; A.render(); } }, 'tower');
   const t0 = Date.now();
   clearInterval(TW._t);
-  TW._t = setInterval(() => {
-    if (!TW) return clearInterval(TW._t);
+  const tick = setInterval(() => {
+    if (!TW) return clearInterval(tick);
+    if (!TW) return;
     const left = 1 - (Date.now() - t0) / TW.speed;
     const bar = document.querySelector('#twbar');
     if (bar) bar.style.width = Math.max(0, left * 100) + '%';
     if (left <= 0) { Array.from(box.children).forEach((n) => { if (n.textContent === target.def) n.className = 'opt right'; }); finish(false); }
   }, 60);
+  TW._t = tick;
 }
 
 /* --- זוגות מבלבלים: המילים שהמבחן מציב זו לצד זו בכוונה --- */
@@ -745,16 +747,6 @@ async function startBlitz() {
 /* ============================================================
    מסכים
    ============================================================ */
-function tile(v, title, sub, fn, badge) {
-  const b = el('button', 'btn ghost');
-  b.style.cssText = 'text-align:right;padding:14px';
-  b.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">' + esc(title) +
-    (badge ? ' <span class="pill good">' + esc(badge) + '</span>' : '') + '</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">' + esc(sub) + '</div>';
-  b.onclick = fn;
-  v.appendChild(b);
-}
-
 /* ---------- מסך התבניות ----------
    RECIPE ישב בקוד מהיום הראשון ונשלף רק בתוך דריל, כלומר אחרי
    שכבר ענית. תבנית נלמדת פעם אחת ונשלפת בכל שאלה — ולכן היא צריכה
@@ -769,13 +761,8 @@ const PATTERN_SHARE = {
   purpose_text: '6%', vocab: '6%', except: '5%', reference: '2%',
 };
 function patterns(v) {
-  const head = el('div', 'sec');
-  head.appendChild(el('span', 'eyebrow', 'תבניות'));
-  head.appendChild(el('p', 'note',
-    'שמונה התבניות ושתי המסגרות — נלמד פעם אחת, נשלף בכל שאלה. ' +
-    'האחוזים נמדדו על 572 שאלות הבנת הנקרא שבמאגר; עוד 19% מהשאלות ' +
-    'לא נופלות לאף תבנית מובהקת, ולשם צריך קריאה רגילה.'));
-  v.appendChild(head);
+  A.head(v, 'תבניות', 'שמונה תבניות ושתי מסגרות — נלמדות פעם אחת, נשלפות בכל שאלה. ' +
+    'האחוזים נמדדו על 572 שאלות הבנת הנקרא שבמאגר.');
 
   const rc = el('div', 'sec');
   rc.appendChild(el('span', 'eyebrow', 'הבנת הנקרא'));
@@ -812,89 +799,27 @@ function patterns(v) {
   v.appendChild(warn);
 }
 
-function menu(v) {
-  const signed = !!(window.Cloud && window.Cloud.user);
-  v.appendChild(el('span', 'eyebrow', 'תרגולים ממוקדים'));
-  v.appendChild(el('p', 'note',
-    'ארבעה תרגולים שמכוונים לדפוס אחד כל אחד. פרקים שלמים בפורמט המבחן ' +
-    'נמצאים תחת "פרקים".'));
-  if (!signed) {
-    v.appendChild(el('div', 'note', 'בנק השאלות דורש התחברות — הכפתור למעלה מימין.'));
-  }
-  tile(v, 'מסגרות מגלות', 'שני הדפוסים שמכריעים את השאלה כשהם נוכחים.', startFrames);
-  tile(v, 'צייד המלכודות', 'ניסוח מחדש — לבחור נכון, ואז להבין למה השאר שגויים. 26% מהניקוד.',
-    startTraps);
-  tile(v, 'מסך התבניות', 'שמונה תבניות הבנת הנקרא ושתי המסגרות — לקרוא לפני, לא אחרי.',
-    () => A.go('pat'));
-  tile(v, 'ספרינט מטרת הפסקה', 'התבנית השנייה בשכיחות בהבנת הנקרא — 20% מהשאלות, והפסקה נתונה.',
-    () => startRC('sprint'));
-  tile(v, 'קטע מלא', 'קטע אמיתי וחמש שאלות בסדר המבחן.', () => startRC('full'));
-
-
-  const pg = el('button', 'btn ghost');
-  pg.style.cssText = 'text-align:right;padding:14px';
-  pg.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">התקדמות</div>' +
-    '<div class="tiny muted" style="font-weight:400;margin-top:2px">אומדן ציון מול 134, מגמה, ודיוק לפי פרק.</div>';
-  pg.onclick = () => A.go('prog');
-  v.appendChild(pg);
-}
-
 function play(v) {
-  v.appendChild(el('span', 'eyebrow', 'משחקים'));
-  tile(v, 'רביעיות', 'שש-עשרה מילים, ארבע קבוצות משמעות. פאזל חדש בכל יום.', startQuads);
-  tile(v, 'מגדל המילים', 'זיהוי תחת שעון. המבחן נותן 60 שניות לשאלה.', startTower);
-  tile(v, 'זוגות מבלבלים', 'המילים שהמבחן מציב זו לצד זו בכוונה.', startPairs);
-  tile(v, 'בליץ 90', 'תשעים שניות. לתור בסופר.', startBlitz,
+  A.head(v, 'משחקים', 'אותן מילים, בלי לחץ. כל משחק מעדכן את הלומדה.');
+  const g = el('div', 'sec list');
+  A.tile(g, 'רביעיות', 'שש-עשרה מילים, ארבע קבוצות משמעות · פאזל חדש כל יום', startQuads);
+  A.tile(g, 'מגדל המילים', 'זיהוי משמעות תחת שעון, עד שנגמרים החיים', startTower,
+    pref('towerBest', 0) ? 'שיא ' + pref('towerBest', 0) : '');
+  A.tile(g, 'זוגות מבלבלים', 'המילים שהמבחן מציב זו לצד זו בכוונה', startPairs);
+  A.tile(g, 'בליץ 90', 'תשעים שניות על המילים שבתרגול שלך', startBlitz,
     pref('blitzBest', 0) ? 'שיא ' + pref('blitzBest', 0) : '');
-}
-
-/* ---------- הדפסה לשבת ופיוס ---------- */
-function reconcile(id) {
-  const b = ns('print')[id];
-  const words = b.words || [];
-  const marks = {};
-  const c = el('div', 'card');
-  const mid = el('div', 'mid');
-  mid.innerHTML = '<span class="eyebrow">סמן מה זכרת</span>' +
-    '<div class="tiny dim">הקשה אחת לכל מילה. מה שלא תסמן ייחשב כלא נבדק ויחזור לתור.</div>';
-  const grid = el('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%;max-width:46ch';
-  words.forEach((w) => {
-    const btn = el('button', 'opt', esc(w));
-    btn.style.cssText = 'min-height:46px;text-align:center';
-    btn.onclick = () => {
-      marks[w] = !marks[w];
-      btn.className = 'opt ' + (marks[w] ? 'right' : '');
-    };
-    grid.appendChild(btn);
-  });
-  mid.appendChild(grid);
-  const acts = el('div', 'acts');
-  const save = el('button', 'btn', 'שמור');
-  save.onclick = () => {
-    let n = 0;
-    words.forEach((w) => {
-      if (!marks[w]) return;
-      A.gradeWord(w, true); n++;
-    });
-    bump({ rev: n, ok: n });
-    b.reconciled = Date.now(); put('print', id, b);
-    closeStudy(); toast(A.plural(n, 'מילה אחת עודכנה', 'מילים עודכנו')); A.render();
-  };
-  acts.appendChild(save);
-  c.append(mid, acts);
-  openStudy(c, { i: 0, n: words.length, right: '', close: () => A.render() });
+  v.appendChild(g);
 }
 
 window.AMDrills = {
-  menu, play, patterns,
+  play, patterns,
   /* משגרים למסך "היום" ולבנק הטעויות — הם מרכיבים משימה מהחלקים האלה
      ולכן צריכים לפתוח אותם ישירות, בלי לעבור דרך התפריט. */
   traps: startTraps,
+  frames: startFrames,
   rc: (mode) => startRC(mode),
   blitz: startBlitz,
   itemId,
-  reconcile,
 };
 if (A.S.ready) A.render();
 

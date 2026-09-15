@@ -16,7 +16,7 @@
      מילה בלי כרטיס היא new, או placed אם היא ברמה שמתחת לרמת הכניסה.
      placed לא נשמרת ככרטיס: אלף כרטיסים כאלה היו אלף פעולות בתור הענן.
 
-   d / l / r נשארו בשמות של FSRS, כי הדפסה, מסך המילים ובנק הטעויות
+   d / l / r נשארו בשמות של FSRS, כי מסך המילים ובנק הטעויות
    קוראים אותם: d = תאריך פירעון, l = נפילות, r = חזרות.
    ============================================================== */
 'use strict';
@@ -234,9 +234,12 @@ function ask(q, frame, onDone, opts) {
     fb.innerHTML = '<span class="eyebrow">' + (chosen === null ? 'התשובה' : 'לא בדיוק') + '</span>' +
       '<div class="head-en sm">' + esc(o.w) + '</div>' + A.meaning(o, false);
     mid.appendChild(fb);
+    /* האפשרויות נשארות על המסך, מסומנות — לראות מה בחרת מול מה נכון
+       הוא חצי מהלימוד. רק "לא יודע" יורד. */
+    acts.querySelectorAll('.btn').forEach((b) => b.remove());
     const go = el('button', 'btn', 'המשך');
     go.onclick = () => onDone(false);
-    acts.innerHTML = ''; acts.appendChild(go);
+    acts.appendChild(go);
     setTimeout(() => go.focus(), 30);
   };
 
@@ -650,33 +653,60 @@ function practiceDone() {
    כרטיס במסך הבית
    ============================================================ */
 function homeCard(v) {
-  const sec = el('div', 'sec lomda-home');
-  const rounds = (A.day().rounds || 0);
+  const sec = el('div', 'sec lcard');
+  const rounds = A.day().rounds || 0;
+  const dots = '<span class="rdots" aria-label="' + Math.min(rounds, ROUNDS_GOAL) + ' מתוך ' + ROUNDS_GOAL + ' סבבים היום">' +
+    Array.from({ length: ROUNDS_GOAL }, (_, i) => '<i class="' + (i < rounds ? 'on' : '') + '"></i>').join('') + '</span>';
+  let go;
   if (!startLevel()) {
-    sec.innerHTML = '<span class="eyebrow">לומדת המילים</span>' +
-      '<div class="lh-t">מתחילים במבחן רמה</div>' +
-      '<p class="note">כמה דקות. המבחן מוצא את הרמה הראשונה שבה כבר לא הכול מוכר לך — ומשם הלומדה מובילה.</p>';
+    sec.innerHTML = '<div class="lc-top"><span class="lc-k">לומדת המילים</span></div>' +
+      '<div class="lc-t">מתחילים במבחן רמה</div>' +
+      '<p class="lc-s">כמה דקות. המבחן מוצא את הרמה הראשונה שבה כבר לא הכול מוכר לך, ומשם הלומדה מובילה.</p>';
+    go = el('button', 'btn', 'למבחן הרמה');
   } else {
     const lv = currentLevel(), st = levelStats(lv);
     const done = st.total - st.new;
     const d = decide();
-    const what = { memorize: 'שינון', practice: 'תרגול', filter: 'סינון', done: 'סיום' }[d] || '';
-    sec.innerHTML = '<span class="eyebrow">לומדת המילים · רמה ' + lv + ' מתוך ' + maxLevel() + '</span>' +
-      '<div class="bar"><i style="width:' + (st.total ? done / st.total * 100 : 0) + '%;background:var(--accent)"></i></div>' +
-      '<div class="lh-row"><span>' + done + '/' + st.total + ' ברמה</span>' +
-      '<span>סבבים היום <b>' + rounds + '/' + ROUNDS_GOAL + '</b></span></div>' +
-      '<div class="figs">' +
-      '<div class="fig new"><span class="n">' + listBy('learn').length + '</span><span class="k">לשינון</span></div>' +
-      '<div class="fig due"><span class="n">' + listBy('drill').length + '</span><span class="k">בתרגול</span></div>' +
-      '<div class="fig"><span class="n">' + hotWords().length + '</span><span class="k">נשכחו</span></div>' +
-      '<div class="fig"><span class="n">' + listBy('master').length + '</span><span class="k">שוחררו</span></div></div>' +
-      '<p class="note">הסבב הבא: <b>' + what + '</b>. ' + (rounds < ROUNDS_GOAL
-        ? 'מנות קטנות לאורך היום עובדות יותר משעה ברצף.' : 'עברת את היעד היומי. עוד סבב — רק אם הראש פנוי.') + '</p>';
+    const what = { memorize: 'שינון', practice: 'תרגול', filter: 'סינון', done: 'הכול נלמד' }[d] || '';
+    const why = { memorize: 'מילים שסימנת שלא ידעת מחכות', practice: 'לחזק את מה שכבר שיננת',
+                  filter: 'למיין מילים חדשות מרמה ' + lv, done: '' }[d] || '';
+    const hot = hotWords().length;
+    sec.innerHTML = '<div class="lc-top"><span class="lc-k">לומדת המילים · רמה ' + lv + ' מתוך ' + maxLevel() + '</span>' + dots + '</div>' +
+      '<div class="lc-t">הסבב הבא: ' + what + '</div>' +
+      '<p class="lc-s">' + why + '</p>' +
+      '<div class="bar lc-bar"><i style="width:' + (st.total ? done / st.total * 100 : 0) + '%;background:var(--accent)"></i></div>' +
+      '<div class="lc-meta"><span>' + done + '/' + st.total + ' ברמה</span>' +
+      '<span>' + listBy('drill').length + ' בתרגול</span>' +
+      (hot ? '<span class="hot">' + A.plural(hot, 'אחת נשכחה', 'נשכחו') + '</span>' : '') +
+      '<span>' + listBy('master').length + ' שוחררו</span></div>';
+    go = el('button', 'btn', rounds >= ROUNDS_GOAL ? 'עוד סבב' : 'המשך');
   }
-  const go = el('button', 'btn', startLevel() ? 'המשך' : 'למבחן הרמה');
   go.onclick = next;
   sec.appendChild(go);
   v.appendChild(sec);
+}
+
+/* ---------- מסך הלומדה ----------
+   הכרטיס, מפת הרמות, והמילון — הכול במקום אחד. */
+function hub(v) {
+  A.head(v, 'לומדה', 'מנות קטנות לאורך היום. כ‑4 סבבים ביום, והלומדה מחליטה מה לעשות.');
+  homeCard(v);
+  if (startLevel()) {
+    const sec = el('div', 'sec');
+    const top = maxLevel(), cur = currentLevel();
+    sec.appendChild(el('span', 'eyebrow', 'הרמות'));
+    const grid = el('div', 'lvgrid');
+    for (let lv = 1; lv <= top; lv++) {
+      const st = levelStats(lv);
+      const pct = st.total ? Math.round((st.total - st.new) / st.total * 100) : 0;
+      grid.appendChild(el('div', 'lv' + (lv === cur ? ' cur' : '') + (pct === 100 ? ' full' : ''),
+        '<i style="height:' + pct + '%"></i><b>' + lv + '</b>'));
+    }
+    sec.appendChild(grid);
+    sec.appendChild(el('p', 'note', 'רמה נמוכה = מילה נפוצה = משפיעה יותר על הציון. זה בסדר לא להגיע לרמות הגבוהות.'));
+    v.appendChild(sec);
+  }
+  if (window.AMWords) window.AMWords.view(v);
 }
 
 /* ============================================================
@@ -698,10 +728,11 @@ function newList() {
 const STATUS_HE = { new: 'חדשה', known: 'ידועה', learn: 'לשינון', drill: 'בתרגול', master: 'שוחררה', placed: 'מתחת לרמת הכניסה' };
 
 document.addEventListener('am:ready', migrateAll);
+document.addEventListener('cloud:merged', () => { BYLV = null; migrateAll(); });
 if (S.ready) migrateAll();
 
 window.AMLomda = {
-  next, homeCard, startPlacement, status, currentLevel, levelStats, maxLevel, startLevel,
+  next, homeCard, hub, startPlacement, status, currentLevel, levelStats, maxLevel, startLevel,
   answer, bucket, markKnown, newList, dueWords, hotWords, listBy, STATUS_HE, byLevel,
   _decide: decide,
 };

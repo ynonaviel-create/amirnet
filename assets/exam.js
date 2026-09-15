@@ -162,7 +162,7 @@ function nextSection() {
   if (!built) { toast('אין מספיק פריטים לפרק הזה'); RUN = null; A.render(); return; }
   RUN.sec = Object.assign(built, {
     i: 0, answers: {}, first: {}, left: SPEC[kind].sec, seconds: SPEC[kind].sec,
-    ended: false, showText: true,
+    ended: false, showText: true, deadline: Date.now() + SPEC[kind].sec * 1000,
   });
   startClock();
   mountSection();
@@ -175,7 +175,9 @@ function startClock() {
   clearInterval(TIMER);
   TIMER = setInterval(() => {
     if (!RUN || !RUN.sec || RUN.sec.ended) return clearInterval(TIMER);
-    RUN.sec.left--;
+    /* לפי שעון אמיתי ולא ספירת תקתוקים: טלפון שמסכו כבה משהה את
+       setInterval, והפרק היה מקבל זמן חינם. */
+    RUN.sec.left = Math.max(0, Math.ceil((RUN.sec.deadline - Date.now()) / 1000));
     const c = document.querySelector('#clock');
     if (c) {
       c.textContent = fmt(RUN.sec.left);
@@ -524,100 +526,63 @@ function gloss(word) {
    ============================================================ */
 async function view(v) {
   const signed = !!(window.Cloud && window.Cloud.user);
-  const head = el('div', 'sec');
-  head.appendChild(el('span', 'eyebrow', 'פרקי אמת'));
-  head.appendChild(el('p', 'note',
-    'פרק אחרי פרק, בפורמט המבחן: ניווט חופשי בתוך הפרק, שעון לכל פרק, ' +
-    'ואין חזרה אחרי סגירה. פריט שכבר ראית לא יחזור עד שהמאגר ייגמר.'));
-  v.appendChild(head);
+  A.head(v, 'תרגול', 'שאלות אמיתיות ממבחני עבר, עם התשובות הרשמיות.');
+
   if (!signed) {
-    const box = el('div', 'sec');
-    box.appendChild(A.state('צריך להתחבר',
-      'חוברות הבחינה של מאל"ו נושאות איסור העתקה והפצה, ולכן בנק השאלות ' +
-      'לא יושב בקוד הפומבי אלא במסד מאחורי התחברות.<br><br>' +
-      'מה שכן עובד בלי חשבון: <b>אוצר המילים, המילון, התזמון וההדפסה</b>.',
-      { label: 'התחברות', fn: () => window.Cloud && window.Cloud.login && window.Cloud.login() }));
-    v.appendChild(box);
-    const what = el('div', 'sec');
-    what.appendChild(el('span', 'eyebrow', 'מה מחכה שם'));
-    what.appendChild(el('div', 'statgrid',
-      '<div class="stat"><div class="v rng">116</div><div class="l">השלמת משפטים</div>' +
-      '<div class="s">פרקים של 4 שאלות</div></div>' +
-      '<div class="stat"><div class="v rng">77</div><div class="l">ניסוח מחדש</div>' +
-      '<div class="s">פרקים של 3 שאלות</div></div>' +
-      '<div class="stat"><div class="v rng">108</div><div class="l">הבנת הנקרא</div>' +
-      '<div class="s">קטעים עם 5 שאלות</div></div>' +
-      '<div class="stat"><div class="v rng">38</div><div class="l">סימולציות מלאות</div>' +
-      '<div class="s">בלי חזרה על פריט</div></div>'));
-    v.appendChild(what);
+    v.appendChild(A.state('צריך להתחבר',
+      'בנק השאלות יושב מאחורי התחברות, כי חוברות הבחינה אסורות בהפצה. ' +
+      'הלומדה והמשחקים עובדים גם בלי חשבון.',
+      { label: 'התחברות עם Google', fn: () => window.Cloud && window.Cloud.login && window.Cloud.login() }));
     return;
   }
 
-  const t = (title, sub, fn, badge) => {
-    const b = el('button', 'btn ghost');
-    b.style.cssText = 'text-align:right;padding:14px';
-    b.innerHTML = '<div style="font-weight:700;font-size:var(--fs-md);color:var(--text)">' + esc(title) +
-      (badge ? ' <span class="pill good">' + esc(badge) + '</span>' : '') + '</div>' +
-      '<div class="tiny muted" style="font-weight:400;margin-top:2px">' + esc(sub) + '</div>';
-    b.onclick = fn;
-    v.appendChild(b);
-  };
-
-  t('סימולציה מלאה', 'שישה פרקים בסדר המבחן · 23 שאלות · 32:30. ציון משוער בסוף.',
-    () => startRun(SIM.slice(), 'סימולציה מלאה'), 'הפורמט המלא');
-  t('רצף פרקים', 'פרק אחרי פרק בלי הפסקה, בסדר מעורב. עוצרים מתי שרוצים.',
+  const D = window.AMDrills, St = window.AMStrat;
+  const g1 = el('div', 'sec list');
+  g1.appendChild(el('span', 'eyebrow', 'בפורמט המבחן'));
+  A.tile(g1, 'סימולציה מלאה', 'שישה פרקים · 23 שאלות · 32:30 · ציון משוער',
+    () => startRun(SIM.slice(), 'סימולציה מלאה'));
+  A.tile(g1, 'רצף פרקים', 'פרק אחרי פרק בסדר מעורב, עוצרים מתי שרוצים',
     () => startRun(shuffle(['sc', 'rs', 'rc', 'sc', 'rs', 'sc', 'rc', 'sc', 'rs', 'sc']), 'רצף פרקים'));
+  const badges = {};
   Object.keys(SPEC).forEach((k) => {
-    t('פרק ' + SPEC[k].he, SPEC[k].n + ' שאלות · ' + fmt(SPEC[k].sec) + ' · ' +
-      Math.round(100 * SPEC[k].weight / TOTALQ) + '% מהציון',
-      () => startRun([k], 'פרק ' + SPEC[k].he));
+    const t = A.tile(g1, SPEC[k].he, SPEC[k].n + ' שאלות · ' + fmt(SPEC[k].sec) + ' · ' +
+      Math.round(100 * SPEC[k].weight / TOTALQ) + '% מהציון', () => startRun([k], 'פרק ' + SPEC[k].he));
+    badges[k] = t.querySelector('.ts');
   });
+  v.appendChild(g1);
 
-  /* כמה נשאר במאגר */
-  const cov = el('div', 'sec');
-  cov.appendChild(el('span', 'eyebrow', 'כמה פרקים נשארו לך'));
-  const grid = el('div', 'statgrid');
-  const pmap = await (async () => {
+  const g2 = el('div', 'sec list');
+  g2.appendChild(el('span', 'eyebrow', 'אימון ממוקד'));
+  if (St) A.tile(g2, 'דריל פסילה · השלמת משפטים', 'לפסול לפני שבוחרים — הליבה של 52% מהציון', () => St.elim('sc', 8));
+  if (St) A.tile(g2, 'דריל פסילה · ניסוח מחדש', 'שני כללים נמדדים שחותכים אפשרות לפני הקריאה', () => St.elim('rs', 6));
+  if (St) A.tile(g2, 'קריאה ממוקדת', 'שאלה קודם, ואז רק הפסקה שהיא מציינת', St.focus);
+  if (D) A.tile(g2, 'צייד המלכודות', 'ניסוח מחדש: לבחור, ואז לתייג למה השאר שגויים', D.traps);
+  if (D) A.tile(g2, 'מסגרות מגלות', 'הגדרה בתוך המשפט, או ניגוד', D.frames);
+  if (D) A.tile(g2, 'ספרינט מטרת הפסקה', '20% משאלות הבנת הנקרא', () => D.rc('sprint'));
+  if (D) A.tile(g2, 'קטע מלא', 'קטע אמיתי וחמש שאלות בסדר המבחן', () => D.rc('full'));
+  v.appendChild(g2);
+
+  const g3 = el('div', 'sec list');
+  g3.appendChild(el('span', 'eyebrow', 'מעקב'));
+  A.tile(g3, 'בנק הטעויות', 'שאלות שטעית בהן ועוד לא סגרת', () => A.go('fix'));
+  A.tile(g3, 'התקדמות', 'אומדן ציון מול 134, מגמה ודיוק לפי פרק', () => A.go('prog'));
+  v.appendChild(g3);
+
+  v.appendChild(el('p', 'note',
+    'לשבועיים האחרונים: שלוש הסימולציות הרשמיות של מאל"ו, כולל האדפטיביות — ' +
+    '<a href="https://amirnet-practice.nite.org.il/amirnet.html" target="_blank" rel="noopener">amirnet-practice.nite.org.il</a>'));
+
+  /* כמה נשאר במאגר — נטען אחרי הציור, ומתווסף לשורות שכבר על המסך */
+  try {
     const ps = await A.bank('passage');
-    return ps ? new Map(ps.map((p) => [p.id, p])) : null;
-  })();
-  for (const k of Object.keys(SPEC)) {
-    const rows = await A.bank(k);
-    if (!rows) continue;
-    const c = coverage(rows, k, pmap);
-    grid.innerHTML += '<div class="stat"><div class="v">' + (c.sections - c.done) + '</div>' +
-      '<div class="l">' + esc(SPEC[k].he) + '</div>' +
-      '<div class="s">מתוך ' + c.sections + ' · ' + c.seen + '/' + c.total + ' שאלות נראו</div></div>';
-  }
-  cov.appendChild(grid);
-  cov.appendChild(el('p', 'note',
-    'המאגר מחזיק <b>116</b> פרקי השלמת משפטים, <b>77</b> ניסוח מחדש ו-<b>108</b> קטעי קריאה — ' +
-    'ומהם <b>38 סימולציות מלאות</b> בלי שפריט אחד יחזור.'));
-  v.appendChild(cov);
-
-  t('תרגולים ממוקדים', 'מסגרות מגלות · צייד המלכודות · ספרינט מטרת הפסקה.',
-    () => A.go('focus'));
-
-  const note = el('div', 'sec');
-  note.appendChild(el('span', 'eyebrow', 'שתי הערות על נאמנות'));
-  note.appendChild(el('p', 'note',
-    '<b>השעון.</b> מאל"ו לא מפרסמת זמן לכל פרק, רק 39 דקות לכלל המבחן על <span class="rng">7–8</span> פרקים ' +
-    'שמתוכם <span class="rng">1–2</span> ניסוייים. ההקצבה כאן נגזרה מעומס הקריאה שמדדתי — <span class="rng">1:24</span> לשאלה כבסיס, ' +
-    'מותאם לכל סוג פרק — וסך הסימולציה 32:30, בדיוק היחס של 23 השאלות הנספרות.<br><br>' +
-    '<b>האדפטיביות.</b> המבחן אדפטיבי ברמת הפרק והסימולציה כאן לא מדמה את זה. חיפשתי ' +
-    'דירוג קושי בפריטים — מיקום בפרק מול נדירות מילת התשובה נתן r=-0.36 על שמונה נקודות ' +
-    'רועשות, ומול אורך המילה r=-0.18. אין שם אות, ולדמות אדפטיביות על דירוג שהמצאתי ' +
-    'היה מייצר ציון שנשמע מדויק ואינו.'));
-  v.appendChild(note);
-
-  const sim = el('div', 'sec');
-  sim.appendChild(el('span', 'eyebrow', 'הסימולציות הרשמיות'));
-  sim.appendChild(el('div', 'note',
-    'למאל"ו שלוש סימולציות חינם בפורמט אמירנט המלא, כולל האדפטיביות האמיתית. ' +
-    'שמור אותן לשבועיים האחרונים — הן הדבר היחיד שמאמן את התנאים עצמם.<br>' +
-    '<a href="https://amirnet-practice.nite.org.il/amirnet.html" target="_blank" rel="noopener" ' +
-    'style="color:var(--accent)">amirnet-practice.nite.org.il</a>'));
-  v.appendChild(sim);
+    const pmap = ps ? new Map(ps.map((p) => [p.id, p])) : null;
+    for (const k of Object.keys(SPEC)) {
+      const rows = await A.bank(k);
+      if (!rows || !badges[k]) continue;
+      const c = coverage(rows, k, pmap);
+      badges[k].textContent += ' · נשארו ' + (c.sections - c.done) + ' מתוך ' + c.sections;
+    }
+  } catch (e) { /* הספירה היא תוספת; בלעדיה המסך שלם */ }
 }
 
 window.AMExam = { view, run: startRun, SPEC, SIM };

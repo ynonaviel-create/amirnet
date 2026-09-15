@@ -56,7 +56,7 @@
   if (disabled) {
     window.Cloud = {
       enabled: false, user: null,
-      init: async () => {}, login: () => {}, logout: async () => {}, setName: async () => {},
+      init: async () => {}, login: () => {}, logout: async () => {}, setName: async () => {}, syncNow: () => {},
       queue: () => {}, queueDelete: () => {}, queueClear: () => {}, queueClearPrefix: () => {},
       status: () => ({ pending: 0, lastSync: 0, syncing: false }),
     };
@@ -128,8 +128,10 @@
     try {
       while (outbox.length) {
         /* רצף כתיבות (set) נשלח כ-upsert אחד; מחיקות — אחת-אחת. הסדר נשמר. */
+        /* עד 500 שורות לבקשה: בהתחברות ראשונה עולים אלפי כרטיסים, ובקשה
+           אחת בגודל כזה נדחית או נחתכת בטלפון על רשת חלשה. */
         let n = 1;
-        if (outbox[0].op === 'set') { while (n < outbox.length && outbox[n].op === 'set') n++; }
+        if (outbox[0].op === 'set') { while (n < outbox.length && n < 500 && outbox[n].op === 'set') n++; }
         const batch = outbox.slice(0, n);
         await apply(batch);
         outbox.splice(0, n);
@@ -154,7 +156,7 @@
       if (outbox.length && (isPermanent(e) || headFails >= MAX_HEAD_FAILS)) {
         const bad = outbox[0];
         let n = 1;
-        if (bad.op === 'set') { while (n < outbox.length && outbox[n].op === 'set') n++; }
+        if (bad.op === 'set') { while (n < outbox.length && n < 500 && outbox[n].op === 'set') n++; }
         outbox.splice(0, n);
         saveOutbox();
         headFails = 0;
@@ -205,7 +207,14 @@
       });
     } catch { /* best effort */ }
   });
-  window.addEventListener('online', () => flush());
+  window.addEventListener('online', () => { flush(); if (state.session) syncNow(); });
+
+  /* חזרה ללשונית או לאפליקציה: מושכים מה שנעשה במכשיר האחר. בלי זה
+     מה שלמדת בטלפון הופיע במחשב רק אחרי רענון ידני. לא יותר מפעם בדקה. */
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { flush(); return; }
+    if (state.session && Date.now() - state.lastSync > 60000) syncNow();
+  });
 
   /* ---------- משיכה ומיזוג ----------
      רץ בהתחברות ובכל פתיחת אתר של משתמש מחובר. מביא את כל השורות (המצב של
@@ -437,6 +446,7 @@
     queueClearPrefix: (ns, prefix) => push({ op: 'clearpre', ns, k: prefix }),
 
     status: () => ({ pending: outbox.length, lastSync: state.lastSync, syncing: state.syncing }),
+    syncNow: () => syncNow(),
   };
   window.Cloud = Cloud;
 
