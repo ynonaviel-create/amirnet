@@ -18,26 +18,26 @@ const { el, esc, toast, ns, put, pref, setPref, card, assoc, bucket, S,
         today, addDays, between, heDate } = A;
 
 const FILTERS = [
-  ['all',   'הכול'],
-  ['new',   'לא מוינו'],
-  ['due',   'בפירעון'],
-  ['stuck', 'תקועות'],
-  ['known', 'ידועות'],
+  ['all',    'הכול'],
+  ['learn',  'לשינון'],
+  ['drill',  'בתרגול'],
+  ['hot',    'נשכחו'],
+  ['master', 'שוחררו'],
+  ['known',  'ידועות'],
+  ['new',    'חדשות'],
 ];
 
 const st = () => Object.assign({ q: '', f: 'all' }, pref('wordsUI', {}));
 const save = (p) => setPref('wordsUI', Object.assign(st(), p));
 
+const L = () => window.AMLomda;
 function matches(w, o, f) {
-  const c = card(w);
-  if (f === 'new')   return !c;
-  if (f === 'due')   return !!(c && c.d && c.d <= today());
-  if (f === 'stuck') return !!(c && ((c.af || 0) >= 2 || (c.l || 0) >= 3));
-  if (f === 'known') return !!(c && c.known);
-  return true;
+  if (f === 'all') return true;
+  const s = L().status(w);
+  if (f === 'hot') { const c = card(w); return s === 'drill' && !!(c && c.hot); }
+  if (f === 'known') return s === 'known' || s === 'placed';
+  return s === f;
 }
-
-const BUCKET_HE = { new: 'טרם נלמדה', young: 'טרייה', solid: 'יציבה', strong: 'מבוססת' };
 
 /* ---------- איפה המילה הופיעה במבחנים ----------
    נטען פעם אחת לסשן ונשמר במפה. בלי זה כל פתיחת דף מילה הייתה סורקת
@@ -65,7 +65,7 @@ function view(v) {
   const c = st();
 
   const head = el('div', 'sec');
-  head.appendChild(el('span', 'eyebrow', 'המילים · ' + S.words.size + ' ממבחני אמת'));
+  head.appendChild(el('span', 'eyebrow', 'המילים · ' + S.words.size + ' במאגר'));
   const q = el('input', 't');
   q.type = 'search';
   q.placeholder = 'חפש באנגלית או בעברית…';
@@ -110,7 +110,7 @@ function view(v) {
       const o = S.words.get(w), cd = card(w);
       const b = el('button', 'wrow');
       b.innerHTML =
-        '<span class="ww">' + esc(w) + '</span>' +
+        '<span class="ww">' + esc(w) + (o.lv ? ' <small class="lvtag">' + o.lv + '</small>' : '') + '</span>' +
         '<span class="wm">' + esc(o.he || o.def || '') + '</span>' +
         '<span class="wb b-' + bucket(cd) + '"></span>';
       b.onclick = () => openWord(w);
@@ -137,25 +137,19 @@ async function openWord(w) {
   if (o.he) h += '<div class="he">' + esc(o.he) + '</div>';
   mid.innerHTML = h;
 
-  /* מצב הכרטיס */
+  /* מצב בלומדה */
   const state = el('div', 'sec');
-  state.appendChild(el('span', 'eyebrow', 'מצב'));
-  if (!cd) {
-    state.appendChild(el('div', 'note', 'המילה עוד לא נכנסה ללימוד. היא תגיע בתורה, ' +
-      'או שאפשר לסמן אותה כידועה במיון המהיר.'));
-  } else {
-    const left = between(today(), cd.d || today());
-    state.appendChild(el('div', 'statgrid',
-      '<div class="stat"><div class="v">' + esc(BUCKET_HE[bucket(cd)]) + '</div>' +
-      '<div class="l">בשלות</div><div class="s">יציבות ' + A.plural(Math.round(cd.st || 0), 'יום אחד', 'ימים') + '</div></div>' +
-      '<div class="stat"><div class="v">' + (left <= 0 ? 'היום' : A.plural(left, 'מחר', 'ימים')) + '</div>' +
-      '<div class="l">החזרה הבאה</div><div class="s">' + esc(heDate(cd.d || today())) + '</div></div>' +
-      '<div class="stat"><div class="v">' + (cd.r || 0) + '</div>' +
-      '<div class="l">חזרות</div><div class="s">' + (cd.l || 0) + ' נפילות</div></div>' +
-      '<div class="stat"><div class="v">' + (cd.known ? 'כן' : 'לא') + '</div>' +
-      '<div class="l">סומנה כידועה</div><div class="s">' +
-      (cd.known ? 'חוזרת פעם אחת לפני המבחן' : 'בתור הרגיל') + '</div></div>'));
-  }
+  const stw = L().status(w);
+  state.appendChild(el('span', 'eyebrow', 'בלומדה'));
+  state.appendChild(el('div', 'statgrid',
+    '<div class="stat"><div class="v">' + (o.lv || '—') + '</div><div class="l">רמה</div>' +
+    '<div class="s">מקום ' + (o.fr || '—') + ' בתדירות</div></div>' +
+    '<div class="stat"><div class="v">' + esc(L().STATUS_HE[stw] || stw) + '</div><div class="l">מצב</div>' +
+    '<div class="s">' + (cd && cd.hot ? 'נשכחה — תחזור בתרגולים הקרובים' : stw === 'drill' ? 'רצף ' + (cd.streak || 0) + ' מתוך 4' : '&nbsp;') + '</div></div>' +
+    '<div class="stat"><div class="v">' + ((cd && cd.r) || 0) + '</div><div class="l">תרגולים</div>' +
+    '<div class="s">' + ((cd && cd.l) || 0) + ' טעויות</div></div>' +
+    '<div class="stat"><div class="v">' + (cd && cd.d && stw === 'drill' ? (between(today(), cd.d) <= 0 ? 'היום' : A.plural(between(today(), cd.d), 'מחר', 'ימים')) : '—') + '</div>' +
+    '<div class="l">חוזרת</div><div class="s">' + (cd && cd.d && stw === 'drill' ? esc(heDate(cd.d)) : '&nbsp;') + '</div></div>'));
   mid.appendChild(state);
 
   /* אסוציאציה */
@@ -176,7 +170,7 @@ async function openWord(w) {
   mid.appendChild(occ);
 
   const acts = el('div', 'acts');
-  if (cd && !cd.known) {
+  if (stw === 'new' || stw === 'learn') {
     const k = el('button', 'btn ghost', 'אני כבר יודע את זה');
     k.onclick = () => { A.markKnown(w); toast('סומנה כידועה'); A.closeStudy(); A.render(); };
     acts.appendChild(k);

@@ -1,0 +1,280 @@
+shell|n|קליפה, צדף|a hard outer covering|casing;husk
+silly|adj|טיפשי, מגוחך|foolish or not serious|foolish;absurd
+amendment|n|תיקון (לחוק)|a change made to a law or document|revision;modification
+angle|n|זווית|the space between two meeting lines; a point of view|corner;perspective
+belong|v|להשתייך|to be the property or member of|be part of;pertain
+efficiency|n|יעילות|doing something well without waste|effectiveness;productivity
+enterprise|n|מיזם, עסק|a business or a bold project|business;venture
+grass|n|דשא|a green plant covering fields|lawn;turf
+hence|adv|לכן, מכאן|as a result; for this reason|therefore;thus
+increasingly|adv|יותר ויותר|more and more|progressively;growingly
+journalist|n|עיתונאי|a person who writes news|reporter;correspondent
+occasion|n|הזדמנות, אירוע|a particular time or event|event;instance
+pace|n|קצב|the speed of movement or progress|speed;rate
+regulation|n|תקנה, ויסות|an official rule; control|rule;control
+resident|n|תושב|a person who lives in a place|inhabitant;dweller
+suitable|adj|מתאים|right for a purpose|appropriate;fitting
+vital|adj|חיוני|absolutely necessary|essential;crucial
+whilst|conj|בעוד ש|while|while;whereas
+collect|v|לאסוף|to gather together|gather;accumulate
+currency|n|מטבע (כסף)|the money used in a country|money;cash
+exhibition|n|תערוכה|a public display of art or objects|show;display
+genuine|adj|אמיתי, כן|real; sincere|authentic;sincere
+hook|n|וו|a curved piece for hanging or catching|hanger;clasp
+log|n|בול עץ; יומן|a piece of a tree trunk; a record|timber;record
+monitor|v|לנטר, לעקוב|to watch and check over time|observe;track
+ratio|n|יחס|the relationship between two amounts|proportion;rate
+remind|v|להזכיר|to make someone remember|prompt;jog memory
+routine|n|שגרה|a regular way of doing things|habit;pattern
+settle|v|להתיישב; ליישב|to make one's home; to resolve|establish;resolve
+spell|v|לאיית|to name the letters of a word|write out;letter
+summary|n|סיכום|a short statement of main points|synopsis;abstract
+survival|n|הישרדות|continuing to live|endurance;existence
+tongue|n|לשון|the organ in the mouth; a language|language;speech
+achievement|n|הישג|something accomplished with effort|accomplishment;success
+coat|n|מעיל; שכבה|a warm outer garment; a layer|jacket;layer
+comprehensive|adj|מקיף|including everything|thorough;complete
+destruction|n|הרס|the act of destroying|devastation;ruin
+divorce|n|גירושין|the legal ending of a marriage|separation;split
+engage|v|לעסוק; לרתק|to take part; to hold attention|participate;involve
+extraordinary|adj|יוצא דופן|very unusual or remarkable|remarkable;exceptional
+frequency|n|תדירות|how often something happens|rate;regularity
+gene|n|גן|a unit of heredity in cells|DNA;hereditary unit
+initiative|n|יוזמה|a new plan; the ability to act independently|plan;enterprise
+logic|n|היגיון|reasoning|reason;rationale
+objective|n|מטרה; אובייקטיבי|a goal; not influenced by feelings|goal;impartial
+roughly|adv|בערך|approximately|approximately;about
+salary|n|משכורת|fixed regular pay|wage;income
+breast|n|שד, חזה|the chest|chest;bosom
+discount|n|הנחה|a reduction in price|reduction;markdown
+dozen|n|תריסר|twelve|twelve;set
+fancy|adj|מפואר, מהודר|elaborate or expensive|elaborate;luxurious
+input|n|קלט; תרומה|what is put in; a contribution|contribution;data
+knock|v|לדפוק|to hit a surface to make a noise|rap;tap
+leather|n|עור (מעובד)|material made from animal skin|hide;suede
+luxury|n|מותרות, יוקרה|great comfort at great expense|extravagance;opulence
+ought|v|צריך, ראוי|should|should;must
+outcome|n|תוצאה|the result|result;consequence
+reporter|n|כתב|a person who reports news|journalist;correspondent
+stretch|v|למתוח, להשתרע|to make longer by pulling; to extend|extend;expand
+tear|v|לקרוע|to pull apart|rip;split
+tennis|n|טניס|a racket and ball game|sport;racket game
+terrorist|n|טרוריסט, מחבל|a person who uses violence for political goals|militant;extremist
+theater|n|תיאטרון|a building for plays|playhouse;stage
+absence|n|היעדרות, העדר|not being present|lack;nonattendance
+agricultural|adj|חקלאי|relating to farming|farming;agrarian
+ease|n|קלות, נוחות|lack of difficulty|simplicity;comfort
+flood|n|שיטפון|a large amount of water covering land|deluge;overflow
+genetic|adj|גנטי|relating to genes|hereditary;inherited
+rapidly|adv|במהירות|quickly|quickly;swiftly
+reader|n|קורא|a person who reads|audience;viewer
+representation|n|ייצוג|acting for someone; a depiction|depiction;portrayal
+sum|n|סכום|an amount of money; a total|amount;total
+swing|v|להתנדנד|to move back and forth|sway;rock
+twin|n|תאום|one of two children born together|double;pair
+boom|n|פריחה, שגשוג|a sudden increase in activity|surge;expansion
+column|n|עמוד; טור|a pillar; a regular article|pillar;article
+compensation|n|פיצוי|payment for loss or injury|reparation;payment
+composition|n|הרכב; חיבור|what something is made of; a written or musical work|makeup;piece
+density|n|צפיפות|how closely packed something is|compactness;thickness
+difficulty|n|קושי|a problem|problem;hardship
+ethnic|adj|אתני|relating to a cultural or national group|cultural;racial
+fundamental|adj|יסודי, בסיסי|of central importance|basic;essential
+greatly|adv|מאוד, במידה רבה|very much|considerably;hugely
+infection|n|זיהום|disease caused by germs|contamination;disease
+intention|n|כוונה|a plan to do something|aim;purpose
+knee|n|ברך|the joint in the middle of the leg|joint;kneecap
+participation|n|השתתפות|taking part|involvement;engagement
+pregnancy|n|הריון|the state of carrying a baby|gestation;expecting
+pretend|v|להעמיד פנים|to act as if something is true|feign;fake
+radical|adj|קיצוני, יסודי|extreme; affecting the basic nature|extreme;drastic
+shake|v|לנער, לרעוד|to move quickly back and forth|tremble;quiver
+shore|n|חוף|the land along the edge of the sea|coast;beach
+substantial|adj|ניכר, משמעותי|large in amount or importance|considerable;significant
+uniform|n|מדים; אחיד|special clothes; the same throughout|outfit;consistent
+wooden|adj|עשוי עץ|made of wood|timber;wood
+aggressive|adj|תוקפני|ready to attack|hostile;forceful
+complaint|n|תלונה|a statement that something is wrong|grievance;protest
+component|n|רכיב|a part of a larger whole|part;element
+diversity|n|גיוון, מגוון|variety|variety;range
+innovation|n|חדשנות|a new idea or method|novelty;invention
+jacket|n|מעיל, ז'קט|a short coat|coat;blazer
+operator|n|מפעיל|a person who operates a machine|controller;handler
+preparation|n|הכנה|making ready|readiness;arrangement
+registration|n|רישום|recording on an official list|enrollment;listing
+sufficient|adj|מספיק|enough|enough;adequate
+tissue|n|רקמה; טישו|cells forming body parts; soft paper|flesh;paper towel
+versus|prep|נגד|against|against;compared with
+announcement|n|הודעה|a public statement|declaration;notice
+biological|adj|ביולוגי|relating to living things|organic;natural
+bite|v|לנשוך|to cut with the teeth|nip;chew
+chip|n|שבב; צ'יפס|a small piece; a microchip|fragment;microchip
+database|n|מסד נתונים|an organized set of data|data bank;records
+disorder|n|הפרעה; אי-סדר|an illness; lack of order|illness;chaos
+explore|v|לחקור, לגלות|to travel through or examine|investigate;examine
+implementation|n|יישום|putting a plan into action|execution;application
+laboratory|n|מעבדה|a room for scientific experiments|lab;workshop
+literary|adj|ספרותי|relating to literature|written;bookish
+mouse|n|עכבר|a small rodent; a computer device|rodent;pointer
+piano|n|פסנתר|a keyboard instrument|keyboard;grand
+presentation|n|הצגה, מצגת|showing or explaining to an audience|demonstration;talk
+ruin|v|להרוס|to destroy or spoil|destroy;wreck
+slave|n|עבד|a person owned by another|servant;captive
+stability|n|יציבות|being stable|steadiness;balance
+steady|adj|יציב, קבוע|firm; regular|stable;constant
+symbol|n|סמל|a sign representing something|sign;emblem
+unlikely|adj|לא סביר|not likely to happen|improbable;doubtful
+affair|n|עניין; רומן|a matter; a secret relationship|matter;issue
+agenda|n|סדר יום|a list of topics or plans|schedule;program
+cooperation|n|שיתוף פעולה|working together|collaboration;teamwork
+craft|n|מלאכה, אומנות|a skill of making things by hand|skill;art
+darkness|n|חושך|the lack of light|dark;gloom
+enable|v|לאפשר|to make possible|allow;permit
+intellectual|adj|אינטלקטואלי|relating to the mind|mental;scholarly
+invite|v|להזמין|to ask someone to come|ask;welcome
+involvement|n|מעורבות|taking part|participation;engagement
+partly|adv|חלקית|to some extent|partially;in part
+racial|adj|גזעי|relating to race|ethnic;racist
+seal|v|לאטום|to close tightly|close;shut
+similarly|adv|באופן דומה|in a similar way|likewise;also
+slide|v|להחליק|to move smoothly over a surface|glide;slip
+stem|n|גבעול|the main stalk of a plant|stalk;shoot
+throat|n|גרון|the front part of the neck|neck;gullet
+toy|n|צעצוע|an object for children to play with|plaything;game
+fool|n|טיפש|a silly person|idiot;clown
+framework|n|מסגרת|a basic structure|structure;frame
+furniture|n|רהיטים|chairs, tables, beds etc.|furnishings;fittings
+interaction|n|אינטראקציה|communication or action between things|communication;contact
+overseas|adv|מעבר לים|abroad|abroad;foreign
+relax|v|להירגע|to become less tense|rest;unwind
+reliable|adj|אמין|able to be trusted|dependable;trustworthy
+rely|v|להסתמך|to depend on|depend;count on
+succeed|v|להצליח|to achieve a goal|prosper;triumph
+tale|n|מעשייה, סיפור|a story|story;legend
+bloody|adj|עקוב מדם|covered in blood; violent|bleeding;violent
+consideration|n|שיקול|careful thought|thought;factor
+dependent|adj|תלוי|relying on something|reliant;contingent
+experimental|adj|ניסיוני|based on experiments; new and untested|trial;innovative
+filter|n|מסנן|a device that removes unwanted things|screen;strainer
+judgment|n|שיפוט, פסק דין|an opinion or decision|verdict;opinion
+mature|adj|בוגר|fully grown or developed|adult;grown-up
+pump|n|משאבה|a machine for moving liquid or air|compressor;siphon
+slip|v|להחליק|to slide and fall|slide;skid
+spare|adj|רזרבי, פנוי|extra; not used|extra;free
+specialist|n|מומחה|a person with special knowledge|expert;authority
+submit|v|להגיש; להיכנע|to present for consideration; to yield|present;surrender
+tap|n|ברז; טפיחה|a device controlling water flow; a light touch|faucet;pat
+tourism|n|תיירות|the business of travel for pleasure|travel;sightseeing
+volunteer|n|מתנדב|a person who works without pay|helper;unpaid worker
+acceptable|adj|מקובל|good enough|satisfactory;adequate
+concentration|n|ריכוז|focused attention; amount in a mixture|focus;density
+frequent|adj|תכוף|happening often|common;regular
+moderate|adj|מתון|not extreme|reasonable;mild
+opera|n|אופרה|a play with singing|musical drama;operetta
+overcome|v|להתגבר|to succeed in dealing with a problem|conquer;defeat
+passage|n|קטע; מעבר|a section of text; a corridor|excerpt;corridor
+psychological|adj|פסיכולוגי|relating to the mind|mental;emotional
+stroke|n|שבץ; משיכה|a sudden brain illness; a movement|attack;blow
+tune|n|מנגינה|a melody|melody;song
+vessel|n|כלי שיט; כלי דם|a ship; a tube in the body|ship;container
+wherever|adv|בכל מקום ש|in any place that|anywhere;everywhere
+acquisition|n|רכישה|buying or obtaining|purchase;gain
+announce|v|להודיע|to make known publicly|declare;proclaim
+autumn|n|סתיו|the season after summer|fall;harvest time
+breathe|v|לנשום|to take air in and out|inhale;respire
+classical|adj|קלאסי|traditional in style|traditional;ancient
+exam|n|מבחן|a test|test;examination
+examination|n|בדיקה; בחינה|a careful inspection; a test|inspection;test
+instrument|n|מכשיר; כלי נגינה|a tool; a device for music|tool;device
+intervention|n|התערבות|becoming involved to change a situation|involvement;interference
+lover|n|מאהב|a person in a romantic relationship|sweetheart;partner
+menu|n|תפריט|a list of options or dishes|list;bill of fare
+offense|n|עבירה; פגיעה|a crime; an insult|crime;insult
+panic|n|בהלה|sudden strong fear|alarm;terror
+requirement|n|דרישה|something needed|need;condition
+scope|n|היקף|the range covered|range;extent
+segment|n|קטע, פלח|a part of something|section;portion
+considerable|adj|ניכר|large in size or amount|substantial;significant
+conventional|adj|מקובל, קונבנציונלי|traditional; usual|traditional;standard
+enormous|adj|עצום|very large|huge;immense
+nevertheless|adv|למרות זאת|in spite of that|however;nonetheless
+pipe|n|צינור|a tube for liquid or gas|tube;duct
+poem|n|שיר|a piece of poetry|verse;rhyme
+shelter|n|מחסה, מקלט|a place giving protection|refuge;cover
+vary|v|להשתנות|to be different|differ;change
+abortion|n|הפלה|ending a pregnancy|termination;miscarriage
+beneath|prep|מתחת ל|under|under;below
+functional|adj|תפקודי, שימושי|practical; working|practical;operational
+gather|v|לאסוף, להתאסף|to come or bring together|collect;assemble
+lazy|adj|עצלן|unwilling to work|idle;inactive
+shoe|n|נעל|a covering for the foot|boot;footwear
+wound|n|פצע|an injury|injury;cut
+asset|n|נכס|a useful or valuable thing|resource;property
+burden|n|נטל|a heavy load or responsibility|load;weight
+civilian|n|אזרח (לא חייל)|a person not in the armed forces|citizen;noncombatant
+complain|v|להתלונן|to say one is unhappy|grumble;protest
+controversial|adj|שנוי במחלוקת|causing disagreement|disputed;debatable
+differently|adv|באופן שונה|in another way|otherwise;diversely
+discipline|n|משמעת; תחום|control of behavior; a field of study|control;field
+essay|n|חיבור|a short piece of writing|composition;article
+maker|n|יצרן|a person or company that makes something|producer;creator
+photograph|n|תצלום|a picture made by a camera|photo;snapshot
+pub|n|פאב|a bar|bar;tavern
+strict|adj|קפדני, מחמיר|demanding that rules are obeyed|stern;rigid
+subsequently|adv|לאחר מכן|afterwards|later;afterwards
+substance|n|חומר; מהות|a material; the essential part|material;essence
+suggestion|n|הצעה|an idea put forward|proposal;recommendation
+bin|n|פח|a container for waste|trash can;container
+briefly|adv|בקצרה|for a short time|shortly;concisely
+employer|n|מעסיק|a person or company that employs people|boss;company
+folk|n|אנשים, עממי|people; traditional|people;traditional
+generate|v|לייצר|to produce|produce;create
+imagination|n|דמיון|the ability to form mental images|creativity;fantasy
+interpretation|n|פרשנות|an explanation of meaning|explanation;reading
+motivation|n|מוטיבציה|the reason or desire to act|drive;incentive
+permit|v|להתיר|to allow|allow;authorize
+portrait|n|דיוקן|a picture of a person|likeness;image
+tension|n|מתח|nervous strain; tightness|stress;strain
+twist|v|לסובב, לעקם|to turn or bend|turn;wind
+unemployment|n|אבטלה|being without a job|joblessness;idleness
+dish|n|צלחת; מנה|a plate; food prepared as a meal|plate;course
+evaluation|n|הערכה|judging the value of something|assessment;appraisal
+excess|n|עודף|more than is needed|surplus;overflow
+fence|n|גדר|a barrier around an area|barrier;railing
+holder|n|מחזיק, בעלים|a person who holds something|owner;bearer
+manufacturer|n|יצרן|a company that makes goods|producer;maker
+poet|n|משורר|a person who writes poems|bard;versifier
+scientist|n|מדען|a person who studies science|researcher;scholar
+snap|v|לשבור בנקישה; להתפרץ|to break suddenly; to speak sharply|break;crack
+swim|v|לשחות|to move through water|bathe;paddle
+veteran|n|ותיק; חייל משוחרר|a person with long experience; a former soldier|old hand;ex-soldier
+wealthy|adj|עשיר|rich|rich;affluent
+attract|v|למשוך|to draw toward|draw;pull
+communicate|v|לתקשר|to share information|convey;talk
+demonstrate|v|להדגים; להפגין|to show clearly; to protest publicly|show;protest
+implement|v|ליישם|to put into effect|carry out;execute
+opponent|n|יריב|a person on the other side|rival;adversary
+prisoner|n|אסיר|a person kept in prison|inmate;captive
+tourist|n|תייר|a person traveling for pleasure|traveler;visitor
+wrap|v|לעטוף|to cover with paper or cloth|cover;envelop
+adopt|v|לאמץ|to take as one's own|embrace;take on
+beside|prep|ליד|next to|next to;alongside
+boot|n|מגף|a shoe covering the ankle|shoe;footwear
+confusion|n|בלבול|uncertainty about what is happening|bewilderment;chaos
+dealer|n|סוחר|a person who buys and sells|trader;merchant
+distant|adj|רחוק|far away|far;remote
+emotion|n|רגש|a strong feeling|feeling;sentiment
+humor|n|הומור|the quality of being funny|comedy;wit
+nerve|n|עצב; תעוזה|a fiber carrying signals; courage|courage;boldness
+preserve|v|לשמר|to keep safe from change or decay|conserve;protect
+qualify|v|להיות זכאי, להכשיר|to meet requirements|be eligible;certify
+sheep|n|כבשה|a farm animal with wool|lamb;ewe
+taxi|n|מונית|a car that takes passengers for money|cab;car
+weakness|n|חולשה|lack of strength|frailty;flaw
+bias|n|הטיה, דעה קדומה|unfair preference|prejudice;partiality
+cancel|v|לבטל|to decide that something will not happen|call off;annul
+carpet|n|שטיח|a floor covering|rug;mat
+compound|n|תרכובת; מתחם|a mixture; an enclosed area|mixture;complex
+examine|v|לבחון, לבדוק|to look at carefully|inspect;study
+mixture|n|תערובת|a combination of things|blend;mix
+perception|n|תפיסה|the way something is understood|awareness;view

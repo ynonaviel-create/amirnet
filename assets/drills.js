@@ -718,8 +718,7 @@ async function startBlitz() {
     const acts = el('div', 'acts');
     const g = el('div', 'grades'); g.style.gridTemplateColumns = 'repeat(2,1fr)';
     const grade = (n) => {
-      const cd = card(w) || { r: 0, l: 0 };
-      A.schedule(cd, n); put('cards', w, cd);
+      A.gradeWord(w, n >= 3);
       bump({ rev: 1, ok: n >= 3 ? 1 : 0 });
       if (n >= 3) ok++;
       i++; step();
@@ -876,8 +875,7 @@ function reconcile(id) {
     let n = 0;
     words.forEach((w) => {
       if (!marks[w]) return;
-      const cd = card(w) || { r: 0, l: 0 };
-      A.schedule(cd, 3); put('cards', w, cd); n++;
+      A.gradeWord(w, true); n++;
     });
     bump({ rev: n, ok: n });
     b.reconciled = Date.now(); put('print', id, b);

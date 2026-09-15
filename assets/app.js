@@ -55,65 +55,11 @@ function studyDaysLeft(from, to) {
   return n;
 }
 
-/* ================= FSRS 4.5 =================
-   מותאם למבחן בשתי נקודות: יעד הזכירה עולה ככל שמתקרבים, ואף כרטיס לא
-   מתוזמן לתאריך שאחרי הבחינה. */
-const W = [0.4872, 1.4003, 3.7145, 13.8206, 5.1618, 1.2298, 0.8975, 0.031, 1.6474,
-           0.1367, 1.0461, 2.1072, 0.0793, 0.3246, 1.587, 0.2272, 2.8755];
-const DECAY = -0.5, FACTOR = Math.pow(0.9, 1 / DECAY) - 1;
-const retr = (t, S) => Math.pow(1 + FACTOR * t / S, DECAY);
-const ivl  = (S, req) => S / FACTOR * (Math.pow(req, 1 / DECAY) - 1);
-const initD = (g) => clamp(W[4] - (g - 3) * W[5], 1, 10);
-const nextD = (D, g) => clamp(W[7] * initD(4) + (1 - W[7]) * (D - W[6] * (g - 3)), 1, 10);
-
-function nextS(D, S, r, g) {
-  if (g === 1) return clamp(W[11] * Math.pow(D, -W[12]) * (Math.pow(S + 1, W[13]) - 1) * Math.exp(W[14] * (1 - r)), 0.1, S);
-  const hard = g === 2 ? W[15] : 1, easy = g === 4 ? W[16] : 1;
-  return clamp(S * (1 + Math.exp(W[8]) * (11 - D) * Math.pow(S, -W[9]) *
-    (Math.exp(W[10] * (1 - r)) - 1) * hard * easy), 0.1, 36500);
-}
-
-function retention() {
-  const left = between(today(), S.exam);
-  if (left <= 12) return 0.94;
-  if (left <= 25) return 0.92;
-  return 0.90;
-}
-
-function previewDays(c, g) {
-  if (g === 1) return 1;
-  const t = c.last ? Math.max(0, between(c.last, today())) : 0;
-  const st = (c.r > 0 && c.st) ? nextS(c.dd, c.st, retr(t, c.st), g) : clamp(W[g - 1], 0.1, 36500);
-  const d = clamp(Math.round(ivl(st, retention())), 1, 400);
-  /* אותו מהדק שב-schedule. בלעדיו כפתור השיפוט הבטיח "בעוד 60 יום"
-     בזמן שהתזמון בפועל קבע את יום המבחן — כלומר התצוגה שיקרה, ודווקא
-     בשלב הסגירה שבו כל יום נחשב. */
-  const left = between(today(), S.exam);
-  return (left > 0 && d > left) ? left : d;
-}
-
-function schedule(c, g) {
-  const t = c.last ? Math.max(0, between(c.last, today())) : 0;
-  if (c.r > 0 && c.st) {
-    const r = retr(t, c.st);
-    c.st = nextS(c.dd, c.st, r, g);
-    c.dd = nextD(c.dd, g);
-  } else {
-    c.st = clamp(W[g - 1], 0.1, 36500);
-    c.dd = initD(g);
-  }
-  c.r = (c.r || 0) + 1;
-  if (g === 1) c.l = (c.l || 0) + 1;
-  c.last = today();
-  c.d = addDays(today(), g === 1 ? 1 : clamp(Math.round(ivl(c.st, retention())), 1, 400));
-  /* מהדק המבחן: מילה שאמורה לחזור אחרי הבחינה תחזור ביום הבחינה. */
-  const left = between(today(), S.exam);
-  if (left > 0 && between(today(), c.d) > left) c.d = S.exam;
-  c.at = Date.now();
-  return c;
-}
-
-const bucket = (c) => !c ? 'new' : (!c.st || c.st < 7) ? 'young' : c.st < 30 ? 'solid' : 'strong';
+/* ================= תזמון =================
+   המנוע — רמות, סינון, שינון ותרגול — יושב ב-lomda.js. כאן רק עטיפות
+   שדרכן שאר הקבצים (בליץ, הדפסה, מסך המילים) מדברים איתו. */
+const L = () => window.AMLomda;
+const bucket = (c) => (L() ? L().bucket(c) : (c ? 'young' : 'new'));
 
 /* ================= אחסון =================
    מטמון בזיכרון + כתיבה מושהית ל-localStorage. בלי המטמון כל שיפוט על
@@ -211,47 +157,11 @@ function streak() {
 }
 
 /* ---------- תורים ---------- */
-const dailyNew = () => pref('newPerDay', 35);
-
-function dueList() {
-  const t = today(), out = [];
-  const cs = ns('cards');
-  for (const w in cs) if (cs[w].d && cs[w].d <= t) out.push(w);
-  return out.sort((a, b) => (cs[a].d < cs[b].d ? -1 : 1));
-}
-const priOf = (w) => ns('prefs')['pri.' + w] || 3;
-
-function newList() {
-  const out = [], cs = ns('cards');
-  S.words.forEach((o, w) => { if (!cs[w]) out.push(w); });
-  return out.sort((a, b) => priOf(a) - priOf(b) ||
-    (S.words.get(b).n || 1) - (S.words.get(a).n || 1) ||
-    (a < b ? -1 : 1));
-}
-function untriaged() {
-  const out = [], cs = ns('cards');
-  S.words.forEach((o, w) => { if (!cs[w] && priOf(w) === 3) out.push(w); });
-  return out;
-}
-function plan() {
-  const d = day();
-  const due = dueList(), fresh = newList();
-  return {
-    due, fresh,
-    dueN: Math.min(due.length, 160),
-    newN: Math.min(fresh.length, Math.max(0, dailyNew() - d.new)),
-  };
-}
-
-/* ---------- סימון "כבר יודע" ----------
-   נכנס כקלף בוגר במקום להילמד, ובזכות מהדק המבחן עדיין יחזור פעם אחת
-   לאימות לפני 22.10. זה מה שמונע בזבוז ימים על מה שכבר בראש. */
-function markKnown(w) {
-  const c = { r: 1, l: 0, st: 60, dd: 4, known: 1, last: today(), d: addDays(today(), 60), at: Date.now() };
-  const left = between(today(), S.exam);
-  if (left > 0 && between(today(), c.d) > left) c.d = S.exam;
-  put('cards', w, c);
-}
+const dueList = () => (L() ? L().dueWords() : []);
+const newList = () => (L() ? L().newList() : []);
+const markKnown = (w) => L() && L().markKnown(w);
+/* שיפוט מהבליץ ומהפיוס: נכון / לא נכון, דרך אותו מנוע */
+const gradeWord = (w, ok) => L() && L().answer(w, ok);
 
 /* ================= תצוגה ================= */
 /* מצב ריק/שגיאה אחיד. עד עכשיו מסך בלי נתונים היה פשוט ריק, וזה
@@ -378,46 +288,6 @@ function applyTypo() {
     });
 }
 
-/* ---------- מיון מהיר ---------- */
-let TRI = null;
-function startTriage(limit) {
-  const q = untriaged();
-  if (!q.length) { toast('כל המאגר כבר ממוין'); return; }
-  /* המיון מוגש באצוות. 1,600 מילים ברצף הן שעה וחצי ולכן לא ייעשו;
-     מאה ועשרים הן שש דקות ולכן כן. */
-  TRI = { q: shuffle(q).slice(0, limit || q.length), i: 0, known: 0 };
-  paintTriage();
-}
-function paintTriage() {
-  if (TRI.i >= TRI.q.length) { closeStudy(); toast('המיון הסתיים'); TRI = null; render(); return; }
-  const w = TRI.q[TRI.i], o = S.words.get(w);
-  const c = el('div', 'card');
-  const mid = el('div', 'mid',
-    '<span class="eyebrow">מיון מהיר · ' + (TRI.i + 1) + ' מתוך ' + TRI.q.length + '</span>' +
-    '<div class="head-en">' + esc(o.w) + '</div>' +
-    '<div class="tiny dim">יודע מה זה אומר, בלי להסס?</div>');
-  const acts = el('div', 'acts');
-  const g = el('div', 'grades g3');
-  const mark = (pri, known) => {
-    if (known) { markKnown(w); TRI.known++; } else setPref('pri.' + w, pri);
-    TRI.i++; paintTriage();
-  };
-  [['לא יודע', 'g1', () => mark(1, false)],
-   ['לא בטוח', '',   () => mark(2, false)],
-   ['יודע', 'g3',    () => mark(3, true)]].forEach(([t, cl, fn]) => {
-    const b = el('button', 'grade ' + cl, esc(t)); b.onclick = fn; g.appendChild(b);
-  });
-  acts.appendChild(g);
-  if (sentOf(w)) {
-    const peek = el('button', 'btn ghost sm', 'הצג את המשפט שבו הופיעה');
-    peek.onclick = () => { peek.remove(); mid.appendChild(el('div', 'ex', highlight(sentOf(w), w))); };
-    acts.appendChild(peek);
-  }
-  c.append(mid, acts);
-  openStudy(c, { i: TRI.i, n: TRI.q.length, right: TRI.known + ' ידועות',
-                 close: () => { TRI = null; render(); } });
-}
-
 /* ---------- משטח לימוד משותף ---------- */
 function openStudy(cardEl, o) {
   let box = $('#study');
@@ -462,126 +332,6 @@ function meaning(o, withEx) {
     (withEx && sentOf(o.w) ? '<div class="ex"><span class="ex-lab">from a real exam</span>' + highlight(sentOf(o.w), o.w) + '</div>' : '');
 }
 
-/* ---------- תרגול אוצר מילים ---------- */
-let SESS = null;
-function startStudy() {
-  const p = plan();
-  const rev = p.due.slice(0, p.dueN).map((w) => ({ w, kind: 'recall' }));
-  const nw  = p.fresh.slice(0, p.newN).map((w) => ({ w, kind: 'intro' }));
-  shuffle(rev);
-  const q = []; let k = 0;
-  for (let i = 0; i < rev.length; i++) {
-    q.push(rev[i]);
-    if (k < nw.length && (i + 1) % 5 === 0) q.push(nw[k++]);
-  }
-  while (k < nw.length) q.push(nw[k++]);
-  if (!q.length) { toast('אין כרטיסים להיום'); return; }
-  SESS = { q, i: 0, done: 0, ok: 0, again: [], t0: Date.now() };
-  paintCard();
-}
-function nextCard() {
-  SESS.i++;
-  if (SESS.i >= SESS.q.length && SESS.again.length) SESS.q = SESS.q.concat(SESS.again.splice(0));
-  if (SESS.i >= SESS.q.length) return finish();
-  paintCard();
-}
-function paintCard() {
-  const it = SESS.q[SESS.i];
-  SESS.usedAssoc = false;
-  (it.kind === 'intro' ? cardIntro : cardRecall)(it.w);
-}
-function endSession() {
-  const secs = Math.round((Date.now() - SESS.t0) / 1000);
-  if (secs > 0) bump({ sec: secs });
-  SESS = null; closeStudy(); render();
-}
-
-function cardIntro(w) {
-  const o = S.words.get(w);
-  const c = el('div', 'card');
-  const mid = el('div', 'mid',
-    '<span class="eyebrow">מילה חדשה</span>' +
-    '<div class="head-en">' + esc(o.w) + '</div>' + meaning(o, true));
-  const acts = el('div', 'acts');
-  acts.innerHTML =
-    '<label class="f" for="ain">כתוב אסוציאציה משלך — צליל, תמונה, סיפור. בלי זה המילה לא נכנסת.</label>' +
-    '<textarea class="t" id="ain" rows="2" placeholder="למשל: abandon &rarr; &quot;אבן-דון&quot; — עזבו אותו מוטל כמו אבן בדרך"></textarea>';
-  const save = el('button', 'btn', 'שמור והמשך');
-  save.onclick = () => {
-    const val = $('#ain').value.trim();
-    if (val.length < 3) { toast('קודם אסוציאציה — אפילו קצרה'); $('#ain').focus(); return; }
-    put('assoc', w, { text: val, at: Date.now() });
-    put('cards', w, { r: 0, l: 0, at: Date.now(), added: today() });
-    bump({ new: 1 });
-    SESS.q.splice(SESS.i + 1, 0, { w, kind: 'recall' });   // נבדק מיד, ושוב בהמשך
-    nextCard();
-  };
-  const row = el('div', 'hints');
-  const kn = el('button', 'hint', 'כבר יודע — דלג');
-  kn.onclick = () => { markKnown(w); toast('סומן כידוע'); nextCard(); };
-  row.appendChild(kn);
-  acts.append(save, row);
-  c.append(mid, acts);
-  openStudy(c, { i: SESS.i, n: SESS.q.length, close: endSession });
-  setTimeout(() => { const t = $('#ain'); if (t) t.focus(); }, 60);
-}
-
-function cardRecall(w) {
-  const o = S.words.get(w), a = assoc(w);
-  const c = el('div', 'card');
-  const mid = el('div', 'mid',
-    '<div class="head-en">' + esc(o.w) + '</div>' + (o.pos ? '<div class="pos">' + esc(o.pos) + '</div>' : ''));
-  const zone = el('div', 'mid'); zone.style.flex = '0';
-  const acts = el('div', 'acts');
-
-  const ladder = el('div', 'hints');
-  const bA = el('button', 'hint', 'האסוציאציה שלי');
-  const bE = el('button', 'hint', 'המשפט');
-  bA.disabled = !a; bE.disabled = !sentOf(w);
-  bA.onclick = () => { SESS.usedAssoc = true; bA.disabled = true;
-    zone.appendChild(el('div', 'assoc', '<span class="eyebrow">האסוציאציה שלך</span>' + esc(a))); };
-  /* ברמז מסתירים את המילה עצמה, אחרת הרמז הוא התשובה */
-  bE.onclick = () => { bE.disabled = true; zone.appendChild(el('div', 'ex', blankWord(sentOf(w), w))); };
-  ladder.append(bA, bE);
-
-  const show = el('button', 'btn', 'הצג תשובה');
-  show.onclick = reveal;
-  acts.append(ladder, show);
-
-  function reveal() {
-    zone.innerHTML = ''; acts.innerHTML = '';
-    mid.innerHTML = '<div class="head-en">' + esc(o.w) + '</div>' + meaning(o, true) +
-      (a ? '<div class="assoc"><span class="eyebrow">האסוציאציה שלך</span>' + esc(a) + '</div>' : '');
-    const cur = card(w) || { r: 0 };
-    const g = el('div', 'grades');
-    [[1, 'שכחתי', 'g1'], [2, 'בקושי', ''], [3, 'ידעתי', 'g3'], [4, 'קל', '']].forEach(([n, t, cl]) => {
-      const b = el('button', 'grade ' + cl,
-        esc(t) + '<small>' + (n === 1 ? 'מחר' : previewDays(cur, n) + 'י') + '</small>');
-      b.onclick = () => grade(w, n);
-      g.appendChild(b);
-    });
-    acts.appendChild(g);
-    const ed = el('button', 'btn ghost sm', a ? 'האסוציאציה לא עובדת — לכתוב חדשה' : 'להוסיף אסוציאציה');
-    ed.onclick = () => editAssoc(w, reveal);
-    acts.appendChild(ed);
-  }
-  c.append(mid, zone, acts);
-  openStudy(c, { i: SESS.i, n: SESS.q.length, close: endSession });
-}
-
-function grade(w, g) {
-  const c = card(w) || { r: 0, l: 0 };
-  schedule(c, g);
-  /* האם האסוציאציה הצילה? זו לולאת המשוב שמזינה את המעבדה. */
-  if (g === 1 && SESS.usedAssoc) c.af = (c.af || 0) + 1;
-  if (g >= 3 && SESS.usedAssoc) c.ah = (c.ah || 0) + 1;
-  put('cards', w, c);
-  bump({ rev: 1, ok: g >= 3 ? 1 : 0 });
-  SESS.done++; if (g >= 3) SESS.ok++;
-  if (g === 1) SESS.again.push({ w, kind: 'recall' });
-  nextCard();
-}
-
 function editAssoc(w, done) {
   const o = S.words.get(w);
   const box = el('div', 'study'); box.style.zIndex = 70;
@@ -622,20 +372,6 @@ function editAssoc(w, done) {
   }, 60);
 }
 
-function finish() {
-  const acc = SESS.done ? Math.round(SESS.ok / SESS.done * 100) : 0;
-  const c = el('div', 'card');
-  c.innerHTML = '<div class="mid"><span class="eyebrow">סיימת</span>' +
-    '<div class="head-en">' + SESS.done + '</div>' +
-    '<div class="he">כרטיסים · ' + acc + '% דיוק</div>' +
-    '<div class="tiny dim">רצף של ' + plural(Math.max(1, streak()), 'יום אחד', 'ימים') + '</div></div>';
-  const a = el('div', 'acts');
-  const b = el('button', 'btn', 'חזרה למסך הבית');
-  b.onclick = endSession;
-  a.appendChild(b); c.appendChild(a);
-  openStudy(c, { i: 1, n: 1, right: '', close: endSession });
-}
-
 /* ---------- מעבדת אסוציאציות ---------- */
 /* ---------- מסכים שמוגשים על ידי הקבצים האחרים ---------- */
 function viewStrat(v) {
@@ -664,13 +400,10 @@ function viewMore(v) {
   s.appendChild(el('span', 'eyebrow', 'כיול'));
   const row = el('div');
   row.innerHTML =
-    '<label class="f" for="npd">מילים חדשות ביום</label>' +
-    '<input class="t mono" id="npd" type="number" min="0" max="120" value="' + dailyNew() + '">' +
-    '<label class="f" for="exd" style="margin-top:10px">תאריך המבחן</label>' +
+    '<label class="f" for="exd">תאריך המבחן</label>' +
     '<input class="t mono" id="exd" type="date" value="' + S.exam + '">';
   const save = el('button', 'btn ghost', 'עדכן');
   save.onclick = () => {
-    setPref('newPerDay', clamp(parseInt($('#npd').value, 10) || 0, 0, 120));
     S.exam = $('#exd').value || EXAM_DEFAULT;
     setPref('exam', S.exam);
     toast('עודכן'); render();
@@ -915,9 +648,9 @@ async function boot() {
 window.AM = {
   el, esc, clamp, shuffle, toast, render, go, openStudy, closeStudy,
   today, addDays, between, heDate, iso, isOff, isShabbat, isHalf, studyDaysLeft,
-  ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, schedule, bucket,
+  ns, put, pref, setPref, bump, day, streak, card, assoc, sentOf, bucket, gradeWord,
   S, dueList, newList, meaning, examSentence, passageHTML, highlightWord: highlight, blankWord,
-  plan, untriaged, startTriage, startStudy, editAssoc, markKnown, previewDays,
+  editAssoc, markKnown,
   state, skeleton, buzz, plural, applyTypo,
   async bank(kind) {
     if (S.bank[kind]) return S.bank[kind];

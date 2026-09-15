@@ -3,8 +3,8 @@
    שלושה דברים שהאפליקציה הייתה חסרה כדי להיות שמישה ביום־יום ולא רק
    נכונה:
 
-   · כניסה ראשונה. מסך שנפתח על 1,638 מילים בלי הסבר לא אומר מה לעשות.
-     שלושה צעדים, חצי דקה, ואז ישר למיון.
+   · כניסה ראשונה. מסך שנפתח על אלפי מילים בלי הסבר לא אומר מה לעשות.
+     שלושה צעדים, חצי דקה, ואז ישר למבחן הרמה.
    · מקלדת. 1–4 לבחירה, Enter להמשך, Esc לסגירה. מי שמתרגל מהמחשב
      עושה מאות בחירות בשעה, ועכבר לכל אחת הוא חיכוך מיותר.
    · באנר אופליין. האפליקציה עובדת אופליין חוץ מבנק השאלות, וההבדל
@@ -34,18 +34,16 @@ const STEPS = [
     eyebrow: 'מתי המבחן',
     title: 'התזמון נגזר מהתאריך',
     body: 'החזרות מתוזמנות כך שאף מילה לא תיפול אחרי המבחן, ושבתות וחגים ' +
-      'מנוכים מספירת ימי הלימוד. עשרה ימים לפני המבחן המערכת עוברת ' +
-      'למצב סגירה ומעלה את יעד הזכירה.',
+      'מנוכים מספירת ימי הלימוד.',
     field: 'date',
   },
   {
-    eyebrow: 'כמה ביום',
-    title: 'מילים חדשות ליום',
-    body: 'זה היעד לחדשות בלבד — חזרות מגיעות בנוסף, לפי מה שהתזמון מבקש. ' +
-      'אפשר לשנות בכל רגע תחת <b>עוד ← כיול</b>, ושם גם ' +
-      '<b>"מה זה, ואיך משתמשים"</b> — הסבר מלא על המבחן ועל כל מסך. ' +
-      'המסך הבא הוא מיון מהיר: תסמן מה שאתה כבר יודע, וזה ייצא מהתור.',
-    field: 'num',
+    eyebrow: 'לומדת המילים',
+    title: 'כפתור אחד: המשך',
+    body: 'המאגר מסודר ברמות לפי תדירות — רמה נמוכה היא מילה נפוצה ולכן חשובה יותר. ' +
+      'מבחן רמה קצר ימצא מאיפה להתחיל, ומשם הלומדה מחליטה לבד: <b>סינון</b> של מה שאתה ' +
+      'כבר יודע, <b>שינון</b> של מה שלא, ו<b>תרגול</b> שמקפיץ שוב מילים שנשכחו ומשחרר ' +
+      'מילים שנזכרו ברצף. הכי טוב: כ‑4 סבבים קצרים ביום.',
   },
 ];
 
@@ -79,25 +77,8 @@ function paintStep() {
         Math.round(A.studyDaysLeft(today(), ST.exam)) + '</b> ימי לימוד בפועל.'
       : 'התאריך הזה כבר עבר.'));
   }
-  if (st.field === 'num') {
-    const inp = el('input', 't mono');
-    inp.type = 'number'; inp.min = '5'; inp.max = '120'; inp.id = 'ob-num';
-    inp.value = ST.perDay;
-    inp.setAttribute('aria-label', 'מילים חדשות ביום');
-    inp.style.cssText = 'max-width:12ch;text-align:center';
-    inp.oninput = () => { ST.perDay = Math.max(5, Math.min(120, +inp.value || 35)); paintStep(); };
-    mid.appendChild(inp);
-    const days = Math.max(1, A.studyDaysLeft(today(), ST.exam) - 10);
-    const need = Math.ceil(S.words.size / days);
-    mid.appendChild(el('div', 'note',
-      'לכיסוי כל <b>' + S.words.size + '</b> המילים לפני שלב הסגירה צריך <b>' + need +
-      '</b> ביום. ' + (ST.perDay >= need
-        ? 'היעד שלך מספיק.'
-        : 'היעד שלך נמוך מזה — המיון המהיר יקצר את הרשימה, וזה בסדר.')));
-  }
-
   const acts = el('div', 'acts');
-  const go = el('button', 'btn', ST.i === STEPS.length - 1 ? 'למיון המהיר' : 'הבא');
+  const go = el('button', 'btn', ST.i === STEPS.length - 1 ? 'למבחן הרמה' : 'הבא');
   go.onclick = next;
   acts.appendChild(go);
   if (ST.i) {
@@ -120,17 +101,16 @@ function next() {
 }
 function done(goTriage) {
   setPref('exam', ST.exam);
-  setPref('newPerDay', ST.perDay);
-  setPref('onboarded', Date.now());
+    setPref('onboarded', Date.now());
   S.exam = ST.exam;
   ST = null;
   A.closeStudy();
   A.render();
-  if (goTriage === true) setTimeout(() => A.startTriage(120), 120);
+  if (goTriage === true) setTimeout(() => window.AMLomda && window.AMLomda.startPlacement(), 120);
 }
 
 function start() {
-  ST = { i: 0, exam: S.exam, perDay: pref('newPerDay', 35) };
+  ST = { i: 0, exam: S.exam };
   paintStep();
 }
 

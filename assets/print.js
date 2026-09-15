@@ -60,9 +60,7 @@ function sourceWords(keys, upto) {
   if (keys.has('due')) for (const w in cs) if (cs[w].d && cs[w].d <= upto) add(w);
   if (keys.has('stuck')) for (const w in cs) if ((cs[w].af || 0) >= 2 || (cs[w].l || 0) >= 3) add(w);
   if (keys.has('new')) {
-    const pri = ns('prefs');
-    let n = 0;
-    S.words.forEach((o, w) => { if (!cs[w] && (pri['pri.' + w] || 3) === 3 && n < 120) { set.add(w); n++; } });
+    A.newList().slice(0, 120).forEach(add);
   }
   if (keys.has('picked')) (pref('printPick', []) || []).forEach(add);
   return [...set];
@@ -70,7 +68,7 @@ function sourceWords(keys, upto) {
 const SOURCES = [
   ['due',    'מילים בפירעון', 'מה שהתזמון מבקש עד סוף הטווח'],
   ['stuck',  'מילים תקועות',  'אסוציאציה שלא מצילה — נפילות חוזרות'],
-  ['new',    'מילים שלא מוינו', 'עד 120, לפי תדירות במבחנים'],
+  ['new',    'מילים חדשות ברמה', 'עד 120 מהרמה הנוכחית בלומדה'],
   ['picked', 'הבחירה הידנית שלי', 'מה שסימנת מהמאגר'],
 ];
 

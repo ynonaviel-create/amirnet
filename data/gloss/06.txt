@@ -1,0 +1,280 @@
+fair|adj|הוגן; יריד|treating people equally and reasonably|just;equitable
+tour|n|סיור, מסע|a journey visiting several places|trip;excursion
+absolutely|adv|בהחלט, לחלוטין|completely and totally|entirely;utterly
+additional|adj|נוסף|added to what already exists|extra;further
+extra|adj|נוסף, מיותר|more than is usual or needed|additional;spare
+quick|adj|מהיר|done or happening in a short time|fast;rapid
+construction|n|בנייה|the process of building something|building;erection
+episode|n|פרק, אירוע|one part of a series or a single event|installment;incident
+justice|n|צדק|fair treatment according to law or morality|fairness;equity
+photo|n|תמונה, צילום|a picture taken with a camera|photograph;picture
+safety|n|בטיחות, ביטחון|the state of being protected from harm|security;protection
+sun|n|שמש|the star that gives the earth light and heat|daylight;sunshine
+coach|n|מאמן|a person who trains a sports team or individual|trainer;instructor
+collection|n|אוסף|a group of things gathered together|assortment;set
+definitely|adv|בהחלט, בוודאות|without any doubt|certainly;surely
+gun|n|אקדח, רובה|a weapon that fires bullets|firearm;weapon
+heavy|adj|כבד|weighing a lot|weighty;hefty
+dad|n|אבא|father|father;papa
+global|adj|עולמי, כולל|relating to the whole world|worldwide;international
+lady|n|גברת|a polite word for a woman|woman;madam
+nobody|pron|אף אחד|no person|no one;none
+plus|prep|ועוד, בתוספת|added to; and also|and;in addition to
+regular|adj|קבוע, רגיל|happening at fixed times; normal|routine;usual
+secretary|n|מזכיר|a person who handles office work or leads a government department|assistant;clerk
+anymore|adv|יותר (לא עוד)|any longer|any longer;now
+battle|n|קרב|a fight between armed forces or opponents|combat;struggle
+brain|n|מוח|the organ inside the head that controls thought|mind;intellect
+hurt|v|לפגוע, לכאוב|to cause pain or injury|injure;harm
+insurance|n|ביטוח|an arrangement paying for loss or damage|coverage;protection
+majority|n|רוב|the greater number or part|most;bulk
+physical|adj|גופני, פיזי|relating to the body or material things|bodily;material
+pro|n|מקצוען; יתרון|a professional; an argument in favor|professional;advantage
+seriously|adv|ברצינות, באופן חמור|in a serious way; badly|gravely;earnestly
+stupid|adj|טיפשי|lacking intelligence or good sense|foolish;silly
+active|adj|פעיל|busy doing things; working|energetic;busy
+cancer|n|סרטן|a disease of uncontrolled cell growth|tumor;malignancy
+civil|adj|אזרחי; מנומס|relating to citizens; polite|civic;courteous
+defense|n|הגנה|protection against attack|protection;guard
+independent|adj|עצמאי|not controlled by others|self-reliant;autonomous
+master|n|אדון, מומחה|a person with great skill or control|expert;owner
+none|pron|אף אחד, כלום|not any|nothing;not one
+band|n|להקה; רצועה|a group of musicians; a strip|group;strip
+beach|n|חוף|a sandy area by the sea|shore;coast
+cash|n|מזומן|money in coins or notes|money;currency
+commercial|adj|מסחרי|related to buying and selling|business;trade
+fan|n|אוהד; מאוורר|an enthusiastic supporter; a cooling device|supporter;admirer
+multiple|adj|מרובה, רבים|having many parts or examples|numerous;many
+secret|n|סוד|something kept hidden from others|mystery;confidence
+senior|adj|בכיר, ותיק|higher in rank or older|superior;elder
+spring|n|אביב; קפיץ; מעיין|the season after winter; a coil; a water source|springtime;source
+commission|n|ועדה; עמלה|an official group; a fee for a service|committee;fee
+grand|adj|גדול, מפואר|large and impressive|magnificent;splendid
+literally|adv|ממש, מילולית|in the exact sense of the words|actually;exactly
+luck|n|מזל|success or failure caused by chance|fortune;chance
+marriage|n|נישואין|the legal union of two partners|wedding;union
+rich|adj|עשיר|having a lot of money or resources|wealthy;affluent
+skin|n|עור|the outer layer of the body|hide;surface
+sweet|adj|מתוק|tasting of sugar; pleasant|sugary;pleasant
+directly|adv|ישירות|without anything in between|straight;immediately
+gay|adj|הומוסקסואל; עליז|homosexual; cheerful (old use)|homosexual;cheerful
+glad|adj|שמח|pleased and happy|happy;pleased
+overall|adj|כולל, כללי|taking everything into account|total;general
+professor|n|פרופסור|a senior university teacher|lecturer;academic
+crime|n|פשע|an illegal act|offense;wrongdoing
+effective|adj|יעיל, אפקטיבי|producing the intended result|efficient;successful
+fully|adv|לגמרי, במלואו|completely|completely;entirely
+highly|adv|מאוד, במידה רבה|to a great degree|very;extremely
+spot|n|מקום; כתם|a particular place; a small mark|place;stain
+winter|n|חורף|the coldest season of the year|cold season;midwinter
+advice|n|עצה|a suggestion about what to do|guidance;counsel
+block|v|לחסום|to stop movement or progress|obstruct;prevent
+equipment|n|ציוד|the tools needed for a purpose|gear;apparatus
+eventually|adv|בסופו של דבר|in the end, after a long time|finally;ultimately
+primary|adj|עיקרי, ראשוני|main or most important; first|main;chief
+responsible|adj|אחראי|having a duty to deal with something|accountable;liable
+sick|adj|חולה|ill|ill;unwell
+camera|n|מצלמה|a device for taking pictures|recorder;lens
+executive|n|מנהל בכיר|a senior manager in a company|manager;director
+hall|n|אולם, מסדרון|a large room or a passage|auditorium;corridor
+mass|n|מסה, המון|a large amount or crowd; weight of matter|bulk;crowd
+mission|n|משימה, שליחות|an important task or goal|task;assignment
+politics|n|פוליטיקה|activities related to governing|government;public affairs
+pop|v|לפקוע, לקפוץ|to burst or appear suddenly|burst;appear
+status|n|מעמד, מצב|position or condition|rank;standing
+trial|n|משפט; ניסוי|a court case; a test|hearing;experiment
+truly|adv|באמת|really; sincerely|really;genuinely
+weather|n|מזג אוויר|conditions of temperature, rain and wind|climate;conditions
+coffee|n|קפה|a hot drink made from roasted beans|brew;espresso
+division|n|חלוקה; מחלקה|splitting into parts; a department|separation;department
+flight|n|טיסה; בריחה|a journey by air; escape|trip;escape
+freedom|n|חופש|the power to act without restriction|liberty;independence
+heat|n|חום|high temperature|warmth;hotness
+library|n|ספרייה|a place where books are kept for use|archive;collection
+location|n|מיקום|a particular place|place;site
+murder|n|רצח|the deliberate killing of a person|killing;homicide
+actual|adj|ממשי, בפועל|existing in fact|real;genuine
+channel|n|ערוץ, תעלה|a TV station; a passage for water or information|station;passage
+distance|n|מרחק|the space between two points|range;gap
+fat|adj|שמן|having much flesh or fat|overweight;plump
+glass|n|זכוכית; כוס|a hard transparent material; a drinking cup|pane;cup
+mobile|adj|נייד|able to move easily|movable;portable
+northern|adj|צפוני|in or from the north|north;arctic
+powerful|adj|חזק, רב עוצמה|having great power or strength|strong;mighty
+protection|n|הגנה|keeping safe from harm|defense;shelter
+religious|adj|דתי|relating to religion|spiritual;devout
+royal|adj|מלכותי|relating to a king or queen|regal;noble
+slow|adj|איטי|not fast|gradual;sluggish
+species|n|מין (ביולוגי)|a group of similar living things|kind;type
+wonderful|adj|נפלא|extremely good|marvelous;great
+bottom|n|תחתית|the lowest part|base;foot
+engine|n|מנוע|a machine that produces motion|motor;machine
+famous|adj|מפורסם|known by many people|well-known;renowned
+partner|n|שותף, בן זוג|a person who shares an activity or relationship|associate;companion
+sad|adj|עצוב|unhappy|unhappy;sorrowful
+southern|adj|דרומי|in or from the south|south;meridional
+square|n|ריבוע; כיכר|a shape with four equal sides; an open public area|plaza;quadrangle
+twice|adv|פעמיים|two times|double;two times
+brand|n|מותג|a product name of a company|label;trademark
+count|v|לספור; להיחשב|to find the number; to matter|number;matter
+critical|adj|ביקורתי; קריטי|expressing disapproval; extremely important|crucial;disapproving
+digital|adj|דיגיטלי|using computer technology|electronic;computerized
+fresh|adj|טרי, רענן|new or recently made|new;crisp
+lake|n|אגם|a large area of water surrounded by land|pond;lagoon
+mental|adj|נפשי, שכלי|relating to the mind|psychological;intellectual
+mouth|n|פה|the opening in the face for eating and speaking|lips;opening
+owner|n|בעלים|a person who owns something|proprietor;holder
+smart|adj|חכם|intelligent|clever;intelligent
+totally|adv|לגמרי|completely|completely;entirely
+budget|n|תקציב|a plan for spending money|allowance;funds
+click|v|ללחוץ, להקיש|to press a button on a mouse or make a short sound|press;tap
+estate|n|אחוזה; נכסים|a large property; everything a person owns|property;assets
+faith|n|אמונה|strong belief or trust|belief;trust
+fashion|n|אופנה|a popular style of clothes or behavior|style;trend
+hill|n|גבעה|a raised area of land, lower than a mountain|mound;slope
+metal|n|מתכת|a hard material such as iron or gold|alloy;ore
+profile|n|פרופיל, תיאור|a short description; a side view|outline;portrait
+sexual|adj|מיני|relating to sex|erotic;intimate
+foundation|n|יסוד; קרן|the base of something; a charitable organization|basis;institution
+prime|adj|עיקרי, מעולה|main; of the best quality|main;chief
+silver|n|כסף (מתכת)|a shiny gray precious metal|argent;sterling
+soul|n|נשמה|the spiritual part of a person|spirit;psyche
+spread|v|להתפשט, לפזר|to extend over a larger area|expand;scatter
+weird|adj|מוזר|strange and unusual|strange;odd
+apparently|adv|כנראה, לכאורה|as it seems|seemingly;evidently
+artist|n|אמן|a person who creates art|painter;creator
+chairman|n|יושב ראש|the person in charge of a meeting or company|chair;president
+edition|n|מהדורה|a particular version of a published work|version;issue
+grade|n|ציון; כיתה; דרגה|a mark; a school year; a level|mark;level
+healthy|adj|בריא|in good health|well;fit
+prison|n|כלא|a building where criminals are kept|jail;penitentiary
+stone|n|אבן|a hard piece of rock|rock;pebble
+strength|n|כוח, חוזק|the quality of being strong|power;might
+wild|adj|פראי|living in nature, not controlled|untamed;savage
+winner|n|מנצח|a person who wins|victor;champion
+bag|n|תיק, שקית|a container for carrying things|sack;pouch
+bet|v|להמר|to risk money on a result|gamble;wager
+camp|n|מחנה|a place with tents or temporary shelters|campsite;base
+cast|v|להטיל; ללהק|to throw; to choose actors|throw;fling
+correct|adj|נכון|without mistakes|right;accurate
+dangerous|adj|מסוכן|likely to cause harm|hazardous;risky
+extremely|adv|מאוד, בקיצוניות|to a very great degree|very;exceedingly
+handle|v|לטפל, להתמודד|to deal with something|manage;cope with
+negative|adj|שלילי|bad or harmful; expressing no|adverse;unfavorable
+spirit|n|רוח|the nonphysical part of a person; mood|soul;morale
+till|prep|עד|until|until;up to
+aware|adj|מודע|knowing about something|conscious;informed
+cat|n|חתול|a small furry pet animal|kitten;feline
+dinner|n|ארוחת ערב|the main meal of the evening|supper;meal
+eastern|adj|מזרחי|in or from the east|east;oriental
+gift|n|מתנה; כישרון|a present; a natural talent|present;talent
+impossible|adj|בלתי אפשרי|not able to happen|unachievable;unattainable
+progress|n|התקדמות|movement forward or improvement|advance;development
+proud|adj|גאה|feeling pleased about an achievement|pleased;honored
+shut|v|לסגור|to close|close;seal
+van|n|טנדר, מסחרית|a vehicle for carrying goods|truck;minibus
+wood|n|עץ (חומר); יער|material from trees; a small forest|timber;forest
+birth|n|לידה|the start of life; the beginning|delivery;origin
+concept|n|מושג, רעיון|an abstract idea|idea;notion
+copy|n|עותק|a thing made to be like another|duplicate;replica
+dear|adj|יקר|loved; expensive|beloved;costly
+journal|n|כתב עת; יומן|a professional magazine; a diary|periodical;diary
+labor|n|עבודה; לידה|physical work; the process of giving birth|work;toil
+leadership|n|מנהיגות|the act or ability of leading|guidance;direction
+length|n|אורך|how long something is|extent;duration
+neither|conj|אף אחד משניים|not one nor the other|nor;not either
+onto|prep|אל, על גבי|moving to a position on|on;upon
+possibly|adv|אולי|perhaps|perhaps;maybe
+software|n|תוכנה|computer programs|programs;applications
+tough|adj|קשוח, קשה|difficult; strong|hard;rugged
+ad|n|מודעה, פרסומת|an advertisement|advertisement;commercial
+alive|adj|חי|living|living;existing
+boss|n|בוס, מנהל|the person in charge at work|manager;supervisor
+connection|n|קשר, חיבור|a link between things or people|link;relationship
+fellow|n|עמית, בחור|a man; a person in the same group|companion;colleague
+horse|n|סוס|a large animal used for riding|stallion;mare
+magic|n|קסם|supernatural power or tricks|sorcery;wizardry
+map|n|מפה|a drawing of an area showing places|chart;plan
+net|n|רשת|material with holes, used for catching|mesh;web
+stick|v|להדביק, להיתקע|to attach or become fixed|attach;adhere
+wake|v|להתעורר|to stop sleeping|awaken;rise
+aid|n|עזרה, סיוע|help or support|assistance;support
+beauty|n|יופי|the quality of being beautiful|loveliness;attractiveness
+corner|n|פינה|where two lines or walls meet|angle;bend
+criminal|n|פושע|a person who commits a crime|offender;lawbreaker
+cultural|adj|תרבותי|relating to culture|artistic;ethnic
+driver|n|נהג|a person who drives a vehicle|motorist;chauffeur
+farm|n|חווה|land used for growing crops or animals|ranch;plantation
+guide|n|מדריך|a person or book that shows the way|leader;manual
+investigation|n|חקירה|a careful examination to find facts|inquiry;probe
+slightly|adv|מעט, קצת|a little|somewhat;marginally
+technical|adj|טכני|relating to practical skills or machines|technological;mechanical
+unique|adj|ייחודי|being the only one of its kind|singular;distinctive
+violence|n|אלימות|physical force meant to hurt|brutality;force
+youth|n|נוער, צעירות|the time of being young; young people|adolescence;young people
+appreciate|v|להעריך|to value or be grateful for|value;be thankful for
+dry|adj|יבש|without water or moisture|arid;parched
+evil|adj|רשע, רע|morally very bad|wicked;sinful
+forever|adv|לנצח|for all time|eternally;always
+injury|n|פציעה|physical harm to the body|wound;harm
+iron|n|ברזל; מגהץ|a strong metal; a tool for pressing clothes|steel;metal
+lovely|adj|מקסים|very pleasant or attractive|delightful;charming
+mad|adj|משוגע; כועס|insane; angry|crazy;furious
+religion|n|דת|belief in and worship of a god|faith;belief
+somewhere|adv|איפשהו|in some place|someplace;anywhere
+web|n|רשת|a network; the internet|network;internet
+wine|n|יין|an alcoholic drink made from grapes|vintage;alcohol
+blog|n|בלוג|a personal website with regular posts|online journal;column
+core|n|ליבה|the central or most important part|center;heart
+democratic|adj|דמוקרטי|based on rule by the people|popular;representative
+description|n|תיאור|an account of what something is like|account;portrayal
+excellent|adj|מצוין|extremely good|outstanding;superb
+medicine|n|תרופה; רפואה|a drug; the science of treating illness|drug;medication
+mountain|n|הר|a very high hill|peak;summit
+nuclear|adj|גרעיני|relating to atomic energy|atomic;nuclear-powered
+port|n|נמל|a town or place where ships stop|harbor;dock
+reaction|n|תגובה|a response to something|response;reply
+shoot|v|לירות; לצלם|to fire a weapon; to film|fire;film
+solid|adj|מוצק, יציב|hard and firm; reliable|firm;sturdy
+stress|n|לחץ; דגש|mental pressure; emphasis|pressure;emphasis
+taste|n|טעם|the flavor of something; personal preference|flavor;preference
+tea|n|תה|a hot drink made from leaves|infusion;brew
+victory|n|ניצחון|success in a fight or competition|win;triumph
+assistant|n|עוזר|a person who helps|helper;aide
+classic|adj|קלאסי|of lasting high quality|traditional;timeless
+electric|adj|חשמלי|powered by electricity|electrical;powered
+emergency|n|מקרה חירום|a sudden dangerous situation|crisis;urgency
+failure|n|כישלון|lack of success|defeat;collapse
+festival|n|פסטיבל, חג|an organized celebration|celebration;fair
+flat|adj|שטוח|level and smooth|level;even
+fuel|n|דלק|a material burned to produce energy|gas;petrol
+hello|n|שלום|a greeting|hi;greeting
+ill|adj|חולה|sick|sick;unwell
+kick|v|לבעוט|to hit with the foot|boot;strike
+mail|n|דואר|letters and packages sent by post|post;letters
+massive|adj|עצום, מסיבי|very large and heavy|huge;enormous
+pair|n|זוג|two things that go together|couple;set
+plane|n|מטוס; מישור|an aircraft; a flat surface|aircraft;surface
+plenty|n|שפע, הרבה|a large enough amount|abundance;lots
+proper|adj|ראוי, מתאים|correct or suitable|appropriate;right
+regional|adj|אזורי|relating to a region|local;district
+session|n|מושב, מפגש|a period for a particular activity|meeting;period
+sky|n|שמיים|the space above the earth|heavens;air
+transfer|v|להעביר|to move from one place to another|move;shift
+upper|adj|עליון|higher in position|higher;top
+valley|n|עמק|low land between hills|dale;basin
+accident|n|תאונה|an unexpected harmful event|crash;mishap
+alternative|n|חלופה|another possible choice|option;substitute
+anywhere|adv|בכל מקום|in or to any place|wherever;any place
+boat|n|סירה|a small vessel for traveling on water|vessel;ship
+capacity|n|קיבולת; יכולת|the maximum amount; ability|volume;ability
+cheap|adj|זול|low in price|inexpensive;economical
+climate|n|אקלים|the usual weather of a place|weather;atmosphere
+duty|n|חובה; מכס|a moral or legal obligation; a tax|obligation;tax
+fantastic|adj|נפלא, דמיוני|extremely good; imaginary|wonderful;fanciful
+governor|n|מושל|the official head of a state or region|ruler;administrator
+industrial|adj|תעשייתי|relating to industry|manufacturing;commercial
+mix|v|לערבב|to combine things together|blend;combine
+museum|n|מוזיאון|a building displaying objects of interest|gallery;exhibition
+path|n|שביל, נתיב|a way for walking; a course|trail;route
+remove|v|להסיר|to take something away|eliminate;take away

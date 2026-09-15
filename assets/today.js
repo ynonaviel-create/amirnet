@@ -88,18 +88,13 @@ function missionCard(v, m) {
 }
 
 function home(v) {
-  const p = A.plan(), d = A.day(), nTri = A.untriaged().length;
   const left = between(today(), S.exam);
   const bud = budget();
   const acc = accuracy();
   const mist = MISTAKES(), stuck = stuckWords();
 
-  /* השורה העליונה — ארבעה מספרים, בלי פרשנות */
-  v.appendChild(el('div', 'figs',
-    '<div class="fig due"><span class="n">' + p.dueN + '</span><span class="k">לחזרה</span></div>' +
-    '<div class="fig new"><span class="n">' + p.newN + '</span><span class="k">חדשות</span></div>' +
-    '<div class="fig"><span class="n">' + d.rev + '</span><span class="k">היום</span></div>' +
-    '<div class="fig"><span class="n">' + A.streak() + '</span><span class="k">רצף</span></div>'));
+  /* הלומדה ראשונה: אוצר מילים הוא 12 מתוך 23 השאלות */
+  if (window.AMLomda) window.AMLomda.homeCard(v);
 
   if (!bud.min) {
     v.appendChild(el('div', 'sec',
@@ -110,30 +105,6 @@ function home(v) {
 
   /* ---- בניית המשימה ---- */
   const M = [];
-
-  const TRI_BATCH = 120;
-  if (nTri) {
-    const batch = Math.min(nTri, TRI_BATCH);
-    M.push({
-      title: 'מיון מהיר · ' + batch + ' מילים', mode: 'exam',
-      time: mmss(Math.max(1, batch * 3 / 60)),
-      why: '<b>' + nTri + '</b> מילים במאגר שעוד לא אמרת עליהן כלום. כל מילה שתסמן כידועה ' +
-           'יוצאת מהתור וחוזרת פעם אחת בלבד לפני המבחן — ככה לא תבזבז ימים על מה שכבר בראש.',
-      go: () => A.startTriage(TRI_BATCH),
-    });
-  }
-
-  const cards = p.dueN + p.newN;
-  if (cards) M.push({
-    title: 'אוצר מילים', mode: 'exam',
-    time: mmss(cards * 11 / 60),
-    why: p.dueN
-      ? '<b>' + p.dueN + '</b> כרטיסים בפירעון היום' + (p.newN ? ' ו‑<b>' + p.newN + '</b> חדשים' : '') +
-        '. כרטיס שנדחה יורד ביציבות ומחייב חזרה מוקדמת יותר.'
-      : '<b>' + p.newN + '</b> מילים חדשות. אין כרגע חוב חזרות.',
-    done: d.rev ? A.plural(d.rev, 'כרטיס אחד כבר נעשה היום', 'כרטיסים כבר נעשו היום') : null,
-    go: A.startStudy,
-  });
 
   /* פרק אמת. זה הליבה של התוכנית — קורסים, מילים, והרבה פרקים —
      ולכן הוא במשימה כל יום ולא רק כשמשהו חלש. */
@@ -236,39 +207,31 @@ function home(v) {
   if (left <= 12 && left >= 0) {
     v.appendChild(el('div', 'note',
       '<b style="color:var(--warn)">מצב סגירה.</b> נשארו ' + left +
-      ' ימים — יעד הזכירה הועלה ל‑94% ואף מילה לא מתוזמנת אחרי המבחן.'));
+      ' ימים. זה הזמן לתרגל יותר ולסנן פחות — ואף מילה לא מתוזמנת אחרי המבחן.'));
   }
 
   maturity(v);
 }
 
-/* ---------- בשלות המאגר ---------- */
+/* ---------- המאגר לפי רמות ----------
+   פס לכל רמה: כמה ממנה כבר מאחוריך (ידועה, בתרגול, שוחררה, מתחת לכניסה). */
 function maturity(v) {
-  const cnt = { new: 0, young: 0, solid: 0, strong: 0 };
-  S.words.forEach((o, w) => { cnt[bucket(card(w))]++; });
-  const tot = S.words.size || 1;
+  const L = window.AMLomda;
+  if (!L || !L.startLevel()) return;
   const sec = el('div', 'sec');
-  sec.appendChild(el('span', 'eyebrow', 'המאגר · ' + S.words.size + ' מילים ממבחני אמת'));
-  sec.appendChild(el('div', 'bar',
-    '<i style="width:' + (cnt.strong / tot * 100) + '%;background:var(--good)"></i>' +
-    '<i style="width:' + (cnt.solid / tot * 100) + '%;background:var(--accent);opacity:.7"></i>' +
-    '<i style="width:' + (cnt.young / tot * 100) + '%;background:var(--warn);opacity:.6"></i>'));
-  sec.appendChild(el('div', 'legend',
-    '<span><i class="dot" style="background:var(--good)"></i>מבוססות ' + cnt.strong + '</span>' +
-    '<span><i class="dot" style="background:var(--accent);opacity:.7"></i>יציבות ' + cnt.solid + '</span>' +
-    '<span><i class="dot" style="background:var(--warn);opacity:.6"></i>טריות ' + cnt.young + '</span>' +
-    '<span><i class="dot" style="background:var(--surface-2)"></i>טרם נלמדו ' + cnt.new + '</span>'));
-
-  const rem = cnt.new;
-  if (rem) {
-    const days = Math.max(1, studyDaysLeft(today(), S.exam) - 10);
-    const need = Math.ceil(rem / days);
-    sec.appendChild(el('div', 'note',
-      'נותרו <b>' + rem + '</b> מילים שלא נגעת בהן, ו‑<b>' + Math.round(studyDaysLeft(today(), S.exam)) +
-      '</b> ימי לימוד בפועל עד המבחן (שבתות וחגים כבר מנוכים). כדי לכסות אותן לפני שלב הסגירה ' +
-      'צריך <b>' + need + ' מילים חדשות ביום</b> — היעד הנוכחי הוא ' + A.pref('newPerDay', 35) +
-      (need <= A.pref('newPerDay', 35) ? ' ומספיק.' : ' ולא יספיק.')));
+  const top = L.maxLevel(), cur = L.currentLevel();
+  sec.appendChild(el('span', 'eyebrow', 'המאגר · ' + top + ' רמות'));
+  const grid = el('div', 'lvgrid');
+  for (let lv = 1; lv <= top; lv++) {
+    const st = L.levelStats(lv);
+    const done = st.total - st.new;
+    const pct = st.total ? Math.round(done / st.total * 100) : 0;
+    grid.appendChild(el('div', 'lv' + (lv === cur ? ' cur' : '') + (pct === 100 ? ' full' : ''),
+      '<b>' + lv + '</b><i style="height:' + pct + '%"></i>'));
   }
+  sec.appendChild(grid);
+  sec.appendChild(el('p', 'note', 'רמה נמוכה = מילה נפוצה יותר = משפיעה יותר על הציון. ' +
+    'זה בסדר גמור לא להגיע לרמות הגבוהות — העיקר להתקדם.'));
   v.appendChild(sec);
 }
 

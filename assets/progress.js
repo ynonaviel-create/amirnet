@@ -204,31 +204,27 @@ async function view(v) {
   maturity(v);
 }
 
-/* ---------- בשלות וקצב ---------- */
+/* ---------- הלומדה במספרים ---------- */
 function maturity(v) {
-  const cnt = { new: 0, young: 0, solid: 0, strong: 0 };
-  S.words.forEach((o, w) => { cnt[bucket(card(w))]++; });
-  const tot = S.words.size || 1;
+  const L = window.AMLomda;
+  if (!L) return;
+  const cnt = { master: 0, drill: 0, learn: 0, known: 0, placed: 0, new: 0 };
+  S.words.forEach((o, w) => { if (o.he && o.lv) cnt[L.status(w)]++; });
+  const tot = Object.values(cnt).reduce((a, b) => a + b, 0) || 1;
   const s = el('div', 'sec');
-  s.appendChild(el('span', 'eyebrow', 'המאגר וקצב הכיסוי'));
-  s.appendChild(el('div', 'bar',
-    '<i style="width:' + (cnt.strong / tot * 100) + '%;background:var(--good)"></i>' +
-    '<i style="width:' + (cnt.solid / tot * 100) + '%;background:var(--accent);opacity:.7"></i>' +
-    '<i style="width:' + (cnt.young / tot * 100) + '%;background:var(--warn);opacity:.6"></i>'));
-  s.appendChild(el('div', 'legend',
-    '<span><i class="dot" style="background:var(--good)"></i>מבוססות ' + cnt.strong + '</span>' +
-    '<span><i class="dot" style="background:var(--accent);opacity:.7"></i>יציבות ' + cnt.solid + '</span>' +
-    '<span><i class="dot" style="background:var(--warn);opacity:.6"></i>טריות ' + cnt.young + '</span>' +
-    '<span><i class="dot" style="background:var(--surface-2)"></i>טרם נלמדו ' + cnt.new + '</span>'));
-  if (cnt.new) {
-    const days = Math.max(1, studyDaysLeft(today(), S.exam) - 10);
-    const need = Math.ceil(cnt.new / days);
-    const goal = pref('newPerDay', 35);
-    s.appendChild(el('div', 'note',
-      '<b>' + cnt.new + '</b> מילים שלא נגעת בהן ו-<b>' + Math.round(studyDaysLeft(today(), S.exam)) +
-      '</b> ימי לימוד בפועל עד המבחן (שבתות וחגים מנוכים). לכיסוי לפני שלב הסגירה ' +
-      'צריך <b>' + need + '</b> ביום, והיעד הנוכחי הוא ' + goal +
-      (need <= goal ? ' — מספיק.' : ' — לא יספיק.')));
+  s.appendChild(el('span', 'eyebrow', 'הלומדה · ' + tot + ' מילים'));
+  const seg = [['master', 'var(--good)', 'שוחררו'], ['drill', 'var(--accent)', 'בתרגול'],
+               ['learn', 'var(--warn)', 'לשינון'], ['known', 'var(--good-ln)', 'ידועות'],
+               ['placed', 'var(--line)', 'מתחת לכניסה']];
+  s.appendChild(el('div', 'bar', seg.map(([k, c]) =>
+    '<i style="width:' + (cnt[k] / tot * 100) + '%;background:' + c + '"></i>').join('')));
+  s.appendChild(el('div', 'legend', seg.map(([k, c, he]) =>
+    '<span><i class="dot" style="background:' + c + '"></i>' + he + ' ' + cnt[k] + '</span>').join('') +
+    '<span><i class="dot" style="background:var(--surface-2)"></i>חדשות ' + cnt.new + '</span>'));
+  if (L.startLevel()) {
+    s.appendChild(el('div', 'note', 'רמת כניסה <b>' + L.startLevel() + '</b> · רמה נוכחית <b>' +
+      L.currentLevel() + '</b> מתוך ' + L.maxLevel() + '. ' +
+      A.plural(L.hotWords().length, 'מילה אחת נשכחה', 'מילים נשכחו') + ' ותחזור בתרגולים הקרובים.'));
   }
   v.appendChild(s);
 }

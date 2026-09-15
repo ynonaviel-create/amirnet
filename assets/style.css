@@ -783,3 +783,45 @@ textarea.t { min-height: 84px; resize: vertical; line-height: 1.5; }
 
 /* הקטע נשאר על המסך ושומר על הגלילה הפנימית שלו בין שאלות */
 #pass { flex: none; }
+
+/* ================= הלומדה ================= */
+.opt.he-opt { direction: rtl; text-align: right; font-family: inherit; font-size: var(--fs-md); }
+.opt.he-opt .num { margin-inline-end: 10px; }
+.he.hq { font-size: clamp(26px, 8vw, 34px); font-weight: 700; line-height: 1.25; }
+.head-en.sm { font-size: clamp(24px, 7vw, 30px); }
+.en-in { font-family: var(--font-en); direction: ltr; unicode-bidi: isolate; }
+.t.en-input { direction: ltr; text-align: center; font-family: var(--font-en); font-size: var(--fs-en-lg); }
+.t.en-input.right { border-color: var(--good); background: var(--good-bg); }
+.t.en-input.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.fb { width: 100%; max-width: 46ch; margin-top: 8px; padding: 12px; border-radius: 10px;
+      background: var(--surface-2); border: 1px solid var(--line); display: flex; flex-direction: column;
+      align-items: center; gap: 6px; }
+.mem-assoc { width: 100%; max-width: 46ch; text-align: right; }
+
+.kinds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.kind { padding: 14px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+        background: var(--surface-solid); font-weight: 600; font-size: var(--fs-base); min-height: 56px; }
+.kind small { display: block; font-weight: 400; font-size: var(--fs-xs); color: var(--accent); margin-top: 3px; }
+.kind.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+
+.spin { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--surface-2);
+        border-top-color: var(--accent); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
+
+.lomda-home { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.lomda-home .figs { margin-top: 10px; }
+.lomda-home .btn { margin-top: 10px; width: 100%; }
+.lomda-home .bar { margin-top: 6px; }
+.lh-t { font-weight: 700; font-size: var(--fs-md); margin-top: 2px; }
+.lh-row { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--muted); margin-top: 6px; }
+
+.lvgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 5px; }
+.lv { position: relative; height: 44px; border-radius: 7px; background: var(--surface-2); overflow: hidden;
+      border: 1px solid var(--line); }
+.lv i { position: absolute; inset-inline: 0; bottom: 0; background: var(--accent); opacity: .35; }
+.lv.full i { background: var(--good); opacity: .45; }
+.lv b { position: relative; z-index: 1; display: block; text-align: center; line-height: 42px;
+        font-family: "IBM Plex Mono", monospace; font-size: var(--fs-xs); }
+.lv.cur { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.lvtag { font-family: "IBM Plex Mono", monospace; font-size: .7em; color: var(--dim); font-weight: 400; }
